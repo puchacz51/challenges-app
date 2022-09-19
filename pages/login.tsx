@@ -1,10 +1,19 @@
 import { NextPage } from 'next';
-import LoginOptions from '../components/forms/loginOptions';
+import { useRef } from 'react';
+import LoginOptions from '../components/forms/LoginOptions';
+import { authApi, useSignWithProviderQuery } from '../services/Store/authApi';
+import { supabase } from '../services/supabase/supabase';
 
 const LoginPage = (): JSX.Element => {
+  const { data,refetch,isFetching } = useSignWithProviderQuery('github');
+
   return (
     <main className='min-h-screen'>
-      <LoginOptions></LoginOptions>
+      <button onClick={refetch}>
+        click me
+      </button>
+      {/* <LoginOptions></LoginOptions> */}
+      {JSON.stringify(supabase.auth.user()?.email)}
     </main>
   );
 };
