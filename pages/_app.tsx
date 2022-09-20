@@ -5,9 +5,23 @@ import { Provider, useDispatch } from 'react-redux';
 import { supabase } from '../services/supabase/supabase';
 import { setCredentials } from '../services/Store/authSlice';
 import axios from 'axios';
+import { GetServerSideProps } from 'next';
+import { useEffect } from 'react';
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
+  console.log(22);
+  
+
+  return { props: { user, token } };
+};
+
 function MyApp({ Component, pageProps }) {
   const store = useStore(pageProps.inialReduxState);
   const dispatch = store.dispatch;
+  useEffect(() => {
+    dispatch(setCredentials(pageProps));
+  }, []);
 
   supabase.auth.onAuthStateChange((event, session) => {
     axios.post('/api/set-auth-cookie', {
@@ -21,7 +35,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <Provider store={store}>
       <Layout>
-        {JSON.stringify(pageProps)} <Component {...pageProps} />
+        <Component {...pageProps} />
       </Layout>
     </Provider>
   );
