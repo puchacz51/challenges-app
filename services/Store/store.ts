@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { authApi } from './authApi';
 import authSlice  from './authSlice';
 import { fakeApi } from './fakeApi';
+import pageSlice from './pageSlice';
 
 let store;
 const initialState = {};
@@ -12,6 +13,7 @@ const initStore = (preloadedState = initialState) =>
       [authApi.reducerPath]: authApi.reducer,
       [fakeApi.reducerPath]: fakeApi.reducer,
       user: authSlice,
+      page:pageSlice
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(authApi.middleware, fakeApi.middleware),

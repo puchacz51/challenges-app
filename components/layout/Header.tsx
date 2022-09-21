@@ -3,7 +3,16 @@ import { FaBars, FaUser } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 const Header = (): JSX.Element => {
   const user = useSelector((state) => state.user);
+  const { path } = useSelector((state) => state.page);
 
+  if (path == '/login') {
+    return (
+      <>
+        <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase'>LOGO</header>
+        <div className='w-full text-transparent p-2 text-4xl '>g</div>
+      </>
+    );
+  }
   return (
     <>
       <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase'>
@@ -16,10 +25,9 @@ const Header = (): JSX.Element => {
 };
 
 const UserProfileBtn = ({ user }) => {
-  
   return (
     <button className='border-2 border-sky'>
-      {user.user?.email ??  <FaUser />}
+      {user.user?.email ?? <FaUser />}
     </button>
   );
 };

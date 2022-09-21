@@ -5,22 +5,22 @@ import { Provider, useDispatch } from 'react-redux';
 import { supabase } from '../services/supabase/supabase';
 import { setCredentials } from '../services/Store/authSlice';
 import axios from 'axios';
-import { GetServerSideProps } from 'next';
 import { useEffect } from 'react';
+import { setPath } from '../services/Store/pageSlice';
+import { useRouter } from 'next/router';
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
-  console.log(22);
-  
-
-  return { props: { user, token } };
-};
-
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
   const store = useStore(pageProps.inialReduxState);
   const dispatch = store.dispatch;
+  const router = useRouter();
   useEffect(() => {
-    dispatch(setCredentials(pageProps));
+    const { user, access_token: token } = supabase.auth.session() ?? {
+      user: null,
+      access_token: null,
+    };
+
+    dispatch(setCredentials({ user, token }));
+    dispatch(setPath(router.pathname));
   }, []);
 
   supabase.auth.onAuthStateChange((event, session) => {
@@ -29,7 +29,7 @@ function MyApp({ Component, pageProps }) {
       session,
     });
     dispatch(
-      setCredentials({ user: session.user, token: session.access_token })
+      setCredentials({ user: session?.user, token: session?.access_token })
     );
   });
   return (
@@ -40,5 +40,3 @@ function MyApp({ Component, pageProps }) {
     </Provider>
   );
 }
-
-export default MyApp;
