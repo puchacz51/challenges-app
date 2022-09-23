@@ -14,12 +14,14 @@ const LoginOptions = (): JSX.Element => {
       <input type='text' name='email' className='m-2 rounded-md text-lg' />
       <label htmlFor='password'></label>
       <input type='text' name='password' />
-      <button className='' onClick={() => signInWithEmail('bar-sowo@wp.pl','Puchacz1')}>
+      <button
+        className=''
+        onClick={() => signInWithEmail('bar-sowo@wp.pl', 'Puchacz1')}>
         sign in
       </button>
       <h2 className=''>other options</h2>
 
-      <button onClick={signInWithGitHub}>
+      <button onClick={(e) => signInWithGitHub(e, 'http://localhost:3000')}>
         <FaGithub />
       </button>
       <Link href='/register'>
