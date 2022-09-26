@@ -1,10 +1,9 @@
-import {Form} from 'formik'
-
-const AddChellengeForm = ()->{
+import {Formik} from 'formik'
+const AddChellengeForm = ()=>{
 
 
   return(
-	
+	<Formik></Formik>
 
   )
 }
