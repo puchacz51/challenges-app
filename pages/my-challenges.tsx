@@ -1,10 +1,16 @@
-import { NextPage } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next';
 import Image from 'next/image';
-import { Form } from 'formik';
+import { parseCookies } from 'nookies';
+import { AddChellengeForm } from '../components/forms/AddChellenge';
+import { getCurrentUser, setCredentials } from '../services/Store/authSlice';
+import { supabase } from '../services/supabase/supabase';
+
+
 const myChallenges: NextPage = () => {
   return (
     <main className='flex flex-col '>
       <ChellengesOption />
+      <AddChellengeForm />
       <ChellengesList />
     </main>
   );

@@ -11,17 +11,13 @@ import { supabase } from '../services/supabase/supabase';
 // };
 
 export default function Home(props) {
-  const { data, isLoading } = useGetTimeQuery('1');
-  const all = useGetTimeQuery('2');
   return (
     <main>
-      {!isLoading && <Nn />}
     </main>
   );
 }
 
 const Nn = () => {
-  const user = supabase.auth.user();
 
   const logIn = () => {
     supabase.auth.signIn({ email: 'bar-sowa@wp.pl', password: 'JAnek1234;' });
