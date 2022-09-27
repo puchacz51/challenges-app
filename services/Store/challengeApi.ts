@@ -23,6 +23,7 @@ export const challengeApi = createApi({
       },
     }),
     getMyChallenge: build.query({
+
       async queryFn(_, { getState }) {
         const myId = getState();
         console.log('zle');
@@ -39,6 +40,7 @@ export const challengeApi = createApi({
 
         return { data: result };
       },
+
     }),
   }),
 });

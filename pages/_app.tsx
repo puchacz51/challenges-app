@@ -11,7 +11,6 @@ import { dispatch, useStore } from '../services/Store/store';
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
   const store = useStore();
-
   useEffect(() => {
     const { user, access_token, refresh_token } = supabase.auth.session() ?? {
       user: null,
@@ -20,20 +19,15 @@ const MyApp = ({ Component, pageProps }) => {
     setCookie(null, 'sb-refresh-token', refresh_token);
     setCookie(null, 'sb-access-token', access_token);
 
-    dispatch(setCredentials({ user, access_token, refresh_token }));
+    dispatch(setCredentials({ user, token: access_token }));
   }, []);
 
   supabase.auth.onAuthStateChange((event, session) => {
-    // axios.post('/api/set-auth-cookie', {
-    //   event,
-    //   session,
-    // });
     if (!session) return;
     dispatch(
       setCredentials({
         user: session?.user,
-        access_token: session.access_token,
-        refresh_token: session.refresh_token,
+        token: session.access_token,
       })
     );
   });

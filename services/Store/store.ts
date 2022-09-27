@@ -1,5 +1,7 @@
 import { configureStore, Store } from '@reduxjs/toolkit';
+import next from 'next';
 import { createWrapper } from 'next-redux-wrapper';
+import { useContext } from 'react';
 import { authApi } from './authApi';
 import authSlice from './authSlice';
 import { challengeApi } from './challengeApi';
@@ -9,7 +11,7 @@ const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [challengeApi.reducerPath]: challengeApi.reducer,
-    user: authSlice,
+    authInfo: authSlice,
     page: pageSlice,
   },
   middleware: (getDefaultMiddleware) =>

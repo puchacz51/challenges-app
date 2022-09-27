@@ -1,12 +1,31 @@
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next';
 import Image from 'next/image';
 import { parseCookies } from 'nookies';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { AddChellengeForm } from '../components/forms/AddChellenge';
 import { getCurrentUser, setCredentials } from '../services/Store/authSlice';
+import { useGetMyChallengesQuery } from '../services/Store/challengeApi';
 import { supabase } from '../services/supabase/supabase';
 
+const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const result = await supabase.auth.api.getUserByCookie(ctx.req);
+  const { user, token } = result || { user: null, token: null };
 
-const myChallenges: NextPage = () => {
+  if (!user || !token) return { redirect: '/login' };
+  return { props: { user, token } };
+};
+
+export { getServerSideProps };
+
+const MyChallenges: NextPage = (props) => {
+  const {user} = useSelector(state=>state.authInfo)
+  const{status}= useGetMyChallengesQuery('my', { skip: !user?.id });
+  console.log(!user?.id,status);
+
+  useEffect(() => {
+    setCredentials(props);
+  }, []);
   return (
     <main className='flex flex-col '>
       <ChellengesOption />
@@ -16,7 +35,7 @@ const myChallenges: NextPage = () => {
   );
 };
 
-export default myChallenges;
+export default MyChallenges;
 
 const ChellengesOption: JSX.Element = () => {
   return (

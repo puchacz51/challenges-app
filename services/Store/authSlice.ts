@@ -5,36 +5,20 @@ import type { RootState } from './store';
 import { supabase } from '../supabase/supabase';
 type AuthState = {
   user: User | null;
-  refresh_token: string | null;
-  access_token: string | null;
+  token: string | null;
 };
-const { user, refresh_token, access_token } =
-  typeof window === 'undefined'
-    ? {
-        user: null,
-        access_token: null,
-        refresh_token: null,
-      }
-    : {
-        user: null,
-        access_token: null,
-        refresh_token: null,
-      };
 
-  const initialState = { user, refresh_token, access_token };
-console.log(supabase.auth.session());
+const initialState = {
+  user: null,
+  token: null,
+};
 
 const authSlice = createSlice({
-  name: 'user',
+  name: 'authInfo',
   initialState,
   reducers: {
     setCredentials: (state, action: PayloadAction<AuthState>) => {
-      state = action.payload;
-    },
-    getCurrentUser: (state) => {
-      console.log(state);
-
-      return state;
+      return action.payload;
     },
   },
 });
