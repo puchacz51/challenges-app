@@ -1,6 +1,8 @@
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/dist/query/react';
 import { HYDRATE } from 'next-redux-wrapper';
 import { supabase } from '../supabase/supabase';
+import { setCredentials } from './authSlice';
+import { store } from './store';
 export const challengeApi = createApi({
   baseQuery: fakeBaseQuery(),
   tagTypes: ['chellenge'],
@@ -8,10 +10,9 @@ export const challengeApi = createApi({
   endpoints: (build) => ({
     getMyChallenges: build.query({
       async queryFn(args, { getState }) {
-        const myId = getState();
-        console.log(myId);
+        const myId = 2;
 
-        if (!true) {
+        if (!myId) {
           return { error: 'not logged user' };
         }
         const result = supabase
@@ -23,14 +24,11 @@ export const challengeApi = createApi({
       },
     }),
     getMyChallenge: build.query({
-
       async queryFn(_, { getState }) {
         const myId = getState();
-        console.log('zle');
+        console.log(myId, 33);
 
-        console.log(myId, 34242);
-
-        if (true) {
+        if (!myId) {
           return { error: 'not logged user' };
         }
         const result = supabase
@@ -40,9 +38,8 @@ export const challengeApi = createApi({
 
         return { data: result };
       },
-
     }),
   }),
 });
 
-export const { useGetMyChallengeQuery, useGetMyChallengesQuery } = challengeApi;
+export const { useGetMyChallengeQuery } = challengeApi;

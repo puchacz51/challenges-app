@@ -1,23 +1,18 @@
-import { configureStore, Store } from '@reduxjs/toolkit';
-import next from 'next';
-import { createWrapper } from 'next-redux-wrapper';
-import { useContext } from 'react';
-import { authApi } from './authApi';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authSlice from './authSlice';
-import { challengeApi } from './challengeApi';
 import pageSlice from './pageSlice';
+const reducer = combineReducers({
+  authInfo: authSlice,
+  page: pageSlice,
+});
 
 const store = configureStore({
-  reducer: {
-    [authApi.reducerPath]: authApi.reducer,
-    [challengeApi.reducerPath]: challengeApi.reducer,
-    authInfo: authSlice,
-    page: pageSlice,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, challengeApi.middleware),
+  reducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   devTools: true,
 });
 
-export const useStore = () => store;
-export const dispatch = store.dispatch;
+export { store };
+store.dispatch;
+
+export type RootState = ReturnType<typeof store.getState>;

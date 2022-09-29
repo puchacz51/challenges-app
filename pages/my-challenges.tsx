@@ -1,55 +1,99 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next';
+import { User } from '@supabase/supabase-js';
+import axios from 'axios';
+import { GetServerSideProps, NextPage } from 'next';
 import Image from 'next/image';
-import { parseCookies } from 'nookies';
 import { useEffect } from 'react';
+import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { AddChellengeForm } from '../components/forms/AddChellenge';
-import { getCurrentUser, setCredentials } from '../services/Store/authSlice';
-import { useGetMyChallengesQuery } from '../services/Store/challengeApi';
+import { setCredentials } from '../services/Store/authSlice';
+import { RootState, store } from '../services/Store/store';
 import { supabase } from '../services/supabase/supabase';
+
+interface ServerProps {
+  initialState: Object;
+  userChallenges: Array<{}>;
+}
 
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const result = await supabase.auth.api.getUserByCookie(ctx.req);
   const { user, token } = result || { user: null, token: null };
+  if (!user?.id || !token) return { redirect: '/login', props: {} };
+  store.dispatch(setCredentials({ user, token }));
 
-  if (!user || !token) return { redirect: '/login' };
-  return { props: { user, token } };
+  const userChallenges = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('userId', user.id);
+  console.log(userChallenges);
+
+  return {
+    props: {
+      initialState: store.getState(),
+      userChallenges: userChallenges.data,
+    },
+  };
 };
 
 export { getServerSideProps };
 
-const MyChallenges: NextPage = (props) => {
-  const {user} = useSelector(state=>state.authInfo)
-  const{status}= useGetMyChallengesQuery('my', { skip: !user?.id });
-  console.log(!user?.id,status);
-
-  useEffect(() => {
-    setCredentials(props);
-  }, []);
+const MyChallenges: NextPage = (props: ServerProps) => {
+  useEffect(() => {}, []);
   return (
     <main className='flex flex-col '>
       <ChellengesOption />
       <AddChellengeForm />
-      <ChellengesList />
+      <ChellengesList initialData={props.userChallenges} />
     </main>
   );
 };
 
 export default MyChallenges;
 
-const ChellengesOption: JSX.Element = () => {
+const ChellengesOption = (): JSX.Element => {
   return (
     <div className='text-lg px-[5%] py-2 text-white bg-slate-900 '>Options</div>
   );
 };
-const ChellengesList: JSX.Element = () => {
+
+const fetchChallenges = async (userId) => {
+  try {
+    const result = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('userId', userId);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const ChellengesList = ({ initialData }): JSX.Element => {
+  const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
+
+  const { data, refetch, isLoading } = useQuery(
+    [MyChallenges],
+    () => fetchChallenges(user?.id),
+    {
+      initialData,
+    }
+  );
+
+  if (isLoading) {
+    return <h2>loading ...</h2>;
+  }
   return (
     <div className='min-h-[200px] bg-slate-500 mx-[5%] border-4 mt-2 border-yellow-400'>
-      <ChellengeNode />
+      {data.map((challengeData) => (
+        <ChellengeNode challengeData={challengeData} />
+      ))}
+
+      <button onClick={(e) => refetch()}>refetch</button>
     </div>
   );
 };
-const ChellengeNode: React.ReactNode = () => {
+const ChellengeNode = ({ challengeData }): JSX.Element => {
+  const { title } = challengeData;
   return (
     <div className='grid grid-rows-5 grid-cols-4 rounded '>
       <div className='col-span-4 row-span-4 bg-slate-200 relative h-[150px]'>
@@ -58,7 +102,7 @@ const ChellengeNode: React.ReactNode = () => {
           objectFit='cover'
           layout='fill'
           alt='title image'></Image>
-        <h3 className=' text-4xl absolute bottom-0 left-2  '>title</h3>
+        <h3 className=' text-4xl absolute bottom-0 left-2  '>{title}</h3>
       </div>
 
       <span className='col-span-2 '>time</span>

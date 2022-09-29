@@ -4,13 +4,12 @@ import { Provider, useDispatch } from 'react-redux';
 import { supabase } from '../services/supabase/supabase';
 import { setCredentials } from '../services/Store/authSlice';
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { setCookie } from 'nookies';
-import { dispatch, useStore } from '../services/Store/store';
-
+import { store } from '../services/Store/store';
+import { QueryClient, QueryClientProvider } from 'react-query';
+const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
-  const router = useRouter();
-  const store = useStore();
+  const dispatch = store.dispatch;
   useEffect(() => {
     const { user, access_token, refresh_token } = supabase.auth.session() ?? {
       user: null,
@@ -33,9 +32,11 @@ const MyApp = ({ Component, pageProps }) => {
   });
   return (
     <Provider store={store}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <QueryClientProvider client={queryClient}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </QueryClientProvider>
     </Provider>
   );
 };

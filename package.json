@@ -21,6 +21,7 @@
     "react-dom": "18.2.0",
     "react-icon": "^1.0.0",
     "react-icons": "^4.4.0",
+    "react-query": "^3.39.2",
     "react-redux": "^8.0.2",
     "yup": "^0.32.11"
   },

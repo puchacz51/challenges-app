@@ -1,8 +1,7 @@
 import { Formik, Form, useFormik } from 'formik';
+import { useMutation } from 'react-query/types/react';
 import { useSelector } from 'react-redux';
 import { string, object, number, boolean, date, SchemaOf } from 'yup';
-import { getCurrentUser } from '../../services/Store/authSlice';
-import { useGetMyChallengesQuery } from '../../services/Store/challengeApi';
 import { supabase } from '../../services/supabase/supabase';
 const privateChellengeschema = object({
   title: string().required().max(30),
@@ -15,18 +14,22 @@ const initialValues = {
   title: '',
   description: '',
   isPublic: false,
+  startTime: 0,
+  endTime: 0,
 };
 
 const addChellenge = async (values) => {
   try {
-    await supabase.from('challenges').insert(values);
-    console.log('added');
+    const result =await supabase.from('challenges').insert(values);
+
+
   } catch (error) {
     console.log(error);
   }
 };
-export  const AddChellengeForm = () => {
-  const cos = useGetMyChallengesQuery('myChallenges', {});
+export const AddChellengeForm = () => {
+  const cos = useMutation(addChellenge,{})
+  
 
   const formik = useFormik({
     initialValues,
@@ -80,4 +83,3 @@ export  const AddChellengeForm = () => {
     </form>
   );
 };
-
