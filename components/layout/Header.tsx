@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 const Header = (): JSX.Element => {
   const authInfo = useSelector<RootState>((state) => state.authInfo);
+
   const path = useSelector<RootState>((state) => state.page.path);
 
   if (path == '/login') {

@@ -25,7 +25,6 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
     .from('challenges')
     .select('*')
     .eq('userId', user.id);
-  console.log(userChallenges);
 
   return {
     props: {
@@ -72,20 +71,20 @@ const ChellengesList = ({ initialData }): JSX.Element => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
 
   const { data, refetch, isLoading } = useQuery(
-    [MyChallenges],
+    ['myChallenges'],
     () => fetchChallenges(user?.id),
     {
       initialData,
     }
   );
-
-  if (isLoading) {
+  
+  if (isLoading&& !data) {
     return <h2>loading ...</h2>;
   }
   return (
     <div className='min-h-[200px] bg-slate-500 mx-[5%] border-4 mt-2 border-yellow-400'>
       {data.map((challengeData) => (
-        <ChellengeNode challengeData={challengeData} />
+        <ChellengeNode key={challengeData.id} challengeData={challengeData} />
       ))}
 
       <button onClick={(e) => refetch()}>refetch</button>
