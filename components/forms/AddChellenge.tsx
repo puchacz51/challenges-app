@@ -28,7 +28,10 @@ const addChellenge = async (values) => {
   }
 };
 export const AddChellengeForm = () => {
-  const cos = useMutation(addChellenge,{})
+  const cos = useMutation(addChellenge,{onMutate: async newValue=>{
+    await queryCl
+
+  }})
   
 
   const formik = useFormik({
