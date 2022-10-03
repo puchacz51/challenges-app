@@ -6,7 +6,7 @@ import { setCredentials } from '../services/Store/authSlice';
 import { useEffect } from 'react';
 import { setCookie } from 'nookies';
 import { store } from '../services/Store/store';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;
@@ -33,9 +33,11 @@ const MyApp = ({ Component, pageProps }) => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <Hydrate state={pageProps.queryState}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </Hydrate>
       </QueryClientProvider>
     </Provider>
   );

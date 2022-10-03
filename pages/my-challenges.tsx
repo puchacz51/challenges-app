@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GetServerSideProps, NextPage } from 'next';
 import Image from 'next/image';
 import { useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { AddChellengeForm } from '../components/forms/AddChellenge';
 import { setCredentials } from '../services/Store/authSlice';
@@ -20,16 +20,20 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user, token } = result || { user: null, token: null };
   if (!user?.id || !token) return { redirect: '/login', props: {} };
   store.dispatch(setCredentials({ user, token }));
+  const queryClient = new QueryClient();
 
-  const userChallenges = await supabase
-    .from('challenges')
-    .select('*')
-    .eq('userId', user.id);
-
+  await queryClient.fetchQuery(['myChallenges'], async () => {
+    const result = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('userId', user.id);
+    return result.data;
+  });
+  
   return {
     props: {
       initialState: store.getState(),
-      userChallenges: userChallenges.data,
+      queryState: dehydrate(queryClient),
     },
   };
 };
@@ -70,23 +74,19 @@ const fetchChallenges = async (userId) => {
 const ChellengesList = ({ initialData }): JSX.Element => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
 
-  const { data, refetch, isLoading } = useQuery(
-    ['myChallenges'],
-    () => fetchChallenges(user?.id),
-    {
-      initialData,
-    }
+  const { data, refetch, isLoading } = useQuery(['myChallenges'], () =>
+    fetchChallenges(user?.id)
   );
-  
-  if (isLoading&& !data) {
+
+  if (isLoading && !data) {
     return <h2>loading ...</h2>;
   }
+
   return (
     <div className='min-h-[200px] bg-slate-500 mx-[5%] border-4 mt-2 border-yellow-400'>
-      {data.map((challengeData) => (
+      {data?.map((challengeData) => (
         <ChellengeNode key={challengeData.id} challengeData={challengeData} />
       ))}
-
       <button onClick={(e) => refetch()}>refetch</button>
     </div>
   );
