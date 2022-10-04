@@ -11,28 +11,24 @@ interface TextInputProps {
   att?: Attributes;
   errors: FieldError;
 }
-const TextInput = ({ title, errors, ...att }: TextInputProps) => {
+const LongTextInput = ({ title, errors, ...att }: TextInputProps) => {
   const [isTouched, setIsTouched] = useState<boolean>(false);
-  const register = useFormContext();
+  const { register } = useFormContext();
   return (
-    <div className={`relative gap-1 pt-3 ${errors && 'text-red-600'}`}>
-      <input
-        className={`outline-none border-b-2 w-full focus:border-black text-lg `}
-        type='text'
+    <div className={`relative gap-1 pt-3 mt-5 ${errors && 'text-red-600'}`}>
+      <textarea
         name={title}
         {...register}
-        onClick={() => setIsTouched(true)}
+        className={`resize-none w-full  border-2 border-black py-3`}
       />
       <label
-        className={`absolute left-0 border-b-2 border-transparent text-lg transition  ${
-          isTouched && '-translate-y-5'
-        } `}
         htmlFor={title}
-        {...att}>
+        {...att}
+        className={`absolute font-bold uppercase left-1/2 -translate-y-1/2 -translate-x-1/2 border-2 rounded-lg  px-1 border-black bg-white`}>
         {`${title}`}
       </label>
       <p>{errors?.message}</p>
     </div>
   );
 };
-export default TextInput;
+export default LongTextInput;
