@@ -10,7 +10,7 @@ const Header = (): JSX.Element => {
   if (path == '/login') {
     return (
       <>
-        <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase'>
+        <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase z-50'>
           LOGO
         </header>
         <div className='w-full text-transparent p-2 text-4xl '>g</div>
@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
   }
   return (
     <>
-      <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase'>
+      <header className='fixed  top-0 bg-fuchsia-600 w-full p-2 text-4xl flex items-center justify-around  uppercase z-50'>
         <FaBars />
         <UserProfileBtn authInfo={authInfo} />
       </header>

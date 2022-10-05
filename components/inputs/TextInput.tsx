@@ -13,15 +13,17 @@ interface TextInputProps {
 }
 const TextInput = ({ title, errors, ...att }: TextInputProps) => {
   const [isTouched, setIsTouched] = useState<boolean>(false);
-  const register = useFormContext();
+  const { register, setValue } = useFormContext();
   return (
     <div className={`relative gap-1 pt-3 ${errors && 'text-red-600'}`}>
       <input
         className={`outline-none border-b-2 w-full focus:border-black text-lg `}
         type='text'
         name={title}
-        {...register}
-        onClick={() => setIsTouched(true)}
+        {...register(title)}
+        onClick={() => {
+          setIsTouched(true);
+        }}
       />
       <label
         className={`absolute left-0 border-b-2 border-transparent text-lg transition  ${

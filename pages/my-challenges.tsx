@@ -103,7 +103,6 @@ const ChellengeNode = ({ challengeData }): JSX.Element => {
           alt='title image'></Image>
         <h3 className=' text-4xl absolute bottom-0 left-2  '>{title}</h3>
       </div>
-
       <span className='col-span-2 '>time</span>
       <span className='col-span-2'>status</span>
     </div>

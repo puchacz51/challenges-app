@@ -12,13 +12,12 @@ interface TextInputProps {
   errors: FieldError;
 }
 const LongTextInput = ({ title, errors, ...att }: TextInputProps) => {
-  const [isTouched, setIsTouched] = useState<boolean>(false);
   const { register } = useFormContext();
   return (
     <div className={`relative gap-1 pt-3 mt-5 ${errors && 'text-red-600'}`}>
       <textarea
         name={title}
-        {...register}
+        {...register(title)}
         className={`resize-none w-full  border-2 border-black py-3`}
       />
       <label

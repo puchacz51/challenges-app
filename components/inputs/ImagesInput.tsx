@@ -1,20 +1,23 @@
 import Image from 'next/image';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
-const ImagesInput = (
-  e: ChangeEvent<HTMLInputElement>,
-  formHandler,
-  setUrls
-) => {
-  const { files } = e.currentTarget;
-  if (!files.length) return;
-  const filesUrl = Array.from(files).map((file) => URL.createObjectURL(file));
-  setUrls(filesUrl);
-  formHandler(files);
-};
-
-const ImagesUplouder = ({ formik }) => {
+const CreateHandleImages =
+  (formHandler, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e?.currentTarget;
+    if (!files.length) return;
+    const filesUrl = Array.from(files).map((file) => URL.createObjectURL(file));
+    setUrls(filesUrl);
+    formHandler(files);
+  };
+const ImagesUplouder = ({ errors }) => {
   const [localImagesUrl, setLocalImagesUrl] = useState(['']);
+  const { setValue } = useFormContext();
+
+  const handleImages = CreateHandleImages(
+    (v) => setValue('images', v),
+    setLocalImagesUrl
+  );
 
   return (
     <>
@@ -23,19 +26,34 @@ const ImagesUplouder = ({ formik }) => {
         type='file'
         accept='images/png, images/jpeg'
         multiple={true}
-        onChange={(e) =>
-          HandleImages(
-            e,
-            (value) => formik.setFieldValue('images', value),
-            setLocalImagesUrl
-          )
-        }
         name='images'
+        onChange={handleImages}
       />
-      {localImagesUrl.map((imageUrl) => (
-        <Image width='100' height='100' key={imageUrl} src={imageUrl} />
-      ))}
+      <span>{errors?.message}</span>
+
+      <ImageItemsList imagesUrl={localImagesUrl} />
     </>
   );
 };
-export default ImagesInput;
+
+const ImageItemsList = ({ imagesUrl }) => {
+  // const placeholder
+
+  return (
+    <div className='flex flex-wrap gap-y-2 justify-around'>
+      {imagesUrl.map((imageUrl) => (
+        <ImageItem key={imageUrl} imageUrl={imageUrl} />
+      ))}
+    </div>
+  );
+};
+
+const ImageItem = ({ imageUrl }) => {
+  return (
+    <div className='relative w-[48%] h-[100px] border-4  border-fuchsia-600 '>
+      <Image layout='fill' objectFit='cover' key={imageUrl} src={imageUrl} />
+    </div>
+  );
+};
+
+export default ImagesUplouder;

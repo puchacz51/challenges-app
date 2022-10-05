@@ -1,16 +1,13 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { string, object, boolean } from 'yup';
+import { string, object, boolean, array, mixed } from 'yup';
 import axios from 'axios';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
 import LongTextInput from '../inputs/LongTextInput';
 import CheckBox from '../inputs/CheckBox';
-const privateChellengeschema = object({
-  title: string().required().max(30),
-  description: string().required().max(200),
-  // isPublic: boolean().equals([false, true]),
-});
+import ImagesInput from '../inputs/ImagesInput';
+import { privateChellengeschema } from './validateChallenge';
 
 const initialValues = {
   title: '',
@@ -18,7 +15,7 @@ const initialValues = {
   isPublic: false,
   startTime: 1000,
   endTime: 1000,
-  images: [],
+  images: {},
 };
 
 const addChellenge = async (values) => {
@@ -36,8 +33,12 @@ const addChellenge = async (values) => {
       }
       formData.append(key, values[key]);
     });
-    await axios.post('/api/post', formData, { method: 'POST' });
+    await axios
+      .post('/api/post', formData, { method: 'POST' })
+      .then((w) => console.log(w));
   } catch (error) {
+    console.log(error);
+    
     throw error;
   }
 };
@@ -46,12 +47,14 @@ export const AddChellengeForm = () => {
   const methods = useForm({ resolver: yupResolver(privateChellengeschema) });
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    setValue,
+    formState: { errors, isSubmitting, touchedFields },
+    getValues,
   } = methods;
 
-  const onSubmitHandler = (data) => {
-    console.log(data);
-    console.log(errors);
+  const onSubmitHandler = async (data) => {
+    console.log(data.images);
+    addChellenge(data);
   };
 
   return (
@@ -70,7 +73,7 @@ export const AddChellengeForm = () => {
           errors={errors.description}
           title='description'></LongTextInput>
         <CheckBox errors={errors.isPublic} title='is Public'></CheckBox>
-
+        <ImagesInput errors={errors.images} />
         {isSubmitting ? (
           <h2>adding...</h2>
         ) : (
@@ -79,6 +82,8 @@ export const AddChellengeForm = () => {
             submit
           </button>
         )}
+
+        {/* {JSON.stringify(getValues())} */}
       </form>
     </FormProvider>
   );
