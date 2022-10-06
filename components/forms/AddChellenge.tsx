@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { string, object, boolean, array, mixed } from 'yup';
-import axios from 'axios';
+// import { string, object, boolean, array, mixed } from 'yup';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
@@ -8,7 +7,8 @@ import LongTextInput from '../inputs/LongTextInput';
 import CheckBox from '../inputs/CheckBox';
 import ImagesInput from '../inputs/ImagesInput';
 import { privateChellengeschema } from './validateChallenge';
-
+import { supabase } from '../../services/supabase/supabase';
+import { nanoid } from '@reduxjs/toolkit';
 const initialValues = {
   title: '',
   description: '',
@@ -17,44 +17,63 @@ const initialValues = {
   endTime: 1000,
   images: {},
 };
-
-const addChellenge = async (values) => {
-  try {
-    console.log('adding....');
-    let formData = new FormData();
-
-    Object.keys(values).forEach((key) => {
-      if (key == 'images') {
-        let id = 0;
-        for (const image of values.images) {
-          formData.append(`image${id++}`, image);
-        }
-        return;
-      }
-      formData.append(key, values[key]);
-    });
-    await axios
-      .post('/api/post', formData, { method: 'POST' })
-      .then((w) => console.log(w));
-  } catch (error) {
-    console.log(error);
-    
-    throw error;
-  }
-};
-
+interface challenge {
+  title: string;
+  description: string;
+  startTime: any;
+  endTime: any;
+  images: FileList;
+}
 export const AddChellengeForm = () => {
-  const methods = useForm({ resolver: yupResolver(privateChellengeschema) });
+  const methods = useForm({
+    resolver: yupResolver(privateChellengeschema),
+    defaultValues: initialValues,
+  });
   const {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting, touchedFields },
     getValues,
   } = methods;
+  const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
+    try {
+      let index = 0;
+      for (const image of images) {
+        await supabase.storage
+          .from('challenges')
+          .upload(imagesPath[index++], image);
+      }
+    } catch (err) {
+      throw err;
+    }
+  };
+  const addToDB = async (formData) => {
+    try {
+      supabase.from('challenges').insert(formData);
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const addChallenge = async (values: challenge, userId: string) => {
+    try {
+      const { images, ...formValues } = values;
+      const [imagesPath, imagesName] = Array.from(images).map((image) => {
+        const name = nanoid() + '.' + image.type;
+        const path = `${userId}/${name}`;
+        return [path, name];
+      });
+
+      await uploadImage(images, imagesPath);
+      await addToDB({...values,imagesName})
+      // await
+    } catch (err) {}
+  };
 
   const onSubmitHandler = async (data) => {
-    console.log(data.images);
-    addChellenge(data);
+    addChallenge(data);
+
+
   };
 
   return (
@@ -88,3 +107,31 @@ export const AddChellengeForm = () => {
     </FormProvider>
   );
 };
+
+// const addChellenge = async (values) => {
+//   try {
+//     console.log('adding....');
+//     let formData = new FormData();
+//     console.log(values);
+
+//     Object.keys(values).forEach((key) => {
+//       if (key == 'images') {
+//         let id = 0;
+//         for (const image of values.images) {
+//           console.log(image);
+
+//           formData.append(`image${id++}`, image);
+//         }
+//         return;
+//       }
+//       formData.append(key, values[key]);
+//     });
+//     await axios
+//       .post('/api/post', formData, { method: 'POST' })
+//       .then((w) => console.log(w));
+//   } catch (error) {
+//     console.log(error);
+
+//     throw error;
+//   }
+// };

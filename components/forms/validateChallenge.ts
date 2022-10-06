@@ -20,7 +20,6 @@ export const validateType = (files) => {
   let valided = true;
   Array.from(files).forEach((file) => {
     if (file && !supportedTypes.includes(file.type)) {
-      console.log(file.type);
 
       valided = false;
       return;
