@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from 'react-query';
-// import { string, object, boolean, array, mixed } from 'yup';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
@@ -9,6 +8,8 @@ import ImagesInput from '../inputs/ImagesInput';
 import { privateChellengeschema } from './validateChallenge';
 import { supabase } from '../../services/supabase/supabase';
 import { nanoid } from '@reduxjs/toolkit';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../services/Store/store';
 const initialValues = {
   title: '',
   description: '',
@@ -35,52 +36,24 @@ export const AddChellengeForm = () => {
     formState: { errors, isSubmitting, touchedFields },
     getValues,
   } = methods;
-  const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
+  const user = useSelector<RootState>((state) => state.authInfo.user);
+
+
+  const onSubmitHandler = async (data, userId) => {
     try {
-      let index = 0;
-      for (const image of images) {
-        await supabase.storage
-          .from('challenges')
-          .upload(imagesPath[index++], image);
-      }
+      console.log('addd ...');
+
+      addChallenge(data, userId);
     } catch (err) {
-      throw err;
+      console.log(err, 2222);
     }
-  };
-  const addToDB = async (formData) => {
-    try {
-      supabase.from('challenges').insert(formData);
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  const addChallenge = async (values: challenge, userId: string) => {
-    try {
-      const { images, ...formValues } = values;
-      const [imagesPath, imagesName] = Array.from(images).map((image) => {
-        const name = nanoid() + '.' + image.type;
-        const path = `${userId}/${name}`;
-        return [path, name];
-      });
-
-      await uploadImage(images, imagesPath);
-      await addToDB({...values,imagesName})
-      // await
-    } catch (err) {}
-  };
-
-  const onSubmitHandler = async (data) => {
-    addChallenge(data);
-
-
   };
 
   return (
     <FormProvider {...methods}>
       <form
         className='flex flex-col relative uppercase mx-auto my-8 w-5/6 border-2 border-black pt-5 px-2 '
-        onSubmit={handleSubmit(onSubmitHandler)}>
+        onSubmit={handleSubmit((data) => onSubmitHandler(data, user.id))}>
         <h2 className='absolute text-2xl left-1/2 bg-white font-bold border-4 border-black rounded-xl px-3 -translate-x-1/2 -translate-y-10 z-10 '>
           challenge
         </h2>
@@ -91,7 +64,7 @@ export const AddChellengeForm = () => {
         <LongTextInput
           errors={errors.description}
           title='description'></LongTextInput>
-        <CheckBox errors={errors.isPublic} title='is Public'></CheckBox>
+        <CheckBox errors={errors.isPublic} title='isPublic'></CheckBox>
         <ImagesInput errors={errors.images} />
         {isSubmitting ? (
           <h2>adding...</h2>

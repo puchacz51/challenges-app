@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { AddChellengeForm } from '../components/forms/AddChellenge';
+import { useChallengeQuery } from '../components/utilities/usePostQuery';
 import { setCredentials } from '../services/Store/authSlice';
 import { RootState, store } from '../services/Store/store';
 import { supabase } from '../services/supabase/supabase';
@@ -29,7 +30,7 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
       .eq('userId', user.id);
     return result.data;
   });
-  
+
   return {
     props: {
       initialState: store.getState(),
@@ -59,24 +60,12 @@ const ChellengesOption = (): JSX.Element => {
   );
 };
 
-const fetchChallenges = async (userId) => {
-  try {
-    const result = await supabase
-      .from('challenges')
-      .select('*')
-      .eq('userId', userId);
-    return result.data;
-  } catch (error) {
-    throw error;
-  }
-};
+
 
 const ChellengesList = ({ initialData }): JSX.Element => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
 
-  const { data, refetch, isLoading } = useQuery(['myChallenges'], () =>
-    fetchChallenges(user?.id)
-  );
+  const { data, refetch, isLoading } =useChallengeQuery(user.id)
 
   if (isLoading && !data) {
     return <h2>loading ...</h2>;
