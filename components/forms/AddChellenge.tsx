@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from 'react-query';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
@@ -6,10 +5,9 @@ import LongTextInput from '../inputs/LongTextInput';
 import CheckBox from '../inputs/CheckBox';
 import ImagesInput from '../inputs/ImagesInput';
 import { privateChellengeschema } from './validateChallenge';
-import { supabase } from '../../services/supabase/supabase';
-import { nanoid } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
+import { addChallengeMutation } from '../utilities/usePostQuery';
 const initialValues = {
   title: '',
   description: '',
@@ -37,15 +35,13 @@ export const AddChellengeForm = () => {
     getValues,
   } = methods;
   const user = useSelector<RootState>((state) => state.authInfo.user);
-
+  const { mutate } = addChallengeMutation();
 
   const onSubmitHandler = async (data, userId) => {
     try {
       console.log('addd ...');
-
-      addChallenge(data, userId);
+      mutate({...data,userId})
     } catch (err) {
-      console.log(err, 2222);
     }
   };
 

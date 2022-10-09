@@ -1,19 +1,25 @@
 import { nanoid } from '@reduxjs/toolkit';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { url } from 'inspector';
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from 'react-query';
 import { supabase } from '../../services/supabase/supabase';
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
+  let index = 0;
   try {
-    let index = 0;
     for (const image of images) {
-      console.log(imagesPath[index++]);
-
-      await supabase.storage
-        .from('challeges')
+      const res = await supabase.storage
+        .from('challenges')
         .upload(imagesPath[index++], image as File, {
           cacheControl: '3600',
           upsert: false,
         });
+      if (res.error) throw res.error;
     }
   } catch (err) {
     throw err;
@@ -21,7 +27,8 @@ const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
 };
 const addToDB = async (formData) => {
   try {
-    await supabase.from('challenges').insert(formData);
+    const result = await supabase.from('challenges').insert(formData);
+    return result.data[0];
   } catch (err) {
     throw err;
   }
@@ -29,16 +36,16 @@ const addToDB = async (formData) => {
 
 const deleteImages = async (imagesPath: string[]) => {
   try {
-    await supabase.storage.from('challenges').remove(imagesPath);
+    const res = await supabase.storage.from('challenges').remove(imagesPath);
+    console.log(res);
   } catch (e) {
     console.log(e);
-    throw e;
   }
 };
-const addChallenge = async (values: challenge, userId: string) => {
+const addChallenge = async (values: Challenge) => {
   let imagesPath;
   try {
-    const { images, ...formValues } = values;
+    const { images, userId, ...formValues } = values;
     imagesPath = Array.from(images).map((image) => {
       const name = nanoid() + '.' + image.type.split('/')[1];
       const path = `${userId}/${name}`;
@@ -47,10 +54,9 @@ const addChallenge = async (values: challenge, userId: string) => {
     });
     await uploadImage(images, imagesPath);
     const dbData = { ...formValues, images: imagesPath, userId };
-    await addToDB(dbData);
+    return await addToDB(dbData);
   } catch (err) {
     deleteImages(imagesPath);
-    console.log(err);
     throw err;
   }
 };
@@ -60,12 +66,55 @@ const fetchChallenges = async (userId) => {
     const result = await supabase
       .from('challenges')
       .select('*')
-      .eq('userId', userId);
+      .eq('userId', userId)
+      .order('createdAt', { ascending: false });
     return result.data;
   } catch (error) {
     throw error;
   }
 };
 export const useChallengeQuery = (id, options?: UseQueryOptions) => {
-  return useQuery(['myChallenges'], () => fetchChallenges(user?.id));
+  return useQuery([id], () => fetchChallenges(id));
+};
+
+const getUrlFromFileList = (files: FileList) => {
+  return Array.from(files).map((file) => URL.createObjectURL(file));
+};
+export const addChallengeMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (values) => await addChallenge(values),
+    onMutate: async (values) => {
+      const { userId, images } = values;
+
+      const localImagesUrl = getUrlFromFileList(images);
+      await queryClient.cancelQueries([userId]);
+      const optimisticChallenge = {
+        id: nanoid(),
+        ...values,
+        images: localImagesUrl,
+      };
+      queryClient.setQueryData([userId], (old) => {
+        return [optimisticChallenge, ...old];
+      });
+
+      return { optimisticChallenge };
+    },
+    onError: (err, values, context) => {
+      const { userId } = values;
+      queryClient.setQueryData([userId], (old) =>
+        old.filter((challenge) => challenge.id === context.id)
+      );
+    },
+    onSuccess: (data, variables, context) => {
+      const { userId } = variables;
+
+      queryClient.setQueryData([userId], (old) =>
+        old.map((challege) =>
+          challege.id === context.optimisticChallenge.id ? data : challege
+        )
+      );
+    },
+  });
 };
