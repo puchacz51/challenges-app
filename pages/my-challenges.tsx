@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { ChallengesList } from '../components/challenges/ChallengesList';
+import ImageSlider from '../components/challenges/ImageSlider';
 import { AddChellengeForm } from '../components/forms/AddChellenge';
 import { useChallengeQuery } from '../components/utilities/usePostQuery';
 import { setCredentials } from '../services/Store/authSlice';
@@ -19,6 +20,8 @@ interface ServerProps {
 
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const result = await supabase.auth.api.getUserByCookie(ctx.req);
+  console.log(result);
+  
   const { user, token } = result || { user: null, token: null };
   if (!user?.id || !token)
     return { redirect: { destination: '/login', permanent: false }, props: {} };
@@ -44,12 +47,14 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
 export { getServerSideProps };
 
 const MyChallenges: NextPage = (props: ServerProps) => {
+  
   useEffect(() => {}, []);
   return (
     <main className='flex flex-col '>
       <ChellengesOption />
+      <ChallengesList>  </ChallengesList>
       {/* <AddChellengeForm /> */}
-      <ChallengesList initialData={props.userChallenges} />
+      {/* <ChallengesList initialData={props.userChallenges} />  */}
     </main>
   );
 };

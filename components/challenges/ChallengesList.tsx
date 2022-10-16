@@ -1,50 +1,57 @@
-import { User } from "@supabase/supabase-js";
-import { useSelector } from "react-redux";
-import { RootState } from "../../services/Store/store";
-import { useChallengeQuery } from "../utilities/usePostQuery";
-import Image from 'next/image'
-import moment from "moment";
+import { User } from '@supabase/supabase-js';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../services/Store/store';
+import { useChallengeQuery } from '../utilities/usePostQuery';
+import Image from 'next/image';
+import moment from 'moment';
+import ImageSlider from './ImageSlider';
 const ChallengesList = (): JSX.Element => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
+  const { data: challenges, refetch, isLoading } = useChallengeQuery(user.id);
 
-  const { data, refetch, isLoading } = useChallengeQuery(user.id);
+  console.log(challenges);
 
-  if (isLoading && !data) {
+  if (isLoading && !challenges) {
     return <h2>loading ...</h2>;
   }
 
   return (
-    <div className='min-h-[200px] bg-green-500 mx-[5%] border-4 mt-2 border-yellow-400'>
-      {data?.map((challengeData) => (
-        <ChellengeNode key={challengeData.id} challengeData={challengeData} />
-      ))}
+    <div className='mx-[5%]'>
+      <h3 className='text-center mx-auto p-1 uppercase text-2xl font-bold bg-slate-500 '>
+        your Challenges
+      </h3>
+      <div className='min-h-[200px]  border-4  '>
+        {challenges.map((challenge) => (
+          <ChallengeNode key={challenge.id} challengeData={challenge} />
+        ))}
+      </div>
     </div>
   );
 };
 
-
-const ChellengeNode = ({ challengeData }): JSX.Element => {
-  const { title, images, createdAt } = challengeData;
-	const time = moment(new Date(createdAt).getTime()).fromNow()
-	
+const ChallengeNode = ({ challengeData }): JSX.Element => {
+  const { title, images, createdAt, status } = challengeData;
+  const time = moment(new Date(createdAt).getTime()).fromNow();
+  const src =
+    images[0] == 'local'
+      ? images[1]
+      : `https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/${images[0]}`;
   return (
-    <div className='grid grid-rows-5 grid-cols-4 my-3 rounded bg-slate-900 '>
-      <div className='col-span-4 row-span-4  bg-slate-200 relative h-[150px]'>
+    <div className='grid grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '>
+      <div className='col-span-4 row-span-4   bg-slate-200 relative h-[150px]'>
         <Image
-          src={`https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/${images[0]}`}
+          src={src}
           objectFit='cover'
           layout='fill'
           alt='title image'></Image>
-        <h3 className=' text-4xl absolute bottom-0 left-2  '>{title}</h3>
+        <h3 className=' text-4xl absolute bottom-0 w-full bg-opacity-30 bg-white '>
+          {title}
+        </h3>
       </div>
       <span className='col-span-2 uppercase text-white px-2'>{time}</span>
-      <span className='col-span-2'>status</span>
+      <span className='col-span-2 uppercase text-white'>{status}</span>
     </div>
   );
 };
 
-
-
 export { ChallengesList };
-
-

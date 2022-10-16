@@ -15,8 +15,15 @@ const MyApp = ({ Component, pageProps }) => {
       user: null,
       access_token: null,
     };
-    setCookie(null, 'sb-refresh-token', refresh_token);
-    setCookie(null, 'sb-access-token', access_token);
+    setCookie(null, 'sb-refresh-token', refresh_token, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+    });
+    setCookie(null, 'sb-access-token', access_token, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+    });
+
 
     dispatch(setCredentials({ user, token: access_token }));
   }, []);

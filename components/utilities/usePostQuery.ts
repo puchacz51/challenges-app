@@ -37,7 +37,6 @@ const addToDB = async (formData) => {
 const deleteImages = async (imagesPath: string[]) => {
   try {
     const res = await supabase.storage.from('challenges').remove(imagesPath);
-    console.log(res);
   } catch (e) {
     console.log(e);
   }
@@ -78,7 +77,8 @@ export const useChallengeQuery = (id, options?: UseQueryOptions) => {
 };
 
 const getUrlFromFileList = (files: FileList) => {
-  return Array.from(files).map((file) => URL.createObjectURL(file));
+  const result = ['local', URL.createObjectURL(files[0])];
+  return result;
 };
 export const addChallengeMutation = () => {
   const queryClient = useQueryClient();
@@ -89,6 +89,8 @@ export const addChallengeMutation = () => {
       const { userId, images } = values;
 
       const localImagesUrl = getUrlFromFileList(images);
+      console.log(localImagesUrl);
+
       await queryClient.cancelQueries([userId]);
       const optimisticChallenge = {
         id: nanoid(),
