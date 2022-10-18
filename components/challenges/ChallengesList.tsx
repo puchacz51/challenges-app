@@ -37,7 +37,9 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
       ? images[1]
       : `https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/${images[0]}`;
   return (
-    <div className='grid grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '>
+    <a
+      className='w-full grid  grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '
+      href={`localhost:3000/challenge/${challengeData.id}`}>
       <div className='col-span-4 row-span-4   bg-slate-200 relative h-[150px]'>
         <Image
           src={src}
@@ -50,7 +52,7 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
       </div>
       <span className='col-span-2 uppercase text-white px-2'>{time}</span>
       <span className='col-span-2 uppercase text-white'>{status}</span>
-    </div>
+    </a>
   );
 };
 

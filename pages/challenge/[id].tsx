@@ -35,20 +35,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
 };
 
-const Challenge: NextPage = ({ challengeId }) => {
+const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
   const { data, error, isLoading } = useQuery([challengeId], {
     queryFn: () => fetchChallenge(challengeId),
-    enabled:false
+    enabled: false,
   });
-  if(!data) return<>
-    stoop
-  </>
+  if (!data) return <>stoop</>;
   console.log(data);
-  
-  return <>
-    <ViewChallenge challengeData={data[0]}></ViewChallenge>
-  
-  </>;
+
+  return (
+    <>
+      <ViewChallenge challengeData={data[0]}></ViewChallenge>
+    </>
+  );
 };
 
 export default Challenge;
