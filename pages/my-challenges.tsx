@@ -16,18 +16,17 @@ import { supabase } from '../services/supabase/supabase';
 interface ServerProps {
   initialState: Object;
   userChallenges: Array<{}>;
+  bucketPath: string;
 }
 
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const result = await supabase.auth.api.getUserByCookie(ctx.req);
-  console.log(result);
-  
   const { user, token } = result || { user: null, token: null };
   if (!user?.id || !token)
     return { redirect: { destination: '/login', permanent: false }, props: {} };
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
-
+  const bucketPath = await supabase.storage.getBucket('challenge');
   await queryClient.fetchQuery([user.id], async () => {
     const result = await supabase
       .from('challenges')
@@ -40,6 +39,7 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
     props: {
       initialState: store.getState(),
       queryState: dehydrate(queryClient),
+      bucketPath,
     },
   };
 };
@@ -47,12 +47,12 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
 export { getServerSideProps };
 
 const MyChallenges: NextPage = (props: ServerProps) => {
-  
+  const { bucketPath } = props;
   useEffect(() => {}, []);
   return (
     <main className='flex flex-col '>
       <ChellengesOption />
-      <ChallengesList>  </ChallengesList>
+      <ChallengesList > </ChallengesList>
       {/* <AddChellengeForm /> */}
       {/* <ChallengesList initialData={props.userChallenges} />  */}
     </main>
@@ -66,5 +66,3 @@ const ChellengesOption = (): JSX.Element => {
     <div className='text-lg px-[5%] py-2 text-white bg-slate-900 '>Options</div>
   );
 };
-
-

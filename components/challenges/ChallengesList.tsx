@@ -39,7 +39,7 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
   return (
     <a
       className='w-full grid  grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '
-      href={`localhost:3000/challenge/${challengeData.id}`}>
+      href={`challenge/${challengeData.id}`}>
       <div className='col-span-4 row-span-4   bg-slate-200 relative h-[150px]'>
         <Image
           src={src}
