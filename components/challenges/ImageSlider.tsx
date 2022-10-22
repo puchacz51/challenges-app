@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '../../services/supabase/supabase';
-import { current } from '@reduxjs/toolkit';
-
+import { motion } from 'framer-motion';
+import { url } from 'inspector';
 interface ImageSliderProps {
   imagesUrl: string[];
 }
@@ -24,15 +24,16 @@ const initialPositionData: TouchPosition = {
 const bucketPath =
   'https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/';
 
-const transformX = (shift: number, imageContainer: HTMLDivElement) => {
-  imageContainer.style.transform = `translateX(${-shift}px)`;
-};
+// const transformX = (shift: number, imageContainer: HTMLDivElement) => {
+//   // imageContainer.style.transform = `translateX(${-shift}px)`;
+// };
 const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
   const imageContianerRef = useRef<HTMLDivElement>();
   const touchPosition = useRef<TouchPosition>(initialPositionData);
   const [currentImage, setCurrentImage] = useState<number>(0);
   const handleStartTouch = (event: TouchEvent<HTMLDivElement>) => {
     const { current, imageWidth } = touchPosition.current;
+
     touchPosition.current.start =
       event.touches[0].clientX + currentImage * imageWidth;
   };
@@ -41,14 +42,13 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
     touchPosition.current.current = shift;
 
     if (shift < 0) {
-      touchPosition.current.current = 0;
+      touchPosition.current.current = touchPosition.current.start;
       return;
     }
     if (shift > touchPosition.current.maxPosition) {
       touchPosition.current.current = touchPosition.current.maxPosition;
       return;
     }
-    transformX(shift, imageContianerRef.current);
   };
   const handleEndTouch = (e: TouchEvent<HTMLDivElement>) => {
     const { current: currentPosition, imageWidth } = touchPosition.current;
@@ -56,12 +56,9 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
     touchPosition.current = {
       ...touchPosition.current,
       start: imageWidth * nextImageIndex,
-      current: 0,
+      current: imageWidth * nextImageIndex,
     };
-    transformX(
-      nextImageIndex * touchPosition.current.imageWidth,
-      imageContianerRef.current
-    );
+
     setCurrentImage(nextImageIndex);
   };
 
@@ -73,33 +70,36 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
       maxPosition: imageContainerWidth * (imagesUrl.length - 1),
       imageWidth: imageContainerWidth,
     };
-    transformX(
-      currentImage * touchPosition.current.imageWidth,
-      imageContianerRef.current
-    );
-    console.log(currentImage * touchPosition.current.imageWidth);
+
   }, [imagesUrl.length, currentImage]);
   return (
     <div className='relative overflow-hidden border-4 border-black'>
-      <div
+      <motion.div
         ref={imageContianerRef}
+        animate={{x:-touchPosition.current.current}}
         onTouchStart={handleStartTouch}
         onTouchMove={handleMovetouch}
         onTouchEnd={handleEndTouch}
         className={` flex flex-nowrap  h-[200px] bg-slate-200  `}>
         {imagesUrl.map((url, index) => {
           return (
-            <div key={url} className={`relative shrink-0 h-[200px] w-full`}>
+            <motion.div
+              whileTap={{ scale: 1.05 }}
+              key={url}
+              className={`relative shrink-0 h-[200px] w-full`}>
               <Image
                 layout='fill'
                 objectFit='cover'
                 alt='userPhoto'
                 src={`${bucketPath}${url}`}
               />
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
+      <span className='absolute right-0 top-0 p-2 bg-slate-50 rounded-3xl text-lg opacity-50'>{`${
+        currentImage + 1
+      }/${imagesUrl.length}`}</span>
     </div>
   );
 };
