@@ -2,7 +2,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import ViewChallenge from '../../components/challenges/ChallegeView';
 import { setCredentials } from '../../services/Store/authSlice';
-import { challengeApi } from '../../services/Store/challengeApi';
 import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
 

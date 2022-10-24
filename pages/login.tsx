@@ -8,7 +8,6 @@ export const getServerSideProps:GetServerSideProps = async ({req,resolvedUrl})=>
 //   return{props:{},redirect:{destination}}
 
 // }
-  console.log(user,req.headers.referer);
   
   // const destination = req. 
 return {props:{}}

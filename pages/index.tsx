@@ -1,14 +1,13 @@
-import Head from 'next/head';
-import Image from 'next/image';
 import { GetServerSideProps } from 'next';
-import { useGetTimeQuery } from '../services/Store/fakeApi';
-import { getUser, withPageAuth } from '@supabase/auth-helpers-nextjs';
 import { supabase } from '../services/supabase/supabase';
-// export const getServerSideProps: GetServerSideProps = async (ctx) => {
-//   const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
+import { store } from '../services/Store/store';
+import { setCredentials } from '../services/Store/authSlice';
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
+  store.dispatch(setCredentials({ user, token }));
 
-//   return { props: { user, token } };
-// };
+  return { props: { user, token } };
+};
 
 export default function Home(props) {
   return (

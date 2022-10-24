@@ -40,7 +40,7 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
       initialState: store.getState(),
       queryState: dehydrate(queryClient),
       bucketPath,
-    },redirect:{destination:'/login',permanent:false}
+    }
   };
 };
 

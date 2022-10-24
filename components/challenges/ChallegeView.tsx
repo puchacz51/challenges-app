@@ -1,3 +1,4 @@
+import ChallengeReactions from './challengeReactions';
 import ImageSlider from './ImageSlider';
 
 const ViewChallenge = ({ challengeData }) => {
@@ -10,6 +11,7 @@ const ViewChallenge = ({ challengeData }) => {
       <ImageSlider imagesUrl={images}></ImageSlider>
       <p>{description}</p>
       <span>created at {new Date(createdAt).toDateString()}</span>
+      <ChallengeReactions />
     </div>
   );
 };
