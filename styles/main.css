@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .reactionBtn {
+    @apply border border-gray-300 rounded;;
+  }
+}

@@ -1,4 +1,5 @@
 import 'tailwindcss/tailwind.css';
+import '../styles/main.css';
 import Layout from '../components/layout/Layout';
 import { Provider, useDispatch } from 'react-redux';
 import { supabase } from '../services/supabase/supabase';
@@ -23,7 +24,6 @@ const MyApp = ({ Component, pageProps }) => {
       maxAge: 30 * 24 * 60 * 60,
       path: '/',
     });
-
 
     dispatch(setCredentials({ user, token: access_token }));
   }, []);

@@ -1,4 +1,4 @@
-import {AiTwotoneLike} from 'react-icons/ai'
+import { AiTwotoneLike } from 'react-icons/ai';
 import { FaHotjar } from 'react-icons/fa';
 
 const reactions = [
@@ -10,17 +10,17 @@ const reactions = [
 
 const ChallengeReactions = () => {
   return (
-    <div className='flex'>
-      <div className=''>
+    <div className='text-4xl flex justify-around'>
+      <div className='reactionBtn'>
         <AiTwotoneLike />
       </div>
-      <div className=''>
+      <div className='reactionBtn'>
         <AiTwotoneLike />
       </div>
-      <div className=''>
+      <div className='reactionBtn'>
         <AiTwotoneLike />
-      </div>
-      <div className=''>
+      </div>{' '}
+      <div className='reactionBtn'>
         <AiTwotoneLike />
       </div>
     </div>

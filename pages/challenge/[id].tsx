@@ -11,8 +11,7 @@ const fetchChallenge = async (idChallenge) => {
       .from('challenges')
       .select('*')
       .eq('id', idChallenge);
-    console.log(result.data);
-
+    await supabase.from('challenges').select('*,reactions:').eq('id', idChallenge).then(res=>console.log(res))
     return result.data;
   } catch (err) {
     throw err;
