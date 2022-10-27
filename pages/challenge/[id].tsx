@@ -7,11 +7,8 @@ import { supabase } from '../../services/supabase/supabase';
 
 const fetchChallenge = async (idChallenge) => {
   try {
-    const result = await supabase
-      .from('challenges')
-      .select('*')
-      .eq('id', idChallenge);
-    await supabase.from('challenges').select('*,reactions:').eq('id', idChallenge).then(res=>console.log(res))
+    const result =  await supabase.from('challenges').select('*,reactions(userId,reaction)').eq('id', idChallenge)
+
     return result.data;
   } catch (err) {
     throw err;
@@ -34,13 +31,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
+  
   const { data, error, isLoading } = useQuery([challengeId], {
     queryFn: () => fetchChallenge(challengeId),
     enabled: false,
   });
   if (!data) return <>stoop</>;
-  console.log(data);
-
   return (
     <>
       <ViewChallenge challengeData={data[0]}></ViewChallenge>
