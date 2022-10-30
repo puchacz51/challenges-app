@@ -8,28 +8,18 @@ import { useEffect } from 'react';
 import { setCookie } from 'nookies';
 import { store } from '../services/Store/store';
 import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
+import axios from 'axios';
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;
-  useEffect(() => {
-    const { user, access_token, refresh_token } = supabase.auth.session() ?? {
-      user: null,
-      access_token: null,
-    };
-    setCookie(null, 'sb-refresh-token', refresh_token, {
-      maxAge: 30 * 24 * 60 * 60,
-      path: '/',
-    });
-    setCookie(null, 'sb-access-token', access_token, {
-      maxAge: 30 * 24 * 60 * 60,
-      path: '/',
-    });
-
-    dispatch(setCredentials({ user, token: access_token }));
-  }, []);
-
   supabase.auth.onAuthStateChange((event, session) => {
     if (!session) return;
+    fetch('/api/set-auth-cookie', {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      credentials: 'same-origin',
+      body: JSON.stringify({ event, session }),
+    });
     dispatch(
       setCredentials({
         user: session?.user,

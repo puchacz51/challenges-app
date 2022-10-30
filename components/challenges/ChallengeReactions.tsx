@@ -1,12 +1,32 @@
+import { useEffect, useState } from 'react';
 import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../services/Store/store';
 const reactions = [
-  { id: 1, name: 'like', Icon: AiTwotoneLike,color:"" },
+  { id: 1, name: 'like', Icon: AiTwotoneLike, color: '' },
   { id: 2, name: 'wow', Icon: DiCodeigniter },
   { id: 3, name: 'dislike', Icon: AiFillDislike },
   { id: 4, name: 'smart', Icon: GiBrain },
 ];
+interface Reaction {
+  userId: string;
+  reaction: number;
+}
+
+const countReactions = (reactions: Reaction[]) => {
+  console.log(reactions);
+  
+  const initialValue = [0, 0, 0, 0];
+  const countedReactions = reactions.reduce((prev, current) => {
+    prev[current.reaction]++;
+    return prev;
+  }, initialValue);
+  console.log(countedReactions);
+  return countReactions;
+};
+
 const ReactionElement = ({ reactionId, amount }) => {
   const { Icon, name } = reactions[reactionId];
 
@@ -22,8 +42,14 @@ const ReactionElement = ({ reactionId, amount }) => {
 };
 
 const ChallengeReactions = ({ reactionsData }) => {
-  const handleChange = () => {};
-
+  console.log(reactionsData);
+  
+  const { user } = useSelector<RootState>((state) => state.authInfo);
+  const [amountOfReactions, setAmountOfReactions] = useState([0, 0, 0, 0]);
+  const [selectedReactions, setSelectedReactions] = useState(-1);
+  useEffect(() => {
+    setAmountOfReactions(countReactions(reactionsData));
+  }, [reactionsData]);
   return (
     <div className={'text-4xl flex justify-around pt-2 bg-white '}>
       {reactions.map((reactionObject, index) => {

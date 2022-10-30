@@ -7,9 +7,15 @@ import { supabase } from '../../services/supabase/supabase';
 
 const fetchChallenge = async (idChallenge) => {
   try {
-    const result =  await supabase.from('challenges').select('*,reactions(userId,reaction)').eq('id', idChallenge)
-
-    return result.data;
+    const challenge = await supabase
+      .from('challenges')
+      .select('*,reactions(userId,reaction)')
+      .eq('id', idChallenge);
+    const reactions = await supabase
+      .from('reactions')
+      .select('reaction,userId')
+      .eq('challengeId', idChallenge);
+    return { challenge: challenge.data[0], reactions: reactions.data };
   } catch (err) {
     throw err;
   }
@@ -31,15 +37,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
-  
   const { data, error, isLoading } = useQuery([challengeId], {
     queryFn: () => fetchChallenge(challengeId),
     enabled: false,
   });
+
   if (!data) return <>stoop</>;
   return (
     <>
-      <ViewChallenge challengeData={data[0]}></ViewChallenge>
+      <ViewChallenge challengeData={data}></ViewChallenge>
     </>
   );
 };
