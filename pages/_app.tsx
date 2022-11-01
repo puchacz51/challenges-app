@@ -9,6 +9,7 @@ import { setCookie } from 'nookies';
 import { store } from '../services/Store/store';
 import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
 import axios from 'axios';
+import { ReactQueryDevtools } from 'react-query-devtools';
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;

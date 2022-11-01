@@ -1,51 +1,46 @@
 import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import ViewChallenge from '../../components/challenges/ChallegeView';
+import challengeReactions from '../../components/challenges/challengeReactions';
+import ChallengeReactions from '../../components/challenges/challengeReactions';
+import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
 import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
-
-const fetchChallenge = async (idChallenge) => {
-  try {
-    const challenge = await supabase
-      .from('challenges')
-      .select('*,reactions(userId,reaction)')
-      .eq('id', idChallenge);
-    const reactions = await supabase
-      .from('reactions')
-      .select('reaction,userId')
-      .eq('challengeId', idChallenge);
-    return { challenge: challenge.data[0], reactions: reactions.data };
-  } catch (err) {
-    throw err;
-  }
-};
+import { fetchChallenge, useChallengeQuery } from './useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data: user, token } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
   store.dispatch(setCredentials({ user, token }));
-
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id;
-  await queryClient.fetchQuery([challengeId], () =>
-    fetchChallenge(challengeId)
+  await queryClient.fetchQuery([Number(challengeId)], () =>
+    fetchChallenge(Number(challengeId))
   );
 
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
 };
 
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
-  const { data, error, isLoading } = useQuery([challengeId], {
-    queryFn: () => fetchChallenge(challengeId),
-    enabled: false,
-  });
+  const { data, error, isLoading } = useChallengeQuery(Number(challengeId));
+  if (isLoading) return <>loading...</>;
+  if (!data) return <>{Number(challengeId)} {data}</>;
+  const { title, description, createdAt, images } = data.challenge;
+  const challengeReactions = data.reactions;
 
-  if (!data) return <>stoop</>;
   return (
     <>
-      <ViewChallenge challengeData={data}></ViewChallenge>
+      <div className='flex flex-col bg-slate-200'>
+        <h2 className='text-3xl uppercase text-center bg-slate-500 font-semibold'>
+          {title}
+        </h2>
+        <ImageSlider imagesUrl={images}></ImageSlider>
+        <p>{description}</p>
+        <span>created at {new Date(createdAt).toDateString()}</span>
+        <ChallengeReactions reactionsData={challengeReactions} />
+      </div>
     </>
   );
 };
