@@ -15,36 +15,40 @@ interface Challenge {
   startTime?: string;
 }
 
-interface ChallengeQuery {
+export interface ChallengeQuery {
   challenge: Challenge;
   reactions: Reaction[];
+  userReaction:Reaction;
 }
 
-export const fetchChallenge = async (idChallenge: number): Promise<ChallengeQuery> => {
+export const fetchChallenge = async (
+  idChallenge: number,
+  userId: string
+): Promise<ChallengeQuery> => {
   try {
     const challenge = await supabase
       .from('challenges')
       .select('*,reactions(userId,reaction)')
       .eq('id', idChallenge);
     const reactions = await supabase
-      .from('reactions')
+      .from<Reaction>('reactions')
       .select('reaction,userId')
       .eq('challengeId', idChallenge);
-      
+    const userReaction = reactions.data.find(
+      (reaction) => reaction.userId == userId
+    );
     return {
       challenge: challenge.data[0] as Challenge,
-      reactions: reactions.data as Reaction[],
+      reactions: reactions.data,
+      userReaction
     };
   } catch (err) {
     throw err;
   }
 };
 
-export const useChallengeQuery = (challengeId:number) =>
-  useQuery<ChallengeQuery>([challengeId], {
-    queryFn: () => fetchChallenge(challengeId),
+export const useChallengeQuery = (challengeId: number, userId: string) =>
+  useQuery<ChallengeQuery>(['challenge', challengeId], {
+    queryFn: () => fetchChallenge(challengeId, userId),
     enabled: false,
   });
-
-
-  

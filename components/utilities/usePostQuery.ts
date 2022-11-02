@@ -72,8 +72,8 @@ const fetchChallenges = async (userId) => {
     throw error;
   }
 };
-export const useChallengeQuery = (id, options?: UseQueryOptions) => {
-  return useQuery([id], () => fetchChallenges(id));
+export const useChallengeQuery = (id: number, options?: UseQueryOptions) => {
+  return useQuery(['challenge', id], () => fetchChallenges(id));
 };
 
 const getUrlFromFileList = (files: FileList) => {

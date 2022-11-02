@@ -1,11 +1,12 @@
 import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
 import ViewChallenge from '../../components/challenges/ChallegeView';
 import challengeReactions from '../../components/challenges/challengeReactions';
 import ChallengeReactions from '../../components/challenges/challengeReactions';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
-import { store } from '../../services/Store/store';
+import { RootState, store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
 import { fetchChallenge, useChallengeQuery } from './useChallengeQuery';
 
@@ -16,20 +17,30 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id;
-  await queryClient.fetchQuery([Number(challengeId)], () =>
-    fetchChallenge(Number(challengeId))
+  await queryClient.fetchQuery(['challenge', Number(challengeId)], () =>
+    fetchChallenge(Number(challengeId), user.id)
   );
 
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
 };
 
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
-  const { data, error, isLoading } = useChallengeQuery(Number(challengeId));
+  const user = useSelector<RootState>((state) => state.authInfo.user);
+  const { data, error, isLoading } = useChallengeQuery(
+    Number(challengeId),
+    user?.id
+  );
   if (isLoading) return <>loading...</>;
-  if (!data) return <>{Number(challengeId)} {data}</>;
+  if (!data)
+    return (
+      <>
+        {Number(challengeId)} {data}
+      </>
+    );
   const { title, description, createdAt, images } = data.challenge;
   const challengeReactions = data.reactions;
-
+      console.log(data);
+      
   return (
     <>
       <div className='flex flex-col bg-slate-200'>
