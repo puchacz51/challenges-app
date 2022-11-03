@@ -3,7 +3,9 @@ import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
 import { useSelector } from 'react-redux';
+import { useChallengeReactionQuery } from '../../pages/challenge/useChallengeQuery';
 import { RootState } from '../../services/Store/store';
+import { useReactionMutation } from './useReactionMutate';
 const reactions = [
   { id: 1, name: 'like', Icon: AiTwotoneLike, color: '' },
   { id: 2, name: 'wow', Icon: DiCodeigniter },
@@ -11,7 +13,7 @@ const reactions = [
   { id: 4, name: 'smart', Icon: GiBrain },
 ];
 export interface Reaction {
-  challengeId:number;
+  challengeId: number;
   userId: string;
   reaction: number;
 }
@@ -28,12 +30,12 @@ const countReactions = (reactions: Reaction[]) => {
   return countedReactions;
 };
 
-const ReactionElement = ({ reactionId, amount }) => {
+const ReactionElement = ({ reactionId, amount,selected }) => {
   const { Icon, name } = reactions[reactionId];
 
   return (
     <button className='reactionBtn relative border-none '>
-      <span className='hidden  '>{reactions[reactionId].name}</span>
+      <span className='hidden'>{reactions[reactionId].name}</span>
       <Icon></Icon>
       <span className='absolute flex items-center justify-center text-base  bg-white  rounded-xl w-5 h-5 translate-x-2 -translate-y-2 top-0 right-0'>
         {amount}
@@ -42,19 +44,27 @@ const ReactionElement = ({ reactionId, amount }) => {
   );
 };
 
-const ChallengeReactions = ({ reactionsData }) => {
-  const { user } = useSelector<RootState>((state) => state.authInfo);
+const ChallengeReactions = ({ userId, challengeId }) => {
   const [amountOfReactions, setAmountOfReactions] = useState([0, 0, 0, 0]);
   const [selectedReactions, setSelectedReactions] = useState(-1);
-
+  const { data: reactionsData } = useChallengeReactionQuery(
+    challengeId,
+    userId
+  );
+  const { reactions, userReaction } = reactionsData;
   useEffect(() => {
-    setAmountOfReactions(countReactions(reactionsData));
-  }, [reactionsData]);
+    setAmountOfReactions(countReactions(reactions));
+  }, [reactions]);
   return (
     <div className={'text-4xl flex justify-around pt-2 bg-white '}>
       {reactions.map((reactionObject, index) => {
         return (
-          <ReactionElement amount={amountOfReactions[index]} key={Math.random()} reactionId={index} />
+          <ReactionElement
+            selected={userReaction.reaction == reactionObject.reaction}
+            amount={amountOfReactions[index]}
+            key={Math.random()}
+            reactionId={index}
+          />
         );
       })}
     </div>
