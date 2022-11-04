@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { ChallengeQuery } from '../../pages/challenge/useChallengeQuery';
+import { ChallengeReactionsData } from '../../pages/challenge/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
 import { Reaction } from './challengeReactions';
 
@@ -10,62 +10,89 @@ interface MutateReactionProps {
   userReaction: Reaction | null;
 }
 
-const mutateReaction = async (props: MutateReactionProps) => {
-  const { challegeId, reactionId, userId, userReaction } = props;
-  if (!userReaction) {
-    await supabase
-      .from('reactions')
-      .insert({ reaction: reactionId, challegeId, userId })
-      .eq('challengeId', challegeId)
-      .eq('userId', userId);
-  } else if (reactionId == userReaction.reaction) {
-    await supabase
-      .from('reactions')
-      .delete()
-      .eq('challengeId', challegeId)
-      .eq('userId', userId);
-  }
-  await supabase
-    .from('reactions')
-    .update({ reaction: reactionId })
-    .eq('challengeId', challegeId)
-    .eq('userId', userId);
-  return props;
-};
 const changeReactions = (
-  challege: ChallengeQuery,
-  props: MutateReactionProps
-) => {
-  const { userId, reactionId, challegeId, userReaction } = props;
-  if (!challege.userReaction) {
-    const newChallenge = {
-      ...challege,
-      reactions: { ...challege.reactions, userReaction },
-    };
-    return newChallenge;
+  reactions: Reaction[],
+  userReaction: Reaction | null,
+  newReaction: Reaction
+): ChallengeReactionsData => {
+  if (!userReaction) {
+    const newReactions = [...reactions, newReaction];
+
+    return { reactions: newReactions, userReaction: newReaction };
   }
-  const newReactions = challege.reactions.filter(
-    (reaction) => reaction.userId != userId
+  const newReactions = reactions.filter(
+    (reaction) => reaction.userId != userReaction.userId
   );
-  if (userReaction.reaction === reactionId) {
-    return { ...challege, reactions: newReactions };
+  if (userReaction.reactionId === newReaction.reactionId) {
+    return { reactions: newReactions, userReaction: newReaction };
   }
-  return { ...challege, reactions: { ...newReactions, userReaction } };
+  return {
+    reactions: [...newReactions, newReaction],
+    userReaction: newReaction,
+  };
 };
 
-export const useReactionMutation = (challegeId: number) => {
+export const useReactionMutation = (challengeId: number, userId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: mutateReaction,
-    onMutate: async (props: MutateReactionProps) => {
-      await queryClient.cancelQueries(['challenge', challegeId]);
-      const challenge = (await queryClient.getQueryData([
-        'challenge',
-        challegeId,
-      ])) as ChallengeQuery;
-      const newChallengeState = changeReactions(challenge, props);
-      queryClient.setQueryData(['challenge', challegeId], newChallengeState);
-      return { newChallengeState };
+    mutationFn: async (newReaction: Reaction) => {
+      const { reactions, userReaction } =
+        queryClient.getQueryData<ChallengeReactionsData>([
+          'reactions',
+          challengeId,
+          userId,
+        ]);
+      const { reactionId } = newReaction;
+
+      if (!userReaction) {
+        await supabase
+          .from<Reaction>('reactions')
+          .insert({ ...newReaction })
+          .eq('challengeId', challengeId)
+          .eq('userId', userId);
+      } else if (reactionId == userReaction.reactionId) {
+        await supabase
+          .from<Reaction>('reactions')
+          .delete()
+          .eq('challengeId', challengeId)
+          .eq('userId', userId);
+      }
+      await supabase
+        .from<Reaction>('reactions')
+        .update({ reactionId })
+        .eq('challengeId', challengeId)
+        .eq('userId', userId);
+      return newReaction;
+    },
+    onMutate: async (newReaction) => {
+      await queryClient.cancelQueries(['reactions', challengeId, userId]);
+      const reactionsData = queryClient.getQueryData<ChallengeReactionsData>([
+        'reactions',
+        challengeId,
+        userId,
+      ]);
+      const { reactions: oldReactions, userReaction } = reactionsData;
+      const newReactions = changeReactions(
+        oldReactions,
+        userReaction,
+        newReaction
+      );
+      console.log(newReactions, 'new Reaction');
+
+      queryClient.setQueryData(
+        ['reactions', challengeId, userId],
+        newReactions
+      );
+      return oldReactions;
+    },
+    onError: (err, newReaction, oldReactions) => {
+      queryClient.setQueryData(
+        ['reactions', challengeId, userId],
+        oldReactions
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['reactions', challengeId, userId], data);
     },
   });
 };

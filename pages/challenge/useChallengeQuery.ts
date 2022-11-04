@@ -16,7 +16,7 @@ interface Challenge {
   startTime?: string;
 }
 
-export interface ChallengeReactionsQuery {
+export interface ChallengeReactionsData {
   reactions: Reaction[];
   userReaction: Reaction;
 }
@@ -27,7 +27,7 @@ export const fetchChallenge = async (
   try {
     const challenge = await supabase
       .from<Challenge>('challenges')
-      .select('*,reactions(userId,reaction)')
+      .select('*')
       .eq('id', idChallenge);
 
     return challenge.data[0];
@@ -48,20 +48,17 @@ export const fetchChallengeReactions = async (
 ) => {
   const reactions = await supabase
     .from<Reaction>('reactions')
-    .select('reaction,userId')
+    .select('reactionId,userId')
     .eq('challengeId', challegeId);
   const userReaction = reactions.data.find(
     (reaction) => reaction.userId == userId
   );
-
-  return { reactions: reactions.data, userReaction };
+  
+  return { reactions: reactions.data, userReaction:userReaction||null };
 };
 
-export const useChallengeReactionQuery = (
-  challengeId: number,
-  userId: string
-) =>
-  useQuery<ChallengeReactionsQuery>(['reactions', challengeId, userId], {
+export const useChallengeReactionQuery = (challengeId: number, userId: string) =>
+  useQuery<ChallengeReactionsData>(['reactions', challengeId, userId], {
     queryFn: () => fetchChallengeReactions(challengeId, userId),
     enabled: false,
   });

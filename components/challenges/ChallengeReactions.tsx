@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { useChallengeReactionQuery } from '../../pages/challenge/useChallengeQuery';
 import { RootState } from '../../services/Store/store';
 import { useReactionMutation } from './useReactionMutate';
-const reactions = [
+const reactionsOptions = [
   { id: 1, name: 'like', Icon: AiTwotoneLike, color: '' },
   { id: 2, name: 'wow', Icon: DiCodeigniter },
   { id: 3, name: 'dislike', Icon: AiFillDislike },
@@ -15,27 +15,26 @@ const reactions = [
 export interface Reaction {
   challengeId: number;
   userId: string;
-  reaction: number;
+  reactionId: number;
 }
 
 const countReactions = (reactions: Reaction[]) => {
-  console.log(reactions);
-
   const initialValue = [0, 0, 0, 0];
+  console.log(reactions);
+  
   const countedReactions = reactions.reduce((prev, current) => {
-    prev[current.reaction]++;
+    prev[current.reactionId]++;
     return prev;
   }, initialValue);
-  console.log(countedReactions);
   return countedReactions;
 };
 
-const ReactionElement = ({ reactionId, amount,selected }) => {
-  const { Icon, name } = reactions[reactionId];
+const ReactionElement = ({ reactionId, amount, selected,action }) => {
+  const { Icon, name } = reactionsOptions[reactionId];
 
   return (
-    <button className='reactionBtn relative border-none '>
-      <span className='hidden'>{reactions[reactionId].name}</span>
+    <button onClick={action} className='reactionBtn relative border-none '>
+      <span className='hidden'>{reactionsOptions[reactionId].name}</span>
       <Icon></Icon>
       <span className='absolute flex items-center justify-center text-base  bg-white  rounded-xl w-5 h-5 translate-x-2 -translate-y-2 top-0 right-0'>
         {amount}
@@ -51,19 +50,21 @@ const ChallengeReactions = ({ userId, challengeId }) => {
     challengeId,
     userId
   );
+  const { mutate } = useReactionMutation(challengeId, userId);
   const { reactions, userReaction } = reactionsData;
   useEffect(() => {
     setAmountOfReactions(countReactions(reactions));
   }, [reactions]);
   return (
     <div className={'text-4xl flex justify-around pt-2 bg-white '}>
-      {reactions.map((reactionObject, index) => {
+      {reactionsOptions.map((reactionObject, index) => {
         return (
           <ReactionElement
-            selected={userReaction.reaction == reactionObject.reaction}
+            selected={false}
             amount={amountOfReactions[index]}
             key={Math.random()}
             reactionId={index}
+            action={() => mutate({ challengeId, reactionId: index, userId })}
           />
         );
       })}

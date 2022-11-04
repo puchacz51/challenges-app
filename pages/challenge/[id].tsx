@@ -2,7 +2,9 @@ import { User } from '@supabase/supabase-js';
 import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import ChallengeReactions from '../../components/challenges/challengeReactions';
+import ChallengeReactions, {
+  Reaction,
+} from '../../components/challenges/challengeReactions';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
 import { RootState, store } from '../../services/Store/store';
@@ -35,8 +37,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { data: challenge, error, isLoading } = useChallengeQuery(challengeId);
-  const { data: reactionsData, isLoading: reactionsLoading } =
-    useChallengeReactionQuery(challengeId, user?.id);
   if (isLoading) return <>loading...</>;
   if (!challenge)
     return (
@@ -45,7 +45,6 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
       </>
     );
   const { title, description, createdAt, images } = challenge;
-
   return (
     <>
       <div className='flex flex-col bg-slate-200'>

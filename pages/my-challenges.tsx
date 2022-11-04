@@ -7,7 +7,7 @@ import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 import { ChallengesList } from '../components/challenges/ChallengesList';
 import ImageSlider from '../components/challenges/ImageSlider';
-import { AddChellengeForm } from '../components/forms/AddChellenge';
+import { AddChallenge } from '../components/forms/AddChellenge';
 import { useChallengeQuery } from '../components/utilities/usePostQuery';
 import { setCredentials } from '../services/Store/authSlice';
 import { RootState, store } from '../services/Store/store';
@@ -40,7 +40,7 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
       initialState: store.getState(),
       queryState: dehydrate(queryClient),
       bucketPath,
-    }
+    },
   };
 };
 
@@ -51,9 +51,9 @@ const MyChallenges: NextPage = (props: ServerProps) => {
   useEffect(() => {}, []);
   return (
     <main className='flex flex-col '>
+      <AddChallenge/>
       <ChellengesOption />
-      <ChallengesList > </ChallengesList>
-      {/* <AddChellengeForm /> */}
+      <ChallengesList> </ChallengesList>
       {/* <ChallengesList initialData={props.userChallenges} />  */}
     </main>
   );

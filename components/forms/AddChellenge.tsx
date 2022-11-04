@@ -8,6 +8,8 @@ import { privateChellengeschema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
+import { useState } from 'react';
+import Challenge from '../../pages/challenge/[id]';
 const initialValues = {
   title: '',
   description: '',
@@ -16,17 +18,36 @@ const initialValues = {
   endTime: 1000,
   images: {},
 };
-interface challenge {
+interface Challenge {
   title: string;
   description: string;
   startTime: any;
   endTime: any;
   images: FileList;
 }
-export const AddChellengeForm = () => {
+
+export const AddChallenge = () => {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  return (
+    <>
+      <button
+        className='bg-red-200'
+        onClick={() => setIsVisible((isVisible) => !isVisible)}>
+        Add new challenge
+      </button>
+      {isVisible && <ChallengeForm />}
+    </>
+  );
+};
+
+interface ChallengeFormProps {
+  initialData?: Challenge;
+}
+
+const ChallengeForm = ({ initialData }:ChallengeFormProps) => {
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
-    defaultValues: initialValues,
+    defaultValues: initialData||initialValues,
   });
   const {
     handleSubmit,
@@ -40,9 +61,8 @@ export const AddChellengeForm = () => {
   const onSubmitHandler = async (data, userId) => {
     try {
       console.log('addd ...');
-      mutate({...data,userId})
-    } catch (err) {
-    }
+      mutate({ ...data, userId });
+    } catch (err) {}
   };
 
   return (
