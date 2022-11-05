@@ -34,6 +34,16 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
 };
 
+const addReaction = async (challengeId, userId) => {
+  const  res = await supabase
+    .from<Reaction>('reactions')
+    .update({ challengeId, userId, reactionId: 40 })
+    .eq('challengeId', challengeId)
+    .eq('userId', userId);
+    console.log(res);
+    
+};
+
 const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { data: challenge, error, isLoading } = useChallengeQuery(challengeId);
@@ -55,6 +65,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
         <ChallengeReactions userId={user.id} challengeId={challengeId} />
+        <button onClick={()=>addReaction(challengeId,user.id)} >Click</button>
       </div>
     </>
   );

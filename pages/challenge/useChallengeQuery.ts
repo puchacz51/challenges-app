@@ -19,6 +19,7 @@ interface Challenge {
 export interface ChallengeReactionsData {
   reactions: Reaction[];
   userReaction: Reaction;
+  oldUserReaction?: Reaction;
 }
 
 export const fetchChallenge = async (
@@ -53,11 +54,14 @@ export const fetchChallengeReactions = async (
   const userReaction = reactions.data.find(
     (reaction) => reaction.userId == userId
   );
-  
-  return { reactions: reactions.data, userReaction:userReaction||null };
+
+  return { reactions: reactions.data, userReaction: userReaction || null };
 };
 
-export const useChallengeReactionQuery = (challengeId: number, userId: string) =>
+export const useChallengeReactionQuery = (
+  challengeId: number,
+  userId: string
+) =>
   useQuery<ChallengeReactionsData>(['reactions', challengeId, userId], {
     queryFn: () => fetchChallengeReactions(challengeId, userId),
     enabled: false,

@@ -33,7 +33,7 @@ const ReactionElement = ({ reactionId, amount, selected,action }) => {
   const { Icon, name } = reactionsOptions[reactionId];
 
   return (
-    <button onClick={action} className='reactionBtn relative border-none '>
+    <button onClick={action} className={`reactionBtn relative border-none  ${selected&&'text-blue-500'}`}>
       <span className='hidden'>{reactionsOptions[reactionId].name}</span>
       <Icon></Icon>
       <span className='absolute flex items-center justify-center text-base  bg-white  rounded-xl w-5 h-5 translate-x-2 -translate-y-2 top-0 right-0'>
@@ -60,7 +60,7 @@ const ChallengeReactions = ({ userId, challengeId }) => {
       {reactionsOptions.map((reactionObject, index) => {
         return (
           <ReactionElement
-            selected={false}
+            selected={userReaction?.reactionId == index}
             amount={amountOfReactions[index]}
             key={Math.random()}
             reactionId={index}

@@ -1,3 +1,5 @@
+import { PostgrestResponse } from '@supabase/supabase-js';
+import { SupabaseQueryBuilder } from '@supabase/supabase-js/dist/module/lib/SupabaseQueryBuilder';
 import { useMutation, useQueryClient } from 'react-query';
 import { ChallengeReactionsData } from '../../pages/challenge/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
@@ -18,17 +20,26 @@ const changeReactions = (
   if (!userReaction) {
     const newReactions = [...reactions, newReaction];
 
-    return { reactions: newReactions, userReaction: newReaction };
+    return {
+      reactions: newReactions,
+      userReaction: newReaction,
+      oldUserReaction: userReaction
+    };
   }
   const newReactions = reactions.filter(
     (reaction) => reaction.userId != userReaction.userId
   );
   if (userReaction.reactionId === newReaction.reactionId) {
-    return { reactions: newReactions, userReaction: newReaction };
+       return {
+         reactions: newReactions,
+         userReaction: newReaction,
+         oldUserReaction: userReaction,
+       };
   }
   return {
     reactions: [...newReactions, newReaction],
     userReaction: newReaction,
+    oldUserReaction: userReaction,
   };
 };
 
@@ -36,35 +47,41 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newReaction: Reaction) => {
-      const { reactions, userReaction } =
+      const { reactions, userReaction,oldUserReaction } =
         queryClient.getQueryData<ChallengeReactionsData>([
           'reactions',
           challengeId,
           userId,
         ]);
       const { reactionId } = newReaction;
-
-      if (!userReaction) {
-        await supabase
+      let response: PostgrestResponse<Reaction>;
+      if (!oldUserReaction?.userId) {
+        response = await supabase
           .from<Reaction>('reactions')
           .insert({ ...newReaction })
           .eq('challengeId', challengeId)
           .eq('userId', userId);
-      } else if (reactionId == userReaction.reactionId) {
-        await supabase
+      } else if (reactionId == oldUserReaction.reactionId) {
+        response = await supabase
           .from<Reaction>('reactions')
           .delete()
           .eq('challengeId', challengeId)
           .eq('userId', userId);
+      } else {
+        response = await supabase
+          .from<Reaction>('reactions')
+          .update({ reactionId })
+          .eq('challengeId', challengeId)
+          .eq('userId', userId);
       }
-      await supabase
-        .from<Reaction>('reactions')
-        .update({ reactionId })
-        .eq('challengeId', challengeId)
-        .eq('userId', userId);
-      return newReaction;
+      if(response.error){
+        throw response.error
+      }
+      const newUserReaction = response.body.filter(reaction => reaction.userId==userId)
+      return { reactions: response.body, userReaction:newUserReaction[0] };
     },
     onMutate: async (newReaction) => {
+
       await queryClient.cancelQueries(['reactions', challengeId, userId]);
       const reactionsData = queryClient.getQueryData<ChallengeReactionsData>([
         'reactions',
@@ -77,8 +94,8 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
         userReaction,
         newReaction
       );
-      console.log(newReactions, 'new Reaction');
-
+        console.log(2);
+        
       queryClient.setQueryData(
         ['reactions', challengeId, userId],
         newReactions
