@@ -23,18 +23,18 @@ const changeReactions = (
     return {
       reactions: newReactions,
       userReaction: newReaction,
-      oldUserReaction: userReaction
+      oldUserReaction: userReaction,
     };
   }
   const newReactions = reactions.filter(
     (reaction) => reaction.userId != userReaction.userId
   );
   if (userReaction.reactionId === newReaction.reactionId) {
-       return {
-         reactions: newReactions,
-         userReaction: newReaction,
-         oldUserReaction: userReaction,
-       };
+    return {
+      reactions: newReactions,
+      userReaction: null,
+      oldUserReaction: userReaction,
+    };
   }
   return {
     reactions: [...newReactions, newReaction],
@@ -47,7 +47,7 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newReaction: Reaction) => {
-      const { reactions, userReaction,oldUserReaction } =
+      const { reactions, userReaction, oldUserReaction } =
         queryClient.getQueryData<ChallengeReactionsData>([
           'reactions',
           challengeId,
@@ -74,14 +74,12 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
           .eq('challengeId', challengeId)
           .eq('userId', userId);
       }
-      if(response.error){
-        throw response.error
+      if (response.error) {
+        throw response.error;
       }
-      const newUserReaction = response.body.filter(reaction => reaction.userId==userId)
-      return { reactions: response.body, userReaction:newUserReaction[0] };
+      return { reactions, userReaction };
     },
     onMutate: async (newReaction) => {
-
       await queryClient.cancelQueries(['reactions', challengeId, userId]);
       const reactionsData = queryClient.getQueryData<ChallengeReactionsData>([
         'reactions',
@@ -94,8 +92,7 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
         userReaction,
         newReaction
       );
-        console.log(2);
-        
+
       queryClient.setQueryData(
         ['reactions', challengeId, userId],
         newReactions
@@ -107,9 +104,6 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
         ['reactions', challengeId, userId],
         oldReactions
       );
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['reactions', challengeId, userId], data);
     },
   });
 };

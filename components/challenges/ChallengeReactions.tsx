@@ -7,10 +7,10 @@ import { useChallengeReactionQuery } from '../../pages/challenge/useChallengeQue
 import { RootState } from '../../services/Store/store';
 import { useReactionMutation } from './useReactionMutate';
 const reactionsOptions = [
-  { id: 1, name: 'like', Icon: AiTwotoneLike, color: '' },
-  { id: 2, name: 'wow', Icon: DiCodeigniter },
-  { id: 3, name: 'dislike', Icon: AiFillDislike },
-  { id: 4, name: 'smart', Icon: GiBrain },
+  { id: 0, name: 'like', Icon: AiTwotoneLike, color: '' },
+  { id: 1, name: 'wow', Icon: DiCodeigniter },
+  { id: 2, name: 'dislike', Icon: AiFillDislike },
+  { id: 3, name: 'smart', Icon: GiBrain },
 ];
 export interface Reaction {
   challengeId: number;
