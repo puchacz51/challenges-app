@@ -17,6 +17,7 @@ import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useState } from 'react';
 import Challenge from '../../pages/challenge/[id]';
 import { useFormikContext } from 'formik';
+import { AddChallengeSteps } from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
@@ -31,23 +32,13 @@ interface Challenge {
   startTime: any;
   endTime: any;
   images: FileList;
-  challengeSteps: ChallengeStep[];
-}
-interface ChallengeStep {
-  id: number;
-  title: string;
-  description?: string;
-  time: number;
-}
-interface ChallengeStepProps {
-  register: UseFormRegister<FieldValues>;
-  index: number;
+  challengeSteps: Challenge[];
 }
 
 export const AddChallenge = () => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
   return (
-    <div className='h-screen'>
+    <div className='h-min-screen'>
       <button
         className='bg-red-200'
         onClick={() => setIsVisible((isVisible) => !isVisible)}>
@@ -55,43 +46,6 @@ export const AddChallenge = () => {
       </button>
       {isVisible && <ChallengeForm />}
     </div>
-  );
-};
-
-const ChallengeStep = ({ register, index }: ChallengeStepProps) => {
-  return (
-    <div className='w-full flex flex-col '>
-      <button>X</button>
-      <TextInput title={`challengestep.${index}.title`} errors={null} text={'step title'}></TextInput>
-
-      <label htmlFor={`challengestep.${index}.title`}>description</label>
-      <input type='text' {...register(`challengestep.${index}.title`)} />
-    </div>
-  );
-};
-
-const AddChallengeSteps = () => {
-  const [steps, setSteps] = useState([]);
-  const [isVisible, setIsVisible] = useState(false);
-  const { register } = useFormContext();
-  const addChallengeStep = () => {
-    if (steps.length < 6) {
-      setSteps([...steps, `step${steps.length + 1}`]);
-    }
-  };
-
-  return (
-    <>
-      <button onClick={() => setIsVisible((is) => !is)}>add steps</button>
-      {isVisible && (
-        <div className='flex flex-col bg-slate-500'>
-          {steps.map((name, i) => (
-            <ChallengeStep register={register} index={i} key={name} />
-          ))}
-          {steps.length < 5 && <button onClick={addChallengeStep}>o</button>}
-        </div>
-      )}
-    </>
   );
 };
 
@@ -112,10 +66,9 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   } = methods;
   const user = useSelector<RootState>((state) => state.authInfo.user);
   const { mutate } = addChallengeMutation();
-
+  
   const onSubmitHandler = async (data, userId) => {
     try {
-      console.log('addd ...');
       mutate({ ...data, userId });
     } catch (err) {}
   };
@@ -136,8 +89,8 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
           errors={errors.description}
           title='description'></LongTextInput>
         <CheckBox errors={errors.isPublic} title='isPublic'></CheckBox>
-        <AddChallengeSteps />
         <ImagesInput errors={errors.images} />
+        <AddChallengeSteps />
         {isSubmitting ? (
           <h2>adding...</h2>
         ) : (
@@ -146,8 +99,6 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
             submit
           </button>
         )}
-
-        {/* {JSON.stringify(getValues())} */}
       </form>
     </FormProvider>
   );

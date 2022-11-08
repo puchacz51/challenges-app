@@ -10,8 +10,9 @@ interface TextInputProps {
   title: string;
   att?: Attributes;
   errors: FieldError;
+  text:string
 }
-const TextInput = ({ title, errors, ...att }: TextInputProps) => {
+const TextInput = ({ title, errors, text , ...att}: TextInputProps) => {
   const [isTouched, setIsTouched] = useState<boolean>(false);
   const { register, setValue } = useFormContext();
   return (
@@ -31,7 +32,7 @@ const TextInput = ({ title, errors, ...att }: TextInputProps) => {
         } `}
         htmlFor={title}
         {...att}>
-        {`${title}`}
+        {`${text}`}
       </label>
       <p>{errors?.message}</p>
     </div>

@@ -9,8 +9,6 @@ const ChallengesList = (): JSX.Element => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
   const { data: challenges, refetch, isLoading } = useChallengeQuery(user.id);
 
-  console.log(challenges);
-
   if (isLoading && !challenges) {
     return <h2>loading ...</h2>;
   }

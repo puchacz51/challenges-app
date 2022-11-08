@@ -13,6 +13,7 @@ interface TextInputProps {
 }
 const LongTextInput = ({ title, errors, ...att }: TextInputProps) => {
   const { register } = useFormContext();
+  
   return (
     <div className={`relative gap-1 pt-3 mt-5 ${errors && 'text-red-600'}`}>
       <textarea
