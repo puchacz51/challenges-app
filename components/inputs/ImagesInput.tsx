@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FcAddImage } from 'react-icons/fc';
+import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
+import { BsFillTrashFill } from 'react-icons/bs';
+
 const CreateHandleImages =
   (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e?.currentTarget;
@@ -15,7 +17,7 @@ const AddImagesElement = ({ addImages }) => {
   return (
     <label
       htmlFor='image'
-      className='relative w-[48%] h-[100px] border-4  border-black '>
+      className='relative w-[44%] h-[100px] border-4  border-black '>
       <button
         onClick={addImages}
         className='w-full h-full flex justify-center items-center'>
@@ -25,29 +27,25 @@ const AddImagesElement = ({ addImages }) => {
   );
 };
 const ImagesUplouder = ({ errors }) => {
-  const [localImagesUrl, setLocalImagesUrl] = useState([]);
-  const { current: imageFiles } = useRef<File[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const { setValue } = useFormContext();
   const imageInputRef = useRef<HTMLInputElement>();
   const handleImageInput = () => {
-    const newInputValue = imageInputRef.current.files;
-    console.log(newInputValue);
-    
-    imageFiles.push(...newInputValue);
-    console.log(imageFiles);
-    
-    const imageURLs = Array.from(imageFiles).map((file) =>
-      URL.createObjectURL(file)
-    );
-    setLocalImagesUrl(imageURLs);
+    const newInputValue = Array.from(imageInputRef.current.files);
+    setImageFiles([...imageFiles, ...newInputValue]);
   };
+  const removeImage = (name: string) => {
+    console.log(name);
+    
+    const newImageFiles = imageFiles.filter(
+      (file) => name !== file.name
+    );
+    setImageFiles(newImageFiles);
+  };
+
   useEffect(() => {
-    setValue('images', localImagesUrl);
-  }, localImagesUrl);
-  // const handleImages = CreateHandleImages(
-  //   (v) => setValue('images', v),
-  //   setLocalImagesUrl
-  // );
+    setValue('images', imageFiles);
+  }, [setValue, imageFiles]);
 
   return (
     <>
@@ -61,28 +59,41 @@ const ImagesUplouder = ({ errors }) => {
         className='hidden'
       />
       <span>{errors?.message}</span>
-      <div className='flex w-full flex-wrap flex-row gap-y-2 justify-around'>
-        <ImageItemsList imagesUrl={localImagesUrl} />
-
-        <AddImagesElement addImages={() => imageInputRef.current.click()} />
+      <div className='flex w-full flex-wrap flex-row gap-3 justify-between'>
+        <ImageItemsList key={imageFiles.length}  imageFiles={imageFiles} removeImage={removeImage} />
+        {imageFiles.length < 6 && (
+          <AddImagesElement addImages={() => imageInputRef.current.click()} />
+        )}
       </div>
     </>
   );
 };
 
-const ImageItemsList = ({ imagesUrl }) => {
+const ImageItemsList = ({ imageFiles,removeImage }:{imageFiles:File[],removeImage:Function}) => {
+  const [localImagesUrl, setLocalImagesUrl] = useState([]);
+  useEffect(() => {
+    const imageURLs = imageFiles?.map((file) => URL.createObjectURL(file));
+    setLocalImagesUrl(imageURLs)
+  }, [imageFiles]);
+
+
   return (
     <>
-      {imagesUrl.map((imageUrl) => (
-        <ImageItem key={imageUrl} imageUrl={imageUrl} />
+      {localImagesUrl?.map((imageUrl, i) => (
+        <ImageItem
+          key={imageUrl}
+          imageUrl={imageUrl}
+          name={imageFiles[i].name}
+          removeImage={removeImage}
+        />
       ))}
     </>
   );
 };
 
-const ImageItem = ({ imageUrl }) => {
+const ImageItem = ({ imageUrl,removeImage,name }) => {
   return (
-    <div className='relative w-[48%] h-[100px] border-4  border-fuchsia-600 '>
+    <div className='relative w-[47%] h-[100px] border-4  border-black '>
       <Image
         alt='your image'
         layout='fill'
@@ -90,6 +101,9 @@ const ImageItem = ({ imageUrl }) => {
         key={imageUrl}
         src={imageUrl}
       />
+      <button className='absolute right-0   ' onClick={()=>removeImage(name)}>
+        <BsFillTrashFill className='h-10 w-10 right-0 p-1 bg-slate-500 text-white rounded-2xl translate-x-5 -translate-y-5 ' />
+      </button>
     </div>
   );
 };

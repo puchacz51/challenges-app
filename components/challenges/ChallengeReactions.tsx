@@ -45,7 +45,6 @@ const ReactionElement = ({ reactionId, amount, selected,action }) => {
 
 const ChallengeReactions = ({ userId, challengeId }) => {
   const [amountOfReactions, setAmountOfReactions] = useState([0, 0, 0, 0]);
-  const [selectedReactions, setSelectedReactions] = useState(-1);
   const { data: reactionsData } = useChallengeReactionQuery(
     challengeId,
     userId

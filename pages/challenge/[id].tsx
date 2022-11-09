@@ -17,18 +17,19 @@ import {
 } from './useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { data: user, token } = await supabase.auth.api.getUserByCookie(
+  const { data: userData, token } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
+  const user = userData || { id: null ,token:null} as User;
+
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const challengeId = Number(ctx.query.id);
   await queryClient.fetchQuery(['challenge', Number(challengeId)], () =>
     fetchChallenge(Number(challengeId))
   );
-  await queryClient.fetchQuery(
-    ['reactions', Number(challengeId), user.id],
-    () => fetchChallengeReactions(challengeId, user.id)
+  await queryClient.fetchQuery(['reactions', Number(challengeId)], () =>
+    fetchChallengeReactions(challengeId, user.id )
   );
 
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
@@ -54,7 +55,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
         <ImageSlider imagesUrl={images}></ImageSlider>
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
-        <ChallengeReactions userId={user.id} challengeId={challengeId} />
+        <ChallengeReactions userId={user?.id} challengeId={challengeId} />
       </div>
     </>
   );
