@@ -11,8 +11,9 @@ const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;
   supabase.auth.onAuthStateChange((event, session) => {
+    console.log(session);
     if (!session) return;
-    fetch('/api/set-auth-cookie', {
+    fetch(`/api/set-auth-cookie`, {
       method: 'POST',
       headers: new Headers({ 'Content-Type': 'application/json' }),
       credentials: 'same-origin',
@@ -25,10 +26,11 @@ const MyApp = ({ Component, pageProps }) => {
       })
     );
   });
+  
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools/>
+        <ReactQueryDevtools />
         <Hydrate state={pageProps.queryState}>
           <Layout>
             <Component {...pageProps} />

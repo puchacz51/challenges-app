@@ -51,18 +51,17 @@ export const fetchChallengeReactions = async (
     .from<Reaction>('reactions')
     .select('reactionId,userId')
     .eq('challengeId', challegeId);
-  let userReaction;
+  let userReaction=null;
   
   if (userId) {
     userReaction = reactions.data.find((reaction) => reaction.userId == userId);
   }
-  userReaction = null;
 
-  return { reactions: reactions.data, userReaction: userReaction || null };
+  return { reactions: reactions.data, userReaction: userReaction  };
 };
 
 export const useChallengeReactionQuery = (challengeId: number, userId: string) =>
-  useQuery<ChallengeReactionsData>(['reactions', Number(challengeId)], {
+  useQuery<ChallengeReactionsData>(['reactions', Number(challengeId),userId], {
     queryFn: () => fetchChallengeReactions(challengeId, userId),
     enabled: false,
   });

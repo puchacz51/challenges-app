@@ -7,6 +7,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     lifetime: 100000,
     path: '/',
     sameSite: 'lax',
-    domain: 'localhost',
+    domain: process.env.NEXT_PUBLIC_IP_ADRESS,
   },
 });

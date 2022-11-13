@@ -20,7 +20,6 @@ export interface Reaction {
 
 const countReactions = (reactions: Reaction[]) => {
   const initialValue = [0, 0, 0, 0];
-  console.log(reactions);
   
   const countedReactions = reactions.reduce((prev, current) => {
     prev[current.reactionId]++;
@@ -49,6 +48,8 @@ const ChallengeReactions = ({ userId, challengeId }) => {
     challengeId,
     userId
   );
+
+   
   const { mutate } = useReactionMutation(challengeId, userId);
   const { reactions, userReaction } = reactionsData;
   useEffect(() => {

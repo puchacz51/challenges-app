@@ -20,7 +20,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data: userData, token } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
-  const user = userData || { id: null ,token:null} as User;
+  const user = userData || { id: null ,token:null} ;
+console.log(user);
 
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
@@ -28,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   await queryClient.fetchQuery(['challenge', Number(challengeId)], () =>
     fetchChallenge(Number(challengeId))
   );
-  await queryClient.fetchQuery(['reactions', Number(challengeId)], () =>
+  await queryClient.fetchQuery(['reactions', Number(challengeId),user.id], () =>
     fetchChallengeReactions(challengeId, user.id )
   );
 

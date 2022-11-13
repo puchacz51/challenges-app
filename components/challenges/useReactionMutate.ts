@@ -44,6 +44,7 @@ const changeReactions = (
 };
 
 export const useReactionMutation = (challengeId: number, userId: string) => {
+
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newReaction: Reaction) => {
@@ -86,7 +87,7 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
         challengeId,
         userId,
       ]);
-    const { reactions: oldReactions, userReaction } = reactionsData;
+      const { reactions: oldReactions, userReaction } = reactionsData;
       const newReactions = changeReactions(
         oldReactions,
         userReaction,

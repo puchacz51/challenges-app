@@ -21,7 +21,7 @@ const LoginOptions = (): JSX.Element => {
       </button>
       <h2 className=''>other options</h2>
 
-      <button onClick={() => signInWithGitHub('http://localhost:3000')}>
+      <button onClick={() => signInWithGitHub()}>
         <FaGithub />
       </button>
       <Link href='/register'>
