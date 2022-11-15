@@ -6,9 +6,12 @@ const signInWithEmail = (email: string, password: string) => {
 const signUpWithEmail = (email, password) => {
   supabase.auth.signUp({ email, password });
 };
-const signInWithGitHub = (
+const signInWithGitHub = async (
   redirectURL = window.location.href.toString()
 ) => {
-  supabase.auth.signIn({ provider: 'github' }, { redirectTo: redirectURL });
+  const user = await supabase.auth.signIn(
+    { provider: 'github' }
+  );
+  
 };
 export { signInWithEmail, signUpWithEmail, signInWithGitHub };

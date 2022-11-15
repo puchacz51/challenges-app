@@ -3,6 +3,7 @@ import LoginOptions from '../components/forms/LoginOptions';
 import { supabase } from '../services/supabase/supabase';
 export const getServerSideProps:GetServerSideProps = async ({req,resolvedUrl})=>{
   const user =await supabase.auth.api.getUserByCookie(req)
+  
 //   if(!user)
 // {
 //   return{props:{},redirect:{destination}}

@@ -1,20 +1,17 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { supabase } from '../services/supabase/supabase';
 import { store } from '../services/Store/store';
 import { setCredentials } from '../services/Store/authSlice';
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
-  store.dispatch(setCredentials({ user, token }));
-    
-  return { props: { user, token } };
+import { getServerSidePropsWrapper } from '../components/getServerSidePropsWrapper';
+const cos: GetServerSideProps = async (ctx) => {
+  return { props: { value: 1 } };
 };
 
+
+export const getServerSideProps = getServerSidePropsWrapper(cos);
+
+
+
 export default function Home(props) {
-  
-
-  return (
-    <main>
-    </main>
-  );
+  return <main></main>;
 }
-

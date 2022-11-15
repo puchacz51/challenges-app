@@ -21,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     ctx.req
   );
   const user = userData || { id: null ,token:null} ;
-console.log(user);
 
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
