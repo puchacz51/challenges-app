@@ -37,7 +37,7 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      initialState: store.getState(),
+      store: store.getState(),
       queryState: dehydrate(queryClient),
       bucketPath,
     },

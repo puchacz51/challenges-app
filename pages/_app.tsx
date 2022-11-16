@@ -8,17 +8,12 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { store } from '../services/Store/store';
 import { QueryClient, QueryClientProvider, Hydrate, hydrate } from 'react-query';
 import { setCookie } from 'nookies';
-const useAuth = () => {
-  return {};
-};
 
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;
-  store.dispatch(setCredentials(pageProps.store.authInfo))
+  store.dispatch(setCredentials(pageProps.store?.authInfo))
   supabase.auth.onAuthStateChange((event, session) => {
-    console.log(111);
-    
     // if (!session) return;
     // fetch(`/api/set-auth-cookie`, {
     //   method: 'POST',

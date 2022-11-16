@@ -1,9 +1,6 @@
 import {
-  FieldValues,
   FormProvider,
   useForm,
-  useFormContext,
-  UseFormRegister,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
@@ -16,7 +13,6 @@ import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useState } from 'react';
 import Challenge from '../../pages/challenge/[id]';
-import { useFormikContext } from 'formik';
 import { AddChallengeSteps } from './ChallengeSteps';
 const initialValues = {
   title: '',
@@ -104,30 +100,3 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   );
 };
 
-// const addChellenge = async (values) => {
-//   try {
-//     console.log('adding....');
-//     let formData = new FormData();
-//     console.log(values);
-
-//     Object.keys(values).forEach((key) => {
-//       if (key == 'images') {
-//         let id = 0;
-//         for (const image of values.images) {
-//           console.log(image);
-
-//           formData.append(`image${id++}`, image);
-//         }
-//         return;
-//       }
-//       formData.append(key, values[key]);
-//     });
-//     await axios
-//       .post('/api/post', formData, { method: 'POST' })
-//       .then((w) => console.log(w));
-//   } catch (error) {
-//     console.log(error);
-
-//     throw error;
-//   }
-// };
