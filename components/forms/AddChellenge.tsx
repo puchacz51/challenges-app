@@ -1,7 +1,4 @@
-import {
-  FormProvider,
-  useForm,
-} from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextInput from '../inputs/TextInput';
 import LongTextInput from '../inputs/LongTextInput';
@@ -56,14 +53,14 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   });
   const {
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting, touchedFields },
-    getValues,
   } = methods;
   const user = useSelector<RootState>((state) => state.authInfo.user);
   const { mutate } = addChallengeMutation();
   
   const onSubmitHandler = async (data, userId) => {
+    console.log(data);
+    
     try {
       mutate({ ...data, userId });
     } catch (err) {}
@@ -82,6 +79,7 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
           errors={errors.title}
           text={'title'}></TextInput>
         <LongTextInput
+          name='description'
           errors={errors.description}
           title='description'></LongTextInput>
         <CheckBox errors={errors.isPublic} title='isPublic'></CheckBox>
@@ -99,4 +97,3 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
     </FormProvider>
   );
 };
-
