@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  FieldValues,
-  useFormContext,
-  UseFormRegister,
-  UseFormReturn,
-} from 'react-hook-form';
-import { array } from 'yup';
+import { FieldValues, useFormContext, UseFormReturn } from 'react-hook-form';
+import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
 import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
@@ -36,9 +31,8 @@ const ChallengeStep = ({
 }: ChallengeStepProps) => {
   const { unregister, getFieldState, clearErrors } = context;
   const { error } = getFieldState(`challengeSteps.${name}`);
+  const [stepWithTime, setStepWithTime] = useState(false);
   useEffect(() => {
-    clearErrors(`challengeSteps.${name}.description`);
-
     return () => unregister(`challengeSteps.${name}.title`);
   }, []);
   return (
@@ -48,7 +42,7 @@ const ChallengeStep = ({
       } ${!selected && 'hidden'} `}>
       <h4 className='mt-1'>step {index + 1} </h4>
       <TextInput
-        title={`challengeSteps.${name}.title`}
+        name={`challengeSteps.${name}.title`}
         errors={error?.title}
         text={'step title'}></TextInput>
       <LongTextInput
@@ -56,13 +50,15 @@ const ChallengeStep = ({
         title='desciption'
         name={`challengeSteps.${name}.description`}
       />
-      {/* <label htmlFor={`challengeStep.${name}.title`}>description</label>
-      <input type='text' {...register(`challengeStep.${name}.description`)} /> */}
-      <TimeInput title={`challengeSteps.${name}.time`} />
+      <SimpleCheckBoxSwitch
+        name='addTime'
+        setValue={() => setStepWithTime((value) => !value)}
+      />
+      {stepWithTime && <TimeInput name={`challengeSteps.${name}.time`} />}
+
       <button className='bg-red-600' onClick={remove}>
         X
       </button>
-      {name}
     </div>
   );
 };
@@ -96,7 +92,6 @@ export const AddChallengeSteps = () => {
     const newStepsOrder = steps.sort(
       (a, b) => stepsValues[a]?.time < stepsValues[b]?.time
     );
-    console.log('new order ', newStepsOrder);
   };
   sortStepsByDate();
   if (steps.length === 0) {

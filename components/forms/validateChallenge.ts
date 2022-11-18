@@ -1,5 +1,4 @@
 import { string, object, boolean, array, mixed, date, lazy } from 'yup';
-import { ChallengeSteps } from './ChallengeSteps';
 export const validateSize = (files) => {
   if (!files) {
     return false;
@@ -32,7 +31,7 @@ const challengeStepsSchema = lazy((value) => {
     const stepObject = object({
       title: string().required('title is required in step').max(30),
       description: string().required('description is required').max(100),
-      time: date(),
+      time: date().notRequired(),
     });
 
     const newEntries = Object.keys(value).reduce((acc, val) => {

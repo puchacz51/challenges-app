@@ -55,12 +55,13 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
     handleSubmit,
     formState: { errors, isSubmitting, touchedFields },
   } = methods;
+
   const user = useSelector<RootState>((state) => state.authInfo.user);
   const { mutate } = addChallengeMutation();
-  
+
   const onSubmitHandler = async (data, userId) => {
     console.log(data);
-    
+
     try {
       mutate({ ...data, userId });
     } catch (err) {}
@@ -75,14 +76,14 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
           challenge
         </h2>
         <TextInput
-          title='title'
+          name='title'
           errors={errors.title}
           text={'title'}></TextInput>
         <LongTextInput
           name='description'
           errors={errors.description}
           title='description'></LongTextInput>
-        <CheckBox errors={errors.isPublic} title='isPublic'></CheckBox>
+        <CheckBox errors={errors.isPublic} name='isPublic'></CheckBox>
         <ImagesInput errors={errors.images} />
         <AddChallengeSteps />
         {isSubmitting ? (
