@@ -37,7 +37,7 @@ export const SimpleCheckBoxSwitch = ({
   name,
   setValue,
 }: SimpleCheckBoxProps) => {
-  const id= useId()
+  const id = useId();
   return (
     <div className='flex items-center '>
       <span className='ml-3 text-sm  pr-3 font-medium  dark:text-gray-300'>

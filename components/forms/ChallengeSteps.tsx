@@ -96,9 +96,11 @@ export const AddChallengeSteps = () => {
   sortStepsByDate();
   if (steps.length === 0) {
     return (
-      <button className='bg-emerald-600 p-0' onClick={handleAddStep}>
-        AddChallenge
-      </button>
+      <div className='h-[50vh] flex justify-center items-center'>
+        <button className='bg-emerald-600 p-2 rounded-xl  ' onClick={handleAddStep}>
+          AddChallenge
+        </button>
+      </div>
     );
   }
 
@@ -107,7 +109,7 @@ export const AddChallengeSteps = () => {
       <button
         className={`w-full ${
           isVisible ? 'bg-cyan-500' : 'bg-emerald-600 p-0  mt-2'
-        }`}
+        } min-h-1/2`}
         onClick={() => setIsVisible((is) => !is)}>
         {isVisible ? 'hide' : 'open steps'}
       </button>

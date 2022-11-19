@@ -9,5 +9,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     sameSite: 'lax',
     domain: process.env.NEXT_PUBLIC_IP_ADRESS,
   },
-  persistSession: true,
+  persistSession: false,
 });

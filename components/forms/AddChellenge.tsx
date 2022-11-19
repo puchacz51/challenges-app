@@ -53,15 +53,13 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   });
   const {
     handleSubmit,
-    formState: { errors, isSubmitting, touchedFields },
+    formState: { errors, isSubmitting },
   } = methods;
 
   const user = useSelector<RootState>((state) => state.authInfo.user);
   const { mutate } = addChallengeMutation();
-
+  const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
   const onSubmitHandler = async (data, userId) => {
-    console.log(data);
-
     try {
       mutate({ ...data, userId });
     } catch (err) {}
@@ -75,17 +73,38 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
         <h2 className='absolute text-2xl left-1/2 bg-white font-bold border-4 border-black rounded-xl px-3 -translate-x-1/2 -translate-y-10 z-10 '>
           challenge
         </h2>
-        <TextInput
-          name='title'
-          errors={errors.title}
-          text={'title'}></TextInput>
-        <LongTextInput
-          name='description'
-          errors={errors.description}
-          title='description'></LongTextInput>
-        <CheckBox errors={errors.isPublic} name='isPublic'></CheckBox>
-        <ImagesInput errors={errors.images} />
-        <AddChallengeSteps />
+        <div className=' my-3 flex justify-around '>
+          <button
+            onClick={() => setSelectedForm('INFO')}
+            className={`uppercase border-2 w-2/5 p-2 border-black  ${
+              selectedForm == 'INFO' && 'bg-black text-white'
+            }`}>
+            Info
+          </button>
+          <button
+            onClick={() => setSelectedForm('STEPS')}
+            className={`uppercase border-2 w-2/5 p-2 border-black  ${
+              selectedForm == 'STEPS' && 'bg-black text-white'
+            }`}>
+            steps
+          </button>
+        </div>
+
+        <div className={`${selectedForm !== 'INFO' && 'hidden'}`}>
+          <TextInput
+            name='title'
+            errors={errors.title}
+            text={'title'}></TextInput>
+          <LongTextInput
+            name='description'
+            errors={errors.description}
+            title='description'></LongTextInput>
+          <CheckBox errors={errors.isPublic} name='isPublic'></CheckBox>
+          <ImagesInput errors={errors.images} />
+        </div>
+        <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>
+          <AddChallengeSteps />
+        </div>
         {isSubmitting ? (
           <h2>adding...</h2>
         ) : (
