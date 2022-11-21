@@ -31,7 +31,7 @@ const challengeStepsSchema = lazy((value) => {
     const stepObject = object({
       title: string().required('title is required in step').max(30),
       description: string().required('description is required').max(100),
-      time: date().notRequired(),
+      time: date().notRequired().nullable(),
     });
 
     const newEntries = Object.keys(value).reduce((acc, val) => {

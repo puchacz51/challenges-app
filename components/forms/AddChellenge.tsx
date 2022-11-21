@@ -10,7 +10,7 @@ import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useState } from 'react';
 import Challenge from '../../pages/challenge/[id]';
-import { AddChallengeSteps } from './ChallengeSteps';
+import { AddChallengeSteps, ChallengeSteps } from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
@@ -19,13 +19,15 @@ const initialValues = {
   endTime: 1000,
   images: {},
 };
-interface Challenge {
+export interface Challenge {
+  id?: number;
   title: string;
   description: string;
-  startTime: any;
-  endTime: any;
+  startTime?: any;
+  endTime?: any;
   images: FileList;
-  challengeSteps: Challenge[];
+  challengeSteps: ChallengeSteps;
+  userId?: string;
 }
 
 export const AddChallenge = () => {
@@ -47,6 +49,7 @@ interface ChallengeFormProps {
 }
 
 const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
+  
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
@@ -54,17 +57,23 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = methods;
 
   const user = useSelector<RootState>((state) => state.authInfo.user);
-  const { mutate } = addChallengeMutation();
+  const { mutate, isSuccess } = addChallengeMutation();
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
+
+console.log(errors);
+
   const onSubmitHandler = async (data, userId) => {
     try {
       mutate({ ...data, userId });
     } catch (err) {}
   };
-
+  if (isSuccess) {
+    reset();
+  }
   return (
     <FormProvider {...methods}>
       <form
@@ -82,6 +91,7 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
             Info
           </button>
           <button
+            type='button'
             onClick={() => setSelectedForm('STEPS')}
             className={`uppercase border-2 w-2/5 p-2 border-black  ${
               selectedForm == 'STEPS' && 'bg-black text-white'

@@ -76,7 +76,6 @@ const ImageItemsList = ({ imageFiles,removeImage }:{imageFiles:File[],removeImag
     setLocalImagesUrl(imageURLs)
   }, [imageFiles]);
 
-
   return (
     <>
       {localImagesUrl?.map((imageUrl, i) => (

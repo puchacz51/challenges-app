@@ -6,14 +6,16 @@ import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
 
 export interface ChallengeStep {
-  id: number;
   title: string;
   description?: string;
-  time: number;
+  time: Date;
+  challengeId?: number;
+  stepID?: number;
 }
 export interface ChallengeSteps {
-  [key: string]: ChallengeStep;
+  [key: `step${number}`]: ChallengeStep;
 }
+
 interface ChallengeStepProps {
   context: UseFormReturn<FieldValues, any>;
   index: number;
@@ -29,9 +31,13 @@ const ChallengeStep = ({
   name,
   selected,
 }: ChallengeStepProps) => {
-  const { unregister, getFieldState, clearErrors } = context;
+  const { unregister, getFieldState, setValue } = context;
   const { error } = getFieldState(`challengeSteps.${name}`);
   const [stepWithTime, setStepWithTime] = useState(false);
+  
+  if (!stepWithTime) {
+    setValue(`challengeSteps.${name}.time`, null);
+  }
   useEffect(() => {
     return () => unregister(`challengeSteps.${name}.title`);
   }, []);
@@ -56,7 +62,7 @@ const ChallengeStep = ({
       />
       {stepWithTime && <TimeInput name={`challengeSteps.${name}.time`} />}
 
-      <button className='bg-red-600' onClick={remove}>
+      <button className='bg-red-600' type='button' onClick={remove}>
         X
       </button>
     </div>
@@ -87,8 +93,6 @@ export const AddChallengeSteps = () => {
     }
   };
   const sortStepsByDate = () => {
-    console.log(stepsValues);
-
     const newStepsOrder = steps.sort(
       (a, b) => stepsValues[a]?.time < stepsValues[b]?.time
     );
@@ -96,8 +100,11 @@ export const AddChallengeSteps = () => {
   sortStepsByDate();
   if (steps.length === 0) {
     return (
-      <div className='h-[50vh] flex justify-center items-center'>
-        <button className='bg-emerald-600 p-2 rounded-xl  ' onClick={handleAddStep}>
+      <div className='min-h-[50vh] flex justify-center items-center'>
+        <button
+          type='button'
+          className='bg-emerald-600 p-2 rounded-xl  '
+          onClick={handleAddStep}>
           AddChallenge
         </button>
       </div>
@@ -105,11 +112,12 @@ export const AddChallengeSteps = () => {
   }
 
   return (
-    <>
+    <div className='min-h-[50vh] '>
       <button
         className={`w-full ${
           isVisible ? 'bg-cyan-500' : 'bg-emerald-600 p-0  mt-2'
         } min-h-1/2`}
+        type='button'
         onClick={() => setIsVisible((is) => !is)}>
         {isVisible ? 'hide' : 'open steps'}
       </button>
@@ -120,6 +128,7 @@ export const AddChallengeSteps = () => {
         <div className=' border-black flex justify-around p-1'>
           {steps.map((name, index) => (
             <button
+              type='button'
               onClick={() => SetSelectedStep(name)}
               key={name + errorsKey[name]}
               className={`shrink-0  text-lg w-7 h-7 mx-1 text-center rounded-full ${
@@ -134,6 +143,7 @@ export const AddChallengeSteps = () => {
           {steps.length < 5 && (
             <div className='w-full flex justify-end '>
               <button
+                type='button'
                 className='bg-emerald-400 uppercase  px-2 border-2 border-black'
                 onClick={handleAddAnotherStep}>
                 add step
@@ -155,6 +165,6 @@ export const AddChallengeSteps = () => {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };

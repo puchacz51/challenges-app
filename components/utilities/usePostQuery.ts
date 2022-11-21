@@ -1,5 +1,4 @@
 import { nanoid } from '@reduxjs/toolkit';
-import { url } from 'inspector';
 import {
   QueryClient,
   useMutation,
@@ -8,6 +7,8 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import { supabase } from '../../services/supabase/supabase';
+import { Challenge } from '../forms/AddChellenge';
+import { ChallengeSteps } from '../forms/ChallengeSteps';
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
   let index = 0;
@@ -25,9 +26,27 @@ const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
     throw err;
   }
 };
+
+const addSteps = async (steps: ChallengeSteps, challengeId: number) => {
+  try {
+    const stepArray = Object.keys(steps).map((stepKey, index) => ({
+      ...steps[stepKey],
+      stepId: index,
+      challengeId,
+    }));
+
+    const addAllSteps = await supabase.from('challengeSteps').insert(stepArray);
+    return addAllSteps.body;
+  } catch {
+    throw new Error('can not add challenge steps ');
+  }
+};
+
 const addToDB = async (formData) => {
   try {
-    const result = await supabase.from('challenges').insert(formData);
+    const result = await supabase
+      .from<Challenge>('challenges')
+      .insert(formData);
     return result.data[0];
   } catch (err) {
     throw err;
@@ -43,8 +62,11 @@ const deleteImages = async (imagesPath: string[]) => {
 };
 const addChallenge = async (values: Challenge) => {
   let imagesPath;
+
+  console.log(values,444);
+  
   try {
-    const { images, userId, ...formValues } = values;
+    const { challengeSteps, images, userId, ...rest } = values;
     imagesPath = Array.from(images).map((image) => {
       const name = nanoid() + '.' + image.type.split('/')[1];
       const path = `${userId}/${name}`;
@@ -52,8 +74,10 @@ const addChallenge = async (values: Challenge) => {
       return path;
     });
     await uploadImage(images, imagesPath);
-    const dbData = { ...formValues, images: imagesPath, userId };
-    return await addToDB(dbData);
+    const dbData = { ...rest, userId, images: imagesPath };
+    const challengeres = await addToDB(dbData);
+   const steps = await addSteps(challengeSteps, challengeres.id);
+    return {...challengeres,steps};
   } catch (err) {
     deleteImages(imagesPath);
     throw err;
@@ -86,10 +110,12 @@ export const addChallengeMutation = () => {
   return useMutation({
     mutationFn: async (values) => await addChallenge(values),
     onMutate: async (values) => {
+
+      console.log(values);
+      
       const { userId, images } = values;
 
       const localImagesUrl = getUrlFromFileList(images);
-      console.log(localImagesUrl);
 
       await queryClient.cancelQueries([userId]);
       const optimisticChallenge = {
@@ -97,8 +123,8 @@ export const addChallengeMutation = () => {
         ...values,
         images: localImagesUrl,
       };
-      queryClient.setQueryData([userId], (old) => {
-        return [optimisticChallenge, ...old];
+      queryClient.setQueryData([userId], () => {
+        return [optimisticChallenge];
       });
 
       return { optimisticChallenge };

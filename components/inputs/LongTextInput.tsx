@@ -17,8 +17,6 @@ const LongTextInput = ({ title, errors, name, ...att }: TextInputProps) => {
   const isTouched = getFieldState(name).isTouched;
   const displayError = errors&&isTouched
 
-  console.log(displayError);
-  
   return (
     <div className={`relative gap-1 pt-3 mt-5 `}>
       <textarea
