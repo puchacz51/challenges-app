@@ -62,9 +62,6 @@ const deleteImages = async (imagesPath: string[]) => {
 };
 const addChallenge = async (values: Challenge) => {
   let imagesPath;
-
-  console.log(values,444);
-  
   try {
     const { challengeSteps, images, userId, ...rest } = values;
     imagesPath = Array.from(images).map((image) => {

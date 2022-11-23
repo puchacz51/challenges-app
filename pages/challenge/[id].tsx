@@ -25,6 +25,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const challengeId = Number(ctx.query.id);
+  
+  
   await queryClient.fetchQuery(['challenge', Number(challengeId)], () =>
     fetchChallenge(Number(challengeId))
   );

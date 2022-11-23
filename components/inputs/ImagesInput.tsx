@@ -18,7 +18,7 @@ const AddImagesElement = ({ addImages }) => {
     <label
       htmlFor='image'
       className='relative w-[44%] h-[100px] border-4  border-black '>
-      <button
+      <button type='button'
         onClick={addImages}
         className='w-full h-full flex justify-center items-center'>
         <FcAddImage className='w-4/5 h-4/5' />
@@ -100,7 +100,7 @@ const ImageItem = ({ imageUrl,removeImage,name }) => {
         key={imageUrl}
         src={imageUrl}
       />
-      <button className='absolute right-0   ' onClick={()=>removeImage(name)}>
+      <button type='button'  className='absolute right-0   ' onClick={()=>removeImage(name)}>
         <BsFillTrashFill className='h-10 w-10 right-0 p-1 bg-slate-500 text-white rounded-2xl translate-x-5 -translate-y-5 ' />
       </button>
     </div>
