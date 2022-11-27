@@ -13,7 +13,7 @@ const reactionsOptions = [
   { id: 3, name: 'smart', Icon: GiBrain },
 ];
 export interface Reaction {
-  challengeId: number;
+  challengeId: string;
   userId: string;
   reactionId: number;
 }

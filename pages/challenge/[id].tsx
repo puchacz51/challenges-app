@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import ChallengeReactions, {
   Reaction,
 } from '../../components/challenges/challengeReactions';
+import { ChallengeTimeLine } from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
 import { RootState, store } from '../../services/Store/store';
@@ -24,20 +25,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
-  const challengeId = Number(ctx.query.id);
+  const challengeId = ctx.query.id as string
   
   
-  await queryClient.fetchQuery(['challenge', Number(challengeId)], () =>
-    fetchChallenge(Number(challengeId))
+  await queryClient.fetchQuery(['challenge',challengeId], () =>
+    fetchChallenge(challengeId)
   );
-  await queryClient.fetchQuery(['reactions', Number(challengeId),user.id], () =>
+  await queryClient.fetchQuery(['reactions', challengeId,user.id], () =>
     fetchChallengeReactions(challengeId, user.id )
   );
 
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
 };
 
-const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
+const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { data: challenge, error, isLoading } = useChallengeQuery(challengeId);
   if (isLoading) return <>loading...</>;
@@ -47,7 +48,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
         {challengeId} {challenge}
       </>
     );
-  const { title, description, createdAt, images } = challenge;
+  const { title, description, createdAt, images,challengeSteps } = challenge;
   return (
     <>
       <div className='flex flex-col bg-slate-200'>
@@ -58,6 +59,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: number }) => {
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
         <ChallengeReactions userId={user?.id} challengeId={challengeId} />
+        <ChallengeTimeLine challengeSteps={challengeSteps}/>
       </div>
     </>
   );

@@ -21,8 +21,7 @@ const initialPositionData: TouchPosition = {
   imageWidth: 0,
 };
 
-const bucketPath =
-  'https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/';
+const bucketPath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/challenges/`;
 
 // const transformX = (shift: number, imageContainer: HTMLDivElement) => {
 //   // imageContainer.style.transform = `translateX(${-shift}px)`;

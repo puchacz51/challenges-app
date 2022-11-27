@@ -10,7 +10,8 @@ const signInWithGitHub = async (
   redirectURL = window.location.href.toString()
 ) => {
   const user = await supabase.auth.signIn(
-    { provider: 'github' }
+    { provider: 'github' },
+    { shouldCreateUser: true }
   );
   
 };

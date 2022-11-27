@@ -3,9 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: '**.pl' }],
+    remotePatterns: [{ protocol: 'https', hostname: '**.co' }],
     domains: [
-      'llryklqvbwstlcapwgav.supabase.co',
+      '(oquugzeadwlzhzcgwish.supabase.co/',
     ],
   },
 };

@@ -1,12 +1,12 @@
 import { User } from '@supabase/supabase-js';
 import axios from 'axios';
 import { GetServerSideProps, NextPage } from 'next';
-import Image from 'next/image';
+
 import { useEffect } from 'react';
 import { dehydrate, QueryClient, useQuery, useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
+
 import { ChallengesList } from '../../components/challenges/ChallengesList';
-import ImageSlider from '../../components/challenges/ImageSlider';
+
 import { AddChallenge } from '../../components/forms/AddChellenge';
 import { useChallengeQuery } from '../../components/utilities/usePostQuery';
 import { setCredentials } from '../../services/Store/authSlice';
@@ -49,6 +49,8 @@ export { getServerSideProps };
 const MyChallenges: NextPage = (props: ServerProps) => {
   const { bucketPath } = props;
   useEffect(() => {}, []);
+
+
   return (
     <main className='flex flex-col '>
       <AddChallenge />

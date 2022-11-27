@@ -19,7 +19,7 @@ const ChallengesList = (): JSX.Element => {
         your Challenges
       </h3>
       <div className='min-h-[200px]  border-4  '>
-        {challenges.map((challenge) => (
+        {challenges?.map((challenge) => (
           <ChallengeNode key={challenge.id} challengeData={challenge} />
         ))}
       </div>
@@ -33,7 +33,7 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
   const src =
     images[0] == 'local'
       ? images[1]
-      : `https://llryklqvbwstlcapwgav.supabase.co/storage/v1/object/public/challenges/${images[0]}`;
+      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/challenges/${images[0]}`;
   return (
     <a
       className='w-full grid  grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '

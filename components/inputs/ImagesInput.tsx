@@ -27,11 +27,17 @@ const AddImagesElement = ({ addImages }) => {
   );
 };
 const ImagesUplouder = ({ errors }) => {
+  const [inputErors,setInputErrors] = useState([])
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const { setValue } = useFormContext();
+  const { setValue,setError } = useFormContext();
   const imageInputRef = useRef<HTMLInputElement>();
   const handleImageInput = () => {
     const newInputValue = Array.from(imageInputRef.current.files);
+    if(newInputValue.length+imageFiles.length>6){
+      
+      setInputErrors(["max amount of images is 6"])
+    }
+
     setImageFiles([...imageFiles, ...newInputValue]);
   };
   const removeImage = (name: string) => {
@@ -49,6 +55,9 @@ const ImagesUplouder = ({ errors }) => {
 
   return (
     <>
+    <div className='p-2 bg-gray-400 '>
+    {inputErors.map(err => <p key={err.length}>{err}</p>)}
+    </div>
       <input
         ref={imageInputRef}
         type='file'

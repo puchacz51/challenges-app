@@ -8,25 +8,24 @@ import { privateChellengeschema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
-import { useState } from 'react';
-import Challenge from '../../pages/challenge/[id]';
-import { AddChallengeSteps, ChallengeSteps } from './ChallengeSteps';
+import { useEffect, useState } from 'react';
+import { AddChallengeSteps, ChallengeSteps, ChallengeStepsForm } from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
   isPublic: false,
-  startTime: 1000,
-  endTime: 1000,
+  startTime: new Date().toUTCString(),
+  endTime:new Date().toUTCString(),
   images: {},
 };
-export interface Challenge {
+export interface FormChallenge {
   id?: number;
   title: string;
   description: string;
   startTime?: any;
   endTime?: any;
   images: FileList;
-  challengeSteps: ChallengeSteps;
+  challengeSteps: ChallengeStepsForm;
   userId?: string;
 }
 
@@ -45,11 +44,10 @@ export const AddChallenge = () => {
 };
 
 interface ChallengeFormProps {
-  initialData?: Challenge;
+  initialData?: FormChallenge ;
 }
 
 const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
-  
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
@@ -63,9 +61,9 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   const user = useSelector<RootState>((state) => state.authInfo.user);
   const { mutate, isSuccess } = addChallengeMutation();
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
-
-console.log(errors);
-
+if(isSuccess){
+  reset()
+}
   const onSubmitHandler = async (data, userId) => {
     try {
       mutate({ ...data, userId });

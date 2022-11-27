@@ -13,7 +13,7 @@ interface TextInputProps {
   errors: FieldError;
 }
 const LongTextInput = ({ title, errors, name, ...att }: TextInputProps) => {
-  const { register, getFieldState } = useFormContext();
+  const { register, getFieldState,trigger } = useFormContext();
   const isTouched = getFieldState(name).isTouched;
   const displayError = errors&&isTouched
 
