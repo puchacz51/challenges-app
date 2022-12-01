@@ -29,23 +29,24 @@ const AddImagesElement = ({ addImages }) => {
 const ImagesUplouder = ({ errors }) => {
   const [inputErors,setInputErrors] = useState([])
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const { setValue,setError } = useFormContext();
+  const { setValue, } = useFormContext();
   const imageInputRef = useRef<HTMLInputElement>();
   const handleImageInput = () => {
     const newInputValue = Array.from(imageInputRef.current.files);
     if(newInputValue.length+imageFiles.length>6){
-      
       setInputErrors(["max amount of images is 6"])
+      return;
     }
+    setInputErrors([])
 
     setImageFiles([...imageFiles, ...newInputValue]);
   };
   const removeImage = (name: string) => {
-    console.log(name);
     
     const newImageFiles = imageFiles.filter(
       (file) => name !== file.name
     );
+        setInputErrors([]);
     setImageFiles(newImageFiles);
   };
 
@@ -55,9 +56,11 @@ const ImagesUplouder = ({ errors }) => {
 
   return (
     <>
-    <div className='p-2 bg-gray-400 '>
-    {inputErors.map(err => <p key={err.length}>{err}</p>)}
-    </div>
+      <div className={`p-2 text-red-600 border-2 border-black mb-4 ${!inputErors.length&&"hidden"}`}>
+        {inputErors.map((err) => (
+          <p key={err.length}>{err}</p>
+        ))}
+      </div>
       <input
         ref={imageInputRef}
         type='file'
@@ -69,7 +72,11 @@ const ImagesUplouder = ({ errors }) => {
       />
       <span>{errors?.message}</span>
       <div className='flex w-full flex-wrap flex-row gap-3 justify-between'>
-        <ImageItemsList key={imageFiles.length}  imageFiles={imageFiles} removeImage={removeImage} />
+        <ImageItemsList
+          key={imageFiles.length}
+          imageFiles={imageFiles}
+          removeImage={removeImage}
+        />
         {imageFiles.length < 6 && (
           <AddImagesElement addImages={() => imageInputRef.current.click()} />
         )}

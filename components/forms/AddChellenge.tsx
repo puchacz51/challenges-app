@@ -9,13 +9,19 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useEffect, useState } from 'react';
-import { AddChallengeSteps, ChallengeSteps, ChallengeStepsForm } from './ChallengeSteps';
+import { User } from '@supabase/supabase-js';
+
+import {
+  AddChallengeSteps,
+  ChallengeSteps,
+  ChallengeStepsForm,
+} from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
   isPublic: false,
   startTime: new Date().toUTCString(),
-  endTime:new Date().toUTCString(),
+  endTime: new Date().toUTCString(),
   images: {},
 };
 export interface FormChallenge {
@@ -26,7 +32,7 @@ export interface FormChallenge {
   endTime?: any;
   images: FileList;
   challengeSteps: ChallengeStepsForm;
-  userId?: string;
+  userId: string;
 }
 
 export const AddChallenge = () => {
@@ -44,34 +50,37 @@ export const AddChallenge = () => {
 };
 
 interface ChallengeFormProps {
-  initialData?: FormChallenge ;
+  initialData?: FormChallenge;
 }
 
 const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
+  const [oldFromData, setOldFormData] = useState<ChallengeFormProps>();
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
+    mode: 'onTouched',
   });
+
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
   } = methods;
 
-  const user = useSelector<RootState>((state) => state.authInfo.user);
-  const { mutate, isSuccess } = addChallengeMutation();
+  const user = useSelector<RootState>((state) => state.authInfo.user) as User;
+  const { mutate } = addChallengeMutation(reset);
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
-if(isSuccess){
-  reset()
-}
+  console.log(1);
+
   const onSubmitHandler = async (data, userId) => {
+    console.log(data)
     try {
       mutate({ ...data, userId });
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
-  if (isSuccess) {
-    reset();
-  }
+
   return (
     <FormProvider {...methods}>
       <form
@@ -82,6 +91,7 @@ if(isSuccess){
         </h2>
         <div className=' my-3 flex justify-around '>
           <button
+            type='button'
             onClick={() => setSelectedForm('INFO')}
             className={`uppercase border-2 w-2/5 p-2 border-black  ${
               selectedForm == 'INFO' && 'bg-black text-white'
@@ -107,7 +117,7 @@ if(isSuccess){
             name='description'
             errors={errors.description}
             title='description'></LongTextInput>
-          <CheckBox errors={errors.isPublic} name='isPublic'></CheckBox>
+          <CheckBox errors={null} name='isPublic'></CheckBox>
           <ImagesInput errors={errors.images} />
         </div>
         <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>

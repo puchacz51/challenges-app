@@ -32,6 +32,7 @@ const MyApp = ({ Component, pageProps }) => {
     );
   });
 
+
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>

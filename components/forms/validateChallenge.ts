@@ -1,5 +1,5 @@
 import { string, object, boolean, array, mixed, date, lazy } from 'yup';
-export const validateSize = (files) => {
+export const validateSize = (files: FileList) => {
   if (!files) {
     return false;
   }
@@ -12,7 +12,7 @@ export const validateSize = (files) => {
   });
   return valided;
 };
-export const validateType = (files) => {
+export const validateType = (files: FileList) => {
   const supportedTypes = ['image/png', 'image/jpeg'];
   if (!files) {
     return false;
@@ -50,6 +50,11 @@ export const privateChellengeschema = object({
   description: string().required().max(200),
   images: mixed()
     .required('you need to provide at least a one image')
+    .test(
+      'filesLength',
+      'you need to provide at least a one image',
+      (files) => files.length > 0
+    )
     .test('fileSize', 'image must be smaller than 5MB', validateSize)
     .test('fileType', 'unsupported image type', validateType),
   challengeSteps: challengeStepsSchema,

@@ -6,9 +6,14 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
+import { Challenge } from '../../pages/challenge/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
-import { Challenge } from '../forms/AddChellenge';
-import { ChallengeSteps } from '../forms/ChallengeSteps';
+import { FormChallenge } from '../forms/AddChellenge';
+import {
+  ChallengeStepForm,
+  ChallengeSteps,
+  ChallengeStepsForm,
+} from '../forms/ChallengeSteps';
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
   let index = 0;
@@ -24,13 +29,14 @@ const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
     }
   } catch (err) {
     console.log(err);
-    
+
     throw err;
   }
 };
 
-const addSteps = async (steps: ChallengeSteps, challengeId: number) => {
-  
+const addSteps = async (steps: ChallengeStepsForm, challengeId: string) => {
+  console.log(steps);
+
   try {
     const stepArray = Object.keys(steps).map((stepKey, index) => ({
       ...steps[stepKey],
@@ -47,12 +53,12 @@ const addSteps = async (steps: ChallengeSteps, challengeId: number) => {
 
 const addToDB = async (formData) => {
   try {
-    console.log(987,formData);
-    
+    console.log(987, formData);
+
     const result = await supabase
       .from<Challenge>('challenges')
       .insert(formData);
-      
+
     return result.data[0];
   } catch (err) {
     throw err;
@@ -66,8 +72,8 @@ const deleteImages = async (imagesPath: string[]) => {
     console.log(e);
   }
 };
-const addChallenge = async (values: Challenge) => {
-  let imagesPath:string[];
+const addChallenge = async (values: FormChallenge) => {
+  let imagesPath: string[];
   try {
     const { challengeSteps, images, userId, ...rest } = values;
     imagesPath = Array.from(images).map((image) => {
@@ -80,10 +86,10 @@ const addChallenge = async (values: Challenge) => {
     const dbData = { ...rest, userId, images: imagesPath };
     const challengeres = await addToDB(dbData);
     let steps;
-    if(steps){
-   steps = await addSteps(challengeSteps, challengeres.id);
+    if (steps) {
+      steps = await addSteps(challengeSteps, challengeres.id);
     }
-    return {...challengeres,steps};
+    return { ...challengeres, steps };
   } catch (err) {
     deleteImages(imagesPath);
     throw err;
@@ -110,15 +116,14 @@ const getUrlFromFileList = (files: FileList) => {
   const result = ['local', URL.createObjectURL(files[0])];
   return result;
 };
-export const addChallengeMutation = () => {
+export const addChallengeMutation = (resetForm: Function) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const queryClient = useQueryClient();
-  
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation({
     mutationFn: async (values) => await addChallenge(values),
-    onMutate: async (values) => {
-
-      console.log(values,333);
-      
+    onMutate: async (values: FormChallenge) => {
       const { userId, images } = values;
 
       const localImagesUrl = getUrlFromFileList(images);
@@ -137,18 +142,19 @@ export const addChallengeMutation = () => {
     },
     onError: (err, values, context) => {
       const { userId } = values;
-      queryClient.setQueryData([userId], (old) =>
-        old.filter((challenge) => challenge.id === context.id)
+      queryClient.setQueryData<Challenge[]>([userId], (old) =>
+        old.filter((challenge) => challenge.id === context.optimisticChallenge.id)
       );
     },
     onSuccess: (data, variables, context) => {
       const { userId } = variables;
 
-      queryClient.setQueryData([userId], (old) =>
+      queryClient.setQueryData<Challenge[]>([userId], (old) =>
         old.map((challege) =>
           challege.id === context.optimisticChallenge.id ? data : challege
         )
       );
+      resetForm();
     },
   });
 };

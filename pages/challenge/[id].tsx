@@ -21,18 +21,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data: userData, token } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
-  const user = userData || { id: null ,token:null} ;
+  const user = userData || { id: null, token: null };
 
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
-  const challengeId = ctx.query.id as string
-  
-  
-  await queryClient.fetchQuery(['challenge',challengeId], () =>
+  const challengeId = ctx.query.id as string;
+
+  await queryClient.fetchQuery(['challenge', challengeId], async () =>
     fetchChallenge(challengeId)
   );
-  await queryClient.fetchQuery(['reactions', challengeId,user.id], () =>
-    fetchChallengeReactions(challengeId, user.id )
+  console.log("start");
+  
+  await queryClient.fetchQuery(['reactions', challengeId, user.id], () =>
+    fetchChallengeReactions(challengeId, user.id)
   );
 
   return { props: { challengeId, queryState: dehydrate(queryClient) } };
@@ -48,7 +49,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
         {challengeId} {challenge}
       </>
     );
-  const { title, description, createdAt, images,challengeSteps } = challenge;
+  const { title, description, createdAt, images, challengeSteps } = challenge;
   return (
     <>
       <div className='flex flex-col bg-slate-200'>
@@ -59,7 +60,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
         <ChallengeReactions userId={user?.id} challengeId={challengeId} />
-        <ChallengeTimeLine challengeSteps={challengeSteps}/>
+        <ChallengeTimeLine challengeSteps={challengeSteps} />
       </div>
     </>
   );

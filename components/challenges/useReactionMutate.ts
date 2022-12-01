@@ -98,9 +98,11 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
         ['reactions', challengeId, userId],
         newReactions
       );
-      return oldReactions;
+      return reactionsData;
     },
     onError: (err, newReaction, oldReactions) => {
+      console.log(oldReactions);
+      
       queryClient.setQueryData(
         ['reactions', challengeId, userId],
         oldReactions
