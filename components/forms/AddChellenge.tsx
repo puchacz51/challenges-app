@@ -11,11 +11,7 @@ import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 
-import {
-  AddChallengeSteps,
-  ChallengeSteps,
-  ChallengeStepsForm,
-} from './ChallengeSteps';
+import { AddChallengeSteps, ChallengeStepsForm } from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
@@ -25,11 +21,10 @@ const initialValues = {
   images: {},
 };
 export interface FormChallenge {
-  id?: number;
   title: string;
   description: string;
-  startTime?: any;
-  endTime?: any;
+  startTime: any;
+  endTime: any;
   images: FileList;
   challengeSteps: ChallengeStepsForm;
   userId: string;
@@ -44,16 +39,17 @@ export const AddChallenge = () => {
         onClick={() => setIsVisible((isVisible) => !isVisible)}>
         Add new challenge
       </button>
-      {isVisible && <ChallengeForm />}
+      {isVisible && <ChallengeForm cancelForm={()=>setIsVisible(false)} />}
     </div>
   );
 };
 
 interface ChallengeFormProps {
   initialData?: FormChallenge;
+  cancelForm: Function;
 }
 
-const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
+const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const [oldFromData, setOldFormData] = useState<ChallengeFormProps>();
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
@@ -68,12 +64,11 @@ const ChallengeForm = ({ initialData }: ChallengeFormProps) => {
   } = methods;
 
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
-  const { mutate } = addChallengeMutation(reset);
+  const { mutate,isSuccess } = addChallengeMutation(reset);
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
   console.log(1);
-
+if(isSuccess) cancelForm()
   const onSubmitHandler = async (data, userId) => {
-    console.log(data)
     try {
       mutate({ ...data, userId });
     } catch (err) {

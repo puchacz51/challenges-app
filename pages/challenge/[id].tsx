@@ -21,8 +21,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data: userData, token } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
+  console.log(ctx.req.cookies);
+  
   const user = userData || { id: null, token: null };
-
+    console.log(user);
+    
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id as string;
