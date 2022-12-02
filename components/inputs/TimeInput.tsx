@@ -4,6 +4,7 @@ import { FieldError, useFormContext } from 'react-hook-form';
 interface TimeInputProps {
   name: string;
   att?: Attributes;
+
 }
 export const TimeInput = ({ name, ...att }: TimeInputProps) => {
   const { register, getFieldState } = useFormContext();

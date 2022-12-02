@@ -4,7 +4,7 @@ import { dehydrate, QueryClient, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import ChallengeReactions, {
   Reaction,
-} from '../../components/challenges/challengeReactions';
+} from '../../components/challenges/ChallengeReactions';
 import { ChallengeTimeLine } from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
@@ -18,13 +18,14 @@ import {
 } from './useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { data: userData, token } = await supabase.auth.api.getUserByCookie(
+  const { data: userData, token,error,user:aa } = await supabase.auth.api.getUserByCookie(
     ctx.req
   );
   console.log(ctx.req.cookies);
+  console.log(error,aa);
   
   const user = userData || { id: null, token: null };
-    console.log(user);
+    console.log(user?.id);
     
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
@@ -63,7 +64,7 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
         <ChallengeReactions userId={user?.id} challengeId={challengeId} />
-        <ChallengeTimeLine challengeSteps={challengeSteps} />
+        <ChallengeTimeLine challengeSteps={challengeSteps} startTime={challenge.startTime} endTime={challenge.endTime} />
       </div>
     </>
   );

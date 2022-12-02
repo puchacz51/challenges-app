@@ -9,7 +9,7 @@ import { ChallengeStep } from './ChallengeStep';
 export interface ChallengeStepForm {
   title: string;
   description?: string;
-  time: Date;
+  time: string;
   challengeId?: number;
   stepID?: number;
 }
@@ -23,18 +23,16 @@ export const AddChallengeSteps = () => {
   const [selectedStep, SetSelectedStep] = useState('');
   const context = useFormContext();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
-  const {setValue,trigger} =context
+  const { setValue, trigger } = context;
   const stepsValues = context.getValues().challengeSteps;
   const removeStep = (name: string) => {
     const newSteps = steps.filter((step) => step != name);
     setSteps(newSteps);
   };
 
-
   const handleInitialSteps = () => {
     handleAddStep();
-    trigger()
-
+    trigger();
   };
   const handleAddStep = () => {
     if (steps.length < 6) {
@@ -49,8 +47,6 @@ export const AddChallengeSteps = () => {
       const stepsTime = steps.filter((step) => step.time != null);
 
       const newStepsTime = stepsTime.sort((a, b) => {
-        console.log(stepsValues[a]?.time, stepsValues[b]?.time);
-
         return (
           Date.parse(stepsValues[a]?.time) - Date.parse(stepsValues[b]?.time)
         );
