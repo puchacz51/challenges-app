@@ -6,53 +6,50 @@ interface ChallengeTimeLineProps {
   startTime: string;
   endTime: string;
 }
- const StepBtn = ({ step, startTime, endTime }: StepBtnProps) => {
-   let stepPostion 
-   if(step.time){
-    stepPostion= (Date.parse(step.time) - Date.parse(startTime)) /
-     (Date.parse(endTime) - Date.parse(startTime));
-   }
-   return <button className={`absolute left-[${stepPostion}%]`}>{step.title}</button>;
- };
+const StepBtn = ({ step, position}: StepBtnProps) => {
+  
+  return (
+    <button className={`absolute left-[${Math.round(position)}%]`}>
+      {step.title}
+    </button>
+  );
+};
 const ChallengeTimeLine = ({
   challengeSteps,
   startTime,
   endTime,
 }: ChallengeTimeLineProps) => {
-  const stepLength = challengeSteps?.length;
+  const stepeKeys = Object.keys(challengeSteps||{});
+  const stepsLength = stepeKeys.length
+  const calStepPosition = () => {
+    const stepsWithTime = challengeSteps.filter((step) => !!step.time);
+    const stepsNoTime = challengeSteps.filter((step) => !step.time);
 
-  const calStepPosition = ()=>{
-    const stepTimes = challengeSteps.map(step=>step.time)
     // const stepPosition = stepTimes.map(time => )
+  };
+  console.log(challengeSteps);
 
-  }
-
-
-  if (!stepLength) {
+  if (!stepsLength) {
     return <h2>no steps </h2>;
   }
 
   return (
     <div className='h-[30px] bg-zinc-700 relative'>
       <div className='bg-green-500'>
-        {challengeSteps.map((step) => (
+        {stepeKeys.map((key,i) => (
           <StepBtn
-            startTime={startTime}
-            endTime={endTime}
-            step={step}
-            key={step.title}
+            position={100/(stepsLength+1)*(i+1)}
+            step={challengeSteps[key]}
+            key={key}
           />
         ))}
       </div>
     </div>
   );
   interface StepBtnProps {
-    startTime: string;
-    endTime: string;
     step: ChallengeSteps[0];
+    position :number
   }
-
- 
 
   // return (
   //   <div className='flex flex-col'>

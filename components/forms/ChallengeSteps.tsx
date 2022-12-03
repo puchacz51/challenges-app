@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FieldValues, useFormContext, UseFormReturn } from 'react-hook-form';
+import { Challenge } from '../../pages/challenge/useChallengeQuery';
+import { ChallengeTimeLine } from '../challenges/ChallengeTimeline';
 import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
 import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
@@ -18,13 +20,41 @@ export interface ChallengeStepsForm {
 }
 export type ChallengeSteps = ChallengeStepForm[];
 
+const compareStringDate = (date1: string, date2: string) => {
+  return Date.parse(date1) - Date.parse(date2);
+};
+
+const challengeOrder = (steps: ChallengeSteps) => {
+  // const noTImeSteps = steps.filter(step => !step.time)
+  const timeSteps = steps.filter((step) => step.time);
+  const sortedTimeSteps = timeSteps.sort((date1, date2) =>
+    compareStringDate(date1.time, date2.time)
+  );
+  const newOrderedSteps = steps.map((step) =>
+    step.time ? sortedTimeSteps.shift() : step
+  );
+
+  return newOrderedSteps;
+};
+
+const StepTimeLine = () => {
+  const { getValues, setValue } = useFormContext<Challenge>();
+  const steps = getValues().challengeSteps;
+  //   useEffect(()=>{
+  // if(steps){
+
+  // }},[steps])
+  return <div></div>;
+};
+
 export const AddChallengeSteps = () => {
   const [steps, setSteps] = useState([]);
   const [selectedStep, SetSelectedStep] = useState('');
   const context = useFormContext();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
-  const { setValue, trigger } = context;
-  const stepsValues = context.getValues().challengeSteps;
+  const { setValue, trigger, getValues } = context;
+  const currentValues = getValues();
+
   const removeStep = (name: string) => {
     const newSteps = steps.filter((step) => step != name);
     setSteps(newSteps);
@@ -40,25 +70,6 @@ export const AddChallengeSteps = () => {
       const newSteps = [...steps, newStep];
       setSteps(newSteps);
       SetSelectedStep(newStep);
-    }
-  };
-  const sortStepsByDate = () => {
-    try {
-      const stepsTime = steps.filter((step) => step.time != null);
-
-      const newStepsTime = stepsTime.sort((a, b) => {
-        return (
-          Date.parse(stepsValues[a]?.time) - Date.parse(stepsValues[b]?.time)
-        );
-      });
-      const newStepsOrder = steps.map((step) => {
-        if (!step.time) return step;
-        else return newStepsTime.shift();
-      });
-
-      setSteps(newStepsOrder);
-    } catch (err) {
-      console.log(err);
     }
   };
 
@@ -108,6 +119,11 @@ export const AddChallengeSteps = () => {
               name={name}
             />
           ))}
+          <ChallengeTimeLine
+            challengeSteps={currentValues.challengeSteps}
+            startTime={currentValues.startTime}
+            endTime={currentValues.endTime}
+          />
         </div>
       </div>
     </div>
@@ -126,3 +142,22 @@ const InitialStepsBtn = ({ handleInitialSteps }) => {
     </div>
   );
 };
+//  const sortStepsByDate = () => {
+//    try {
+//      const stepsTime = steps.filter((step) => step.time != null);
+
+//      const newStepsTime = stepsTime.sort((a, b) => {
+//        return (
+//          Date.parse(stepsValues[a]?.time) - Date.parse(stepsValues[b]?.time)
+//        );
+//      });
+//      const newStepsOrder = steps.map((step) => {
+//        if (!step.time) return step;
+//        else return newStepsTime.shift();
+//      });
+
+//      setSteps(newStepsOrder);
+//    } catch (err) {
+//      console.log(err);
+//    }
+//  };
