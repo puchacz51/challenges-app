@@ -12,31 +12,29 @@ import {
   Hydrate,
   hydrate,
 } from 'react-query';
-import { setCookie } from 'nookies';
+import { setCookie, destroyCookie } from 'nookies';
 
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;
   store.dispatch(setCredentials(pageProps.store?.authInfo));
   supabase.auth.onAuthStateChange((event, session) => {
-    // if (!session) return;
-    // fetch(`/api/set-auth-cookie`, {
-    //   method: 'POST',
-    //   headers: new Headers({ 'Content-Type': 'application/json' }),
-    //   credentials: 'same-origin',
-    //   body: JSON.stringify({ event, session }),
-    // });
-    setCookie(undefined, 'sb-access-token', session.access_token, {
-      maxAge: 30 * 24 * 60 * 60,
-    });
-    setCookie(undefined, 'sb-refresh-token', session.refresh_token, {
-      maxAge: 30 * 24 * 60 * 60,
-    });
+    if (session) {
+      setCookie(undefined, 'sb-access-token', session.access_token, {
+        maxAge: 30 * 24 * 60 * 60,
+      });
+      setCookie(undefined, 'sb-refresh-token', session.refresh_token, {
+        maxAge: 30 * 24 * 60 * 60,
+      });
+    } else {
+      destroyCookie(null, 'sb-access-token');
+      destroyCookie(null, 'sb-refresh-token');
+    }
 
     dispatch(
       setCredentials({
         user: session?.user,
-        token: session.access_token,
+        token: session?.access_token,
       })
     );
   });

@@ -18,34 +18,41 @@ import {
 } from './useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { data: userData, token,error,user:aa } = await supabase.auth.api.getUserByCookie(
-    ctx.req
-  );
-  console.log(ctx.req.cookies);
-  console.log(error,aa);
-  
+  const {
+    data: userData,
+    token,
+    error,
+    user: aa,
+  } = await supabase.auth.api.getUserByCookie(ctx.req);
+  store.dispatch(setCredentials({ user: userData, token }));
+
   const user = userData || { id: null, token: null };
-    console.log(user?.id);
-    
-  store.dispatch(setCredentials({ user, token }));
+console.log(error);
+
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id as string;
 
   await queryClient.fetchQuery(['challenge', challengeId], async () =>
     fetchChallenge(challengeId)
   );
-  console.log("start");
-  
   await queryClient.fetchQuery(['reactions', challengeId, user.id], () =>
     fetchChallengeReactions(challengeId, user.id)
   );
 
-  return { props: { challengeId, queryState: dehydrate(queryClient) } };
+  return {
+    props: {
+      challengeId,
+      queryState: dehydrate(queryClient),
+      store: store.getState(),
+    },
+  };
 };
 
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { data: challenge, error, isLoading } = useChallengeQuery(challengeId);
+  console.log(user, 6666);
+
   if (isLoading) return <>loading...</>;
   if (!challenge)
     return (
@@ -64,7 +71,11 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
         <p>{description}</p>
         <span>created at {new Date(createdAt).toDateString()}</span>
         <ChallengeReactions userId={user?.id} challengeId={challengeId} />
-        <ChallengeTimeLine challengeSteps={challengeSteps} startTime={challenge.startTime} endTime={challenge.endTime} />
+        <ChallengeTimeLine
+          challengeSteps={challengeSteps}
+          startTime={challenge.startTime}
+          endTime={challenge.endTime}
+        />
       </div>
     </>
   );

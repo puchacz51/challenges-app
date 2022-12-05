@@ -9,7 +9,7 @@ interface ChallengeTimeLineProps {
 const StepBtn = ({ step, position}: StepBtnProps) => {
   
   return (
-    <button className={`absolute left-[${Math.round(position)}%]`}>
+    <button className={`absolute left-[${Math.round(position)}px]`}>
       {step.title}
     </button>
   );
@@ -27,15 +27,13 @@ const ChallengeTimeLine = ({
 
     // const stepPosition = stepTimes.map(time => )
   };
-  console.log(challengeSteps);
 
   if (!stepsLength) {
     return <h2>no steps </h2>;
   }
 
   return (
-    <div className='h-[30px] bg-zinc-700 relative'>
-      <div className='bg-green-500'>
+    <div className='h-[30px] bg-zinc-700 relative '>
         {stepeKeys.map((key,i) => (
           <StepBtn
             position={100/(stepsLength+1)*(i+1)}
@@ -43,7 +41,6 @@ const ChallengeTimeLine = ({
             key={key}
           />
         ))}
-      </div>
     </div>
   );
   interface StepBtnProps {
