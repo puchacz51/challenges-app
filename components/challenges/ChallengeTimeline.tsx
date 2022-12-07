@@ -6,10 +6,11 @@ interface ChallengeTimeLineProps {
   startTime: string;
   endTime: string;
 }
-const StepBtn = ({ step, position}: StepBtnProps) => {
-  
+const StepBtn = ({ step, position }: StepBtnProps) => {
   return (
-    <button className={`absolute left-[${Math.round(position)}px]`}>
+    <button
+      className={`absolute `}
+      style={{ left: `${Math.round(position)}%` }}>
       {step.title}
     </button>
   );
@@ -19,8 +20,8 @@ const ChallengeTimeLine = ({
   startTime,
   endTime,
 }: ChallengeTimeLineProps) => {
-  const stepeKeys = Object.keys(challengeSteps||{});
-  const stepsLength = stepeKeys.length
+  const stepeKeys = Object.keys(challengeSteps || {});
+  const stepsLength = stepeKeys.length;
   const calStepPosition = () => {
     const stepsWithTime = challengeSteps.filter((step) => !!step.time);
     const stepsNoTime = challengeSteps.filter((step) => !step.time);
@@ -34,18 +35,18 @@ const ChallengeTimeLine = ({
 
   return (
     <div className='h-[30px] bg-zinc-700 relative '>
-        {stepeKeys.map((key,i) => (
-          <StepBtn
-            position={100/(stepsLength+1)*(i+1)}
-            step={challengeSteps[key]}
-            key={key}
-          />
-        ))}
+      {stepeKeys.map((key, i) => (
+        <StepBtn
+          position={(100 / (stepsLength + 1)) * (i + 1)}
+          step={challengeSteps[key]}
+          key={key}
+        />
+      ))}
     </div>
   );
   interface StepBtnProps {
     step: ChallengeSteps[0];
-    position :number
+    position: number;
   }
 
   // return (

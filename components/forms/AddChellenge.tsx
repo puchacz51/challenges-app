@@ -11,7 +11,7 @@ import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 
-import { AddChallengeSteps, ChallengeStepsForm } from './ChallengeSteps';
+import { AddChallengeSteps, ChallengeStepForm, ChallengeStepsForm } from './ChallengeSteps';
 const initialValues = {
   title: '',
   description: '',
@@ -116,7 +116,7 @@ if(isSuccess) cancelForm()
           <ImagesInput errors={errors.images} />
         </div>
         <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>
-          <AddChallengeSteps />
+          <ChallengeStepForm  />
         </div>
         {isSubmitting ? (
           <h2>adding...</h2>

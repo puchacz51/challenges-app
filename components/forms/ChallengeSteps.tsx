@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FieldValues, useFormContext, UseFormReturn } from 'react-hook-form';
 import { Challenge } from '../../pages/challenge/useChallengeQuery';
 import { ChallengeTimeLine } from '../challenges/ChallengeTimeline';
@@ -37,24 +37,63 @@ const challengeOrder = (steps: ChallengeSteps) => {
   return newOrderedSteps;
 };
 
-const StepTimeLine = () => {
-  const { getValues, setValue } = useFormContext<Challenge>();
-  const steps = getValues().challengeSteps;
-  //   useEffect(()=>{
-  // if(steps){
-
-  // }},[steps])
-  return <div></div>;
+const ChangeStepOrder = () => {
+  const context = useFormContext();
+  const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
+  const { setValue, trigger, getValues } = context;
+  const currentValue = getValues();
+  const stepsLength = currentValue?.challengeSteps.length
+  return <div>sdadsadsadsadsadsadadsasdsada</div>;
 };
 
-export const AddChallengeSteps = () => {
+export const ChallengeStepForm = () => {
+  const {getValues} = useFormContext();
+    const currentValue = getValues();
+    const stepsLength = currentValue?.challengeSteps;
+  const [displayMode, setDisplayMode] = useState<'addSteps' | 'changeOrder'>(
+    'addSteps'
+  );
+
+
+   if (stepsLength=== 0)
+     return <InitialStepsBtn handleInitialSteps={handleInitialSteps} />;
+  return (
+    <>
+      <div className='mx-auto border-1  my-1  flex justify-around'>
+        <button
+          type='button'
+          className={`p-1 border-2 w-1/3 border-black uppercase ${
+            displayMode === 'addSteps' && 'bg-black text-white'
+          } `}
+          onClick={() => setDisplayMode('addSteps')}>
+          add steps
+        </button>
+        <button
+          type='button'
+          className={`p-1 border-2 w-1/3 border-black uppercase  ${
+            displayMode === 'changeOrder' && 'bg-black text-white'
+          } `}
+          onClick={() => setDisplayMode('changeOrder')}>
+          steps order
+        </button>
+      </div>
+      {displayMode === 'addSteps' && (
+        <AddChallengeSteps displayOrder={() => setDisplayMode('changeOrder')} />
+      )}
+      {displayMode === 'changeOrder' && (
+        <ChangeStepOrder displayAddSteps={() => setDisplayMode('addSteps')} />
+      )}
+    </>
+  );
+};
+
+export const AddChallengeSteps = ({ displayOrder }) => {
   const [steps, setSteps] = useState([]);
   const [selectedStep, SetSelectedStep] = useState('');
   const context = useFormContext();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
   const { setValue, trigger, getValues } = context;
   const currentValues = getValues();
-
   const removeStep = (name: string) => {
     const newSteps = steps.filter((step) => step != name);
     setSteps(newSteps);
@@ -73,8 +112,7 @@ export const AddChallengeSteps = () => {
     }
   };
 
-  if (steps.length === 0)
-    return <InitialStepsBtn handleInitialSteps={handleInitialSteps} />;
+ 
   return (
     <div className='min-h-[50vh] '>
       <div className={`border-2  border-black `}>
@@ -107,7 +145,12 @@ export const AddChallengeSteps = () => {
             </div>
           )}
         </div>
-
+        <button
+          className='mx-auto  w-3/5 bg-blue-500 font-bold uppercase px-2 py-1 rounded-xl '
+          type='button'
+          onClick={displayOrder}>
+          change steps order
+        </button>
         <div className='flex flex-col mx-1'>
           {steps.map((name, i) => (
             <ChallengeStep
@@ -119,11 +162,6 @@ export const AddChallengeSteps = () => {
               name={name}
             />
           ))}
-          <ChallengeTimeLine
-            challengeSteps={currentValues.challengeSteps}
-            startTime={currentValues.startTime}
-            endTime={currentValues.endTime}
-          />
         </div>
       </div>
     </div>
@@ -142,22 +180,3 @@ const InitialStepsBtn = ({ handleInitialSteps }) => {
     </div>
   );
 };
-//  const sortStepsByDate = () => {
-//    try {
-//      const stepsTime = steps.filter((step) => step.time != null);
-
-//      const newStepsTime = stepsTime.sort((a, b) => {
-//        return (
-//          Date.parse(stepsValues[a]?.time) - Date.parse(stepsValues[b]?.time)
-//        );
-//      });
-//      const newStepsOrder = steps.map((step) => {
-//        if (!step.time) return step;
-//        else return newStepsTime.shift();
-//      });
-
-//      setSteps(newStepsOrder);
-//    } catch (err) {
-//      console.log(err);
-//    }
-//  };
