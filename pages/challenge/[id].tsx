@@ -51,7 +51,6 @@ console.log(error);
 const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { data: challenge, error, isLoading } = useChallengeQuery(challengeId);
-  console.log(user, 6666);
 
   if (isLoading) return <>loading...</>;
   if (!challenge)
