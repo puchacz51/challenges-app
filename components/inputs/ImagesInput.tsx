@@ -123,15 +123,20 @@ const ImageItem = ({ imageUrl, removeImage, name }) => {
   }));
 console.log(isDragging);
 
+  if(isDragging){
+
+return <div  className='hidden' ></div>
+  }
+
+
   return (
     <div
       ref={drag}
-      className={`relative w-[47%] h-[100px] border-4  border-black ${isDragging&&''}`}>
+      className={`relative w-[47%] h-[100px] border-4  border-black ${isDragging&&'hidden'}`}>
       <Image
         alt='your image'
         layout='fill'
         objectFit='cover'
-        className={`${isDragging&&'shadow-sm'}`}
         key={imageUrl}
         src={imageUrl}
       />
