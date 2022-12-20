@@ -2,9 +2,10 @@ import Image from 'next/image';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
-import { BsFillTrashFill } from 'react-icons/bs';
-import { DndProvider, useDrag } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndContext } from '@dnd-kit/core';
+import { ImageItem } from './ImageItem';
+import { SortableContext } from '@dnd-kit/sortable';
+
 const CreateHandleImages =
   (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e?.currentTarget;
@@ -101,52 +102,20 @@ const ImageItemsList = ({
   }, [imageFiles]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      {localImagesUrl?.map((imageUrl, i) => (
-        <ImageItem
-          key={imageUrl}
-          imageUrl={imageUrl}
-          name={imageFiles[i].name}
-          removeImage={removeImage}
-        />
-      ))}
-    </DndProvider>
-  );
-};
-
-const ImageItem = ({ imageUrl, removeImage, name }) => {
-  const [{isDragging}, drag, prev] = useDrag(() => ({
-    type: 'image',
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
-console.log(isDragging);
-
-  if(isDragging){
-
-return <div  className='hidden' ></div>
-  }
-
-
-  return (
-    <div
-      ref={drag}
-      className={`relative w-[47%] h-[100px] border-4  border-black ${isDragging&&'hidden'}`}>
-      <Image
-        alt='your image'
-        layout='fill'
-        objectFit='cover'
-        key={imageUrl}
-        src={imageUrl}
-      />
-      <button
-        type='button'
-        className='absolute right-0   '
-        onClick={() => removeImage(name)}>
-        <BsFillTrashFill className='h-10 w-10 right-0 p-1 bg-slate-500 text-white rounded-2xl translate-x-5 -translate-y-5 ' />
-      </button>
-    </div>
+    <>
+      <DndContext>
+        <SortableContext items={localImagesUrl}>
+          {localImagesUrl?.map((imageUrl, i) => (
+            <ImageItem
+              key={imageUrl}
+              imageUrl={imageUrl}
+              name={imageFiles[i].name}
+              removeImage={removeImage}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+    </>
   );
 };
 
