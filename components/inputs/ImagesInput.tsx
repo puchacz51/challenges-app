@@ -2,9 +2,16 @@ import Image from 'next/image';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
-import { DndContext } from '@dnd-kit/core';
+import {
+  DndContext,
+  MouseSensor,
+  TouchSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { ImageItem } from './ImageItem';
-import { SortableContext } from '@dnd-kit/sortable';
+import { rectSwappingStrategy, SortableContext } from '@dnd-kit/sortable';
 
 const CreateHandleImages =
   (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -74,16 +81,12 @@ const ImagesUplouder = ({ errors }) => {
         className='hidden'
       />
       <span>{errors?.message}</span>
-      <div className='flex w-full flex-wrap flex-row gap-3 justify-between'>
-        <ImageItemsList
-          key={imageFiles.length}
-          imageFiles={imageFiles}
-          removeImage={removeImage}
-        />
-        {imageFiles.length < 6 && (
-          <AddImagesElement addImages={() => imageInputRef.current.click()} />
-        )}
-      </div>
+      <ImageItemsList
+        key={imageFiles.length}
+        imageFiles={imageFiles}
+        removeImage={removeImage}
+        addImage={() => imageInputRef.current.click()}
+      />
     </>
   );
 };
@@ -91,9 +94,11 @@ const ImagesUplouder = ({ errors }) => {
 const ImageItemsList = ({
   imageFiles,
   removeImage,
+  addImage,
 }: {
   imageFiles: File[];
   removeImage: Function;
+  addImage: Function;
 }) => {
   const [localImagesUrl, setLocalImagesUrl] = useState([]);
   useEffect(() => {
@@ -101,10 +106,17 @@ const ImageItemsList = ({
     setLocalImagesUrl(imageURLs);
   }, [imageFiles]);
 
+  const mouseSensor = useSensor(MouseSensor);
+  const touchSensor = useSensor(TouchSensor);
+  const sensors = useSensors(mouseSensor, touchSensor);
+  const { setNodeRef } = useDroppable({ id: 'imageArea' });
   return (
     <>
-      <DndContext>
-        <SortableContext items={localImagesUrl}>
+      <DndContext sensors={sensors} >
+        <SortableContext items={localImagesUrl} strategy={rectSwappingStrategy}>
+        <div
+          ref={setNodeRef}
+          className='grid grid-cols-2 gap-4 gird w-full justify-between'>
           {localImagesUrl?.map((imageUrl, i) => (
             <ImageItem
               key={imageUrl}
@@ -113,6 +125,9 @@ const ImageItemsList = ({
               removeImage={removeImage}
             />
           ))}
+
+          {imageFiles.length < 6 && <AddImagesElement addImages={addImage} />}
+        </div>
         </SortableContext>
       </DndContext>
     </>

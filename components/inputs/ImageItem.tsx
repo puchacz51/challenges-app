@@ -1,12 +1,23 @@
-import { useDroppable } from '@dnd-kit/core';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import Image from 'next/image';
 import { BsFillTrashFill } from 'react-icons/bs';
-
+import { CSS } from '@dnd-kit/utilities';
 export const ImageItem = ({ imageUrl, removeImage, name }) => {
-const {setNodeRef} = useDroppable({ id: name });
+  const { setNodeRef, transform, isDragging, listeners, attributes } =
+    useDraggable({ id: name });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
+  console.log(imageUrl, isDragging);
+
   return (
     <>
-      <div className={`relative w-[47%] h-[100px] border-4  border-black `}>
+      <div
+        {...listeners}
+        {...attributes}
+        ref={setNodeRef}
+        style={style}
+        className={`relative w-[100%] h-[100px] border-4  border-black ${isDragging&&'z-30'}`}>
         <Image
           alt='your image'
           layout='fill'
