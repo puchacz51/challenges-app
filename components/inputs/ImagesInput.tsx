@@ -52,6 +52,8 @@ const ImagesUplouder = ({ errors }) => {
     setImageFiles([...imageFiles, ...newInputValue]);
   };
   const removeImage = (name: string) => {
+    console.log('removed ');
+    
     const newImageFiles = imageFiles.filter((file) => name !== file.name);
     setInputErrors([]);
     setImageFiles(newImageFiles);
@@ -112,8 +114,7 @@ const ImageItemsList = ({
   const { setNodeRef } = useDroppable({ id: 'imageArea' });
   return (
     <>
-      <DndContext sensors={sensors} >
-        <SortableContext items={localImagesUrl} strategy={rectSwappingStrategy}>
+      <DndContext sensors={sensors}  >
         <div
           ref={setNodeRef}
           className='grid grid-cols-2 gap-4 gird w-full justify-between'>
@@ -128,7 +129,6 @@ const ImageItemsList = ({
 
           {imageFiles.length < 6 && <AddImagesElement addImages={addImage} />}
         </div>
-        </SortableContext>
       </DndContext>
     </>
   );
