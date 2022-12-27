@@ -3,15 +3,22 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
 import {
+  closestCenter,
   DndContext,
+  DragOverlay,
   MouseSensor,
+  rectIntersection,
   TouchSensor,
   useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
 import { ImageItem } from './ImageItem';
-import { rectSwappingStrategy, SortableContext } from '@dnd-kit/sortable';
+import {
+  arrayMove,
+  rectSwappingStrategy,
+  SortableContext,
+} from '@dnd-kit/sortable';
 
 const CreateHandleImages =
   (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +60,7 @@ const ImagesUplouder = ({ errors }) => {
   };
   const removeImage = (name: string) => {
     console.log('removed ');
-    
+
     const newImageFiles = imageFiles.filter((file) => name !== file.name);
     setInputErrors([]);
     setImageFiles(newImageFiles);
@@ -103,18 +110,50 @@ const ImageItemsList = ({
   addImage: Function;
 }) => {
   const [localImagesUrl, setLocalImagesUrl] = useState([]);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+
   useEffect(() => {
     const imageURLs = imageFiles?.map((file) => URL.createObjectURL(file));
     setLocalImagesUrl(imageURLs);
   }, [imageFiles]);
-
+  // drag
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
   const { setNodeRef } = useDroppable({ id: 'imageArea' });
+  const dragStartHandler = ({ active }) => {
+    setActiveImage(active.id);
+  };
+  const dragEndhandler = ({ active, over,collisions }) => {
+    
+    if (active.id != over?.id) {
+      setLocalImagesUrl((imageUrls) => {
+        const oldIndex = imageUrls.indexOf(active.id);
+        const newIndex = imageUrls.indexOf(over?.id);
+
+        return arrayMove(imageUrls, oldIndex, newIndex);
+      });
+    }
+    setActiveImage(null);
+  };
+  const dragMoveHandler = ({active,over,collisions}) => {
+        if (active.id != over?.id) {
+          setLocalImagesUrl((imageUrls) => {
+            const oldIndex = imageUrls.indexOf(active.id);
+            const newIndex = imageUrls.indexOf(over?.id);
+
+            return arrayMove(imageUrls, oldIndex, newIndex);
+          });
+        }
+  };
   return (
     <>
-      <DndContext sensors={sensors}  >
+      <DndContext
+        sensors={sensors}
+        onDragStart={dragStartHandler}
+        onDragEnd={dragEndhandler}
+        onDragMove={dragMoveHandler}
+        collisionDetection={rectIntersection}>
         <div
           ref={setNodeRef}
           className='grid grid-cols-2 gap-4 gird w-full justify-between'>
@@ -126,7 +165,15 @@ const ImageItemsList = ({
               removeImage={removeImage}
             />
           ))}
-
+          <DragOverlay>
+            {activeImage && (
+              <ImageItem
+                name='dragged'
+                removeImage={() => {}}
+                imageUrl={activeImage}
+              />
+            )}
+          </DragOverlay>
           {imageFiles.length < 6 && <AddImagesElement addImages={addImage} />}
         </div>
       </DndContext>
