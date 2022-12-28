@@ -1,11 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import { FieldValues, useFormContext, UseFormReturn } from 'react-hook-form';
-import { Challenge } from '../../pages/challenge/useChallengeQuery';
-import { ChallengeTimeLine } from '../challenges/ChallengeTimeline';
-import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
-import LongTextInput from '../inputs/LongTextInput';
-import TextInput from '../inputs/TextInput';
-import { TimeInput } from '../inputs/TimeInput';
+import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { ChallengeStep } from './ChallengeStep';
 
 export interface ChallengeStepForm {
@@ -42,21 +36,20 @@ const ChangeStepOrder = () => {
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
   const { setValue, trigger, getValues } = context;
   const currentValue = getValues();
-  const stepsLength = currentValue?.challengeSteps.length
+  const stepsLength = currentValue?.challengeSteps.length;
   return <div>sdadsadsadsadsadsadadsasdsada</div>;
 };
 
 export const ChallengeStepForm = () => {
-  const {getValues} = useFormContext();
-    const currentValue = getValues();
-    const stepsLength = currentValue?.challengeSteps;
+  const { getValues } = useFormContext();
+  const currentValue = getValues();
+  const stepsLength = currentValue?.challengeSteps;
   const [displayMode, setDisplayMode] = useState<'addSteps' | 'changeOrder'>(
     'addSteps'
   );
 
-
-   if (stepsLength=== 0)
-     return <InitialStepsBtn handleInitialSteps={handleInitialSteps} />;
+  if (stepsLength === 0)
+    return <InitialStepsBtn handleInitialSteps={handleInitialSteps} />;
   return (
     <>
       <div className='mx-auto border-1  my-1  flex justify-around'>
@@ -112,7 +105,6 @@ export const AddChallengeSteps = ({ displayOrder }) => {
     }
   };
 
- 
   return (
     <div className='min-h-[50vh] '>
       <div className={`border-2  border-black `}>

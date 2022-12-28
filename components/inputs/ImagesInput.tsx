@@ -3,9 +3,11 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
 import {
-  closestCenter,
   DndContext,
+  DragEndEvent,
+  DragMoveEvent,
   DragOverlay,
+  DragStartEvent,
   MouseSensor,
   rectIntersection,
   TouchSensor,
@@ -14,11 +16,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { ImageItem } from './ImageItem';
-import {
-  arrayMove,
-  rectSwappingStrategy,
-  SortableContext,
-} from '@dnd-kit/sortable';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const CreateHandleImages =
   (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +31,7 @@ const AddImagesElement = ({ addImages }) => {
   return (
     <label
       htmlFor='image'
-      className='relative w-[44%] h-[100px] border-4  border-black '>
+      className='relative h-[100px] border-4  border-black '>
       <button
         type='button'
         onClick={addImages}
@@ -50,8 +48,8 @@ const ImagesUplouder = ({ errors }) => {
   const imageInputRef = useRef<HTMLInputElement>();
   const handleImageInput = () => {
     const newInputValue = Array.from(imageInputRef.current.files);
-    if (newInputValue.length + imageFiles.length > 6) {
-      setInputErrors(['max amount of images is 6']);
+    if (newInputValue.length + imageFiles.length > 5) {
+      setInputErrors(['max amount of images is 5']);
       return;
     }
     setInputErrors([]);
@@ -117,46 +115,64 @@ const ImageItemsList = ({
     setLocalImagesUrl(imageURLs);
   }, [imageFiles]);
   // drag
-  const mouseSensor = useSensor(MouseSensor);
-  const touchSensor = useSensor(TouchSensor);
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: { distance: 15 }
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: { distance: 15 },onActivation:(e)=>e.event.preventDefault()
+  });
   const sensors = useSensors(mouseSensor, touchSensor);
   const { setNodeRef } = useDroppable({ id: 'imageArea' });
   const dragStartHandler = ({ active }) => {
+    console.log('start');
+
     setActiveImage(active.id);
   };
-  const dragEndhandler = ({ active, over,collisions }) => {
-    
-    if (active.id != over?.id) {
-      setLocalImagesUrl((imageUrls) => {
-        const oldIndex = imageUrls.indexOf(active.id);
-        const newIndex = imageUrls.indexOf(over?.id);
 
-        return arrayMove(imageUrls, oldIndex, newIndex);
-      });
-    }
+  const dragEndhandler = useCallback(
+    ({ active, over, delta, activatorEvent }: DragEndEvent) => {
+      if (active.id != over?.id) {
+        setLocalImagesUrl((imageUrls) => {
+          const oldIndex = imageUrls.indexOf(active.id);
+          const newIndex = imageUrls.indexOf(over?.id);
+
+          return arrayMove(imageUrls, oldIndex, newIndex);
+        });
+      }
+      setActiveImage(null);
+    },
+    []
+  );
+  const dragMoveHandler = useCallback(
+    ({ active, over, delta }: DragMoveEvent) => {
+      if (Math.max(delta.x, delta.y) < 10) return;
+      if (active.id != over?.id) {
+        setLocalImagesUrl((imageUrls) => {
+          const oldIndex = imageUrls.indexOf(active.id);
+          const newIndex = imageUrls.indexOf(over?.id);
+
+          return arrayMove(imageUrls, oldIndex, newIndex);
+        });
+      }
+    },
+    []
+  );
+  const cancelDragHandler = useCallback(() => {
     setActiveImage(null);
-  };
-  const dragMoveHandler = ({active,over,collisions}) => {
-        if (active.id != over?.id) {
-          setLocalImagesUrl((imageUrls) => {
-            const oldIndex = imageUrls.indexOf(active.id);
-            const newIndex = imageUrls.indexOf(over?.id);
-
-            return arrayMove(imageUrls, oldIndex, newIndex);
-          });
-        }
-  };
+  }, []);
   return (
     <>
       <DndContext
         sensors={sensors}
         onDragStart={dragStartHandler}
         onDragEnd={dragEndhandler}
-        onDragMove={dragMoveHandler}
+        onDragOver={dragMoveHandler}
+        onDragCancel={cancelDragHandler}
+        autoScroll={false}
         collisionDetection={rectIntersection}>
         <div
           ref={setNodeRef}
-          className='grid grid-cols-2 gap-4 gird w-full justify-between'>
+          className='grid grid-cols-2 gap-4 gird w-full justify-between first '>
           {localImagesUrl?.map((imageUrl, i) => (
             <ImageItem
               key={imageUrl}
@@ -169,7 +185,7 @@ const ImageItemsList = ({
             {activeImage && (
               <ImageItem
                 name='dragged'
-                removeImage={() => {}}
+                removeImage={null}
                 imageUrl={activeImage}
               />
             )}
