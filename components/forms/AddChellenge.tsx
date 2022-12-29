@@ -67,12 +67,12 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     getValues,
     reset,
   } = methods;
-  useEffect(() => {
-    const inter = setInterval(() => {
-      console.log(getValues());
-    }, 10000);
-    return () => clearInterval(inter);
-  }, []);
+  // useEffect(() => {
+  //   const inter = setInterval(() => {
+  //     console.log(getValues());
+  //   }, 10000);
+  //   return () => clearInterval(inter);
+  // }, []);
 
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { mutate, isSuccess } = addChallengeMutation(reset);

@@ -7,7 +7,6 @@ import {
   DragEndEvent,
   DragMoveEvent,
   DragOverlay,
-  DragStartEvent,
   MouseSensor,
   rectIntersection,
   TouchSensor,
@@ -17,15 +16,6 @@ import {
 } from '@dnd-kit/core';
 import { ImageItem } from './ImageItem';
 import { arrayMove } from '@dnd-kit/sortable';
-
-const CreateHandleImages =
-  (setFiles, setUrls) => (e: ChangeEvent<HTMLInputElement>) => {
-    const { files } = e?.currentTarget;
-    if (!files.length) return;
-    const filesUrl = Array.from(files).map((file) => URL.createObjectURL(file));
-    setUrls(filesUrl);
-    setFiles(files);
-  };
 
 const AddImagesElement = ({ addImages }) => {
   return (
@@ -53,9 +43,9 @@ const ImagesUplouder = ({ errors }) => {
       return;
     }
     setInputErrors([]);
-
     setImageFiles([...imageFiles, ...newInputValue]);
   };
+
   const removeImage = (name: string) => {
     console.log('removed ');
 
@@ -89,7 +79,6 @@ const ImagesUplouder = ({ errors }) => {
       />
       <span>{errors?.message}</span>
       <ImageItemsList
-        key={imageFiles.length}
         imageFiles={imageFiles}
         removeImage={removeImage}
         addImage={() => imageInputRef.current.click()}
@@ -97,64 +86,81 @@ const ImagesUplouder = ({ errors }) => {
     </>
   );
 };
-
+interface ImageItemsListProps {
+  imageFiles: File[];
+  removeImage: Function;
+  addImage: Function;
+  setImagesOrder?: () => void;
+}
 const ImageItemsList = ({
   imageFiles,
   removeImage,
   addImage,
-}: {
-  imageFiles: File[];
-  removeImage: Function;
-  addImage: Function;
-}) => {
+}: ImageItemsListProps) => {
   const [localImagesUrl, setLocalImagesUrl] = useState([]);
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  useEffect(() => {
+    console.log('first');
+  }, []);
 
   useEffect(() => {
+    console.log('useEffect', localImagesUrl.length);
+
     const imageURLs = imageFiles?.map((file) => URL.createObjectURL(file));
-    setLocalImagesUrl(imageURLs);
-  }, [imageFiles]);
+    if (!localImagesUrl.length) {
+      setLocalImagesUrl(imageURLs);
+    } else {
+      console.log(111);
+
+      const addedImageUrls = imageURLs.filter(
+        (url) => !localImagesUrl.includes(url)
+      );
+      const newOrderedUrls = localImagesUrl
+        .filter((url) => imageURLs.includes(url))
+        .concat(addedImageUrls);
+      console.log(newOrderedUrls, 'newOrderedURLS');
+      console.log(localImagesUrl, 'old localImagesUrl');
+      console.log(addedImageUrls, 'addedImageUrls');
+
+      console.log(newOrderedUrls);
+
+      setLocalImagesUrl(newOrderedUrls);
+    }
+  }, [imageFiles.length, imageFiles]);
   // drag
   const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: { distance: 15 }
+    activationConstraint: { delay: 1, tolerance: 1 },
   });
   const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: { distance: 15 },onActivation:(e)=>e.event.preventDefault()
+    activationConstraint: { delay: 1, tolerance: 1 },
   });
   const sensors = useSensors(mouseSensor, touchSensor);
   const { setNodeRef } = useDroppable({ id: 'imageArea' });
   const dragStartHandler = ({ active }) => {
-    console.log('start');
-
     setActiveImage(active.id);
   };
 
-  const dragEndhandler = useCallback(
-    ({ active, over, delta, activatorEvent }: DragEndEvent) => {
-      if (active.id != over?.id) {
-        setLocalImagesUrl((imageUrls) => {
-          const oldIndex = imageUrls.indexOf(active.id);
-          const newIndex = imageUrls.indexOf(over?.id);
-
-          return arrayMove(imageUrls, oldIndex, newIndex);
-        });
-      }
-      setActiveImage(null);
-    },
-    []
-  );
+  const dragEndhandler = useCallback(({ active, over }: DragEndEvent) => {
+    if (active.id != over?.id) {
+      setLocalImagesUrl((imageUrls) => {
+        const oldIndex = imageUrls.indexOf(active.id);
+        const newIndex = imageUrls.indexOf(over?.id);
+        return arrayMove(imageUrls, oldIndex, newIndex);
+      });
+    }
+    setActiveImage(null);
+  }, []);
   const dragMoveHandler = useCallback(
     ({ active, over, delta }: DragMoveEvent) => {
-      if (Math.max(delta.x, delta.y) < 10) return;
       if (active.id != over?.id) {
         setLocalImagesUrl((imageUrls) => {
           const oldIndex = imageUrls.indexOf(active.id);
           const newIndex = imageUrls.indexOf(over?.id);
-
           return arrayMove(imageUrls, oldIndex, newIndex);
         });
       }
     },
+
     []
   );
   const cancelDragHandler = useCallback(() => {
@@ -190,7 +196,7 @@ const ImageItemsList = ({
               />
             )}
           </DragOverlay>
-          {imageFiles.length < 6 && <AddImagesElement addImages={addImage} />}
+          {imageFiles.length < 5 && <AddImagesElement addImages={addImage} />}
         </div>
       </DndContext>
     </>
