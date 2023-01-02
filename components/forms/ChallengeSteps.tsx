@@ -1,3 +1,4 @@
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ChallengeStep } from './ChallengeStep';
@@ -31,14 +32,6 @@ const challengeOrder = (steps: ChallengeSteps) => {
   return newOrderedSteps;
 };
 
-const ChangeStepOrder = () => {
-  const context = useFormContext();
-  const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
-  const { setValue, trigger, getValues } = context;
-  const currentValue = getValues();
-  const stepsLength = currentValue?.challengeSteps.length;
-  return <div>sdadsadsadsadsadsadadsasdsada</div>;
-};
 
 export const ChallengeStepForm = () => {
   const { getValues } = useFormContext();
