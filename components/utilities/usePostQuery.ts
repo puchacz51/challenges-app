@@ -1,20 +1,14 @@
 import { nanoid } from '@reduxjs/toolkit';
 import {
-  QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
 import { Challenge } from '../../pages/challenge/useChallengeQuery';
-import LoginPage from '../../pages/login';
 import { supabase } from '../../services/supabase/supabase';
 import { FormChallenge } from '../forms/AddChellenge';
-import {
-  ChallengeStepForm,
-  ChallengeSteps,
-  ChallengeStepsForm,
-} from '../forms/ChallengeSteps';
+import { ChallengeStepsForm } from '../forms/ChallengeSteps';
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
   try {
@@ -27,18 +21,6 @@ const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
         })
     );
     Promise.all(imagePromises);
-    // for (const image of images) {
-    //   const res = await supabase.storage
-    //     .from('challenges')
-    //     .upload(imagesPath[index++], image as File, {
-    //       cacheControl: '3600',
-    //       upsert: false,
-    //     });
-    //   if (res.error) throw res.error;
-    // }
-    // const removeImages = () => (path) =>
-    //   supabase.storage.from('challenges').remove(imagesPath);
-    // return removeImages;
   } catch (err) {
     throw err;
   }
@@ -74,8 +56,8 @@ const deleteFromDB = async (challengeId: string) => {
   {
     return async () => {
       try {
-        console.log("deleting from database");
-        
+        console.log('deleting from database');
+
         await supabase.from('challenges').delete().eq('id', challengeId);
       } catch (err) {
         console.log(err);
@@ -85,7 +67,7 @@ const deleteFromDB = async (challengeId: string) => {
 };
 const addToDB = async (formData: Challenge) => {
   try {
-    const {error,data} = await supabase
+    const { error, data } = await supabase
       .from<Challenge>('challenges')
       .insert(formData);
     if (error) throw error;
@@ -104,7 +86,7 @@ const deleteImages = async (imagesPath: string[]) => async () => {
 };
 const addChallenge = async (values: FormChallenge) => {
   let imagesPath: string[];
-  const { challengeSteps, images, userId, ...rest } = values;
+  const { challengeSteps, images, userId, imagesOrder, ...rest } = values;
   let challengeres: Challenge;
   try {
     imagesPath = Array.from(images).map((image) => {
@@ -112,9 +94,15 @@ const addChallenge = async (values: FormChallenge) => {
       const path = `${userId}/${name}`;
       return path;
     });
+    const orderedPaths = imagesOrder.map(({ name }) => {
+      const foundedIndex = Array.from(images).findIndex(
+        (item) => item.name === name
+      );
+      return imagesPath[foundedIndex];
+    });
 
     await uploadImage(images, imagesPath);
-    const dbData = { ...rest, userId, images: imagesPath };
+    const dbData = { ...rest, userId, images: orderedPaths };
     challengeres = await addToDB(dbData);
     let steps = [];
     if (Object.keys(challengeSteps).length) {
@@ -122,14 +110,13 @@ const addChallenge = async (values: FormChallenge) => {
     }
     return { ...challengeres, steps };
   } catch (err) {
-   await Promise.allSettled([
+    await Promise.allSettled([
       deleteFromDB(challengeres.id),
       deleteImages(imagesPath),
       deleteSteps(challengeres.id),
     ]);
 
     console.log(err);
-    
   }
 };
 

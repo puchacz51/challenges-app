@@ -23,6 +23,7 @@ const initialValues = {
   startTime: new Date().toUTCString(),
   endTime: new Date().toUTCString(),
   images: {},
+  imagesOrder:null
 };
 export interface FormChallenge {
   title: string;
@@ -32,6 +33,7 @@ export interface FormChallenge {
   images: FileList;
   challengeSteps: ChallengeStepsForm;
   userId: string;
+  imagesOrder:{name:string,url:string[]}[]|null
 }
 
 export const AddChallenge = () => {
@@ -54,7 +56,7 @@ interface ChallengeFormProps {
 }
 
 const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
-  const [oldFromData, setOldFormData] = useState<ChallengeFormProps>();
+  // const [oldFromData, setOldFormData] = useState<ChallengeFormProps>();
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
@@ -67,12 +69,7 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     getValues,
     reset,
   } = methods;
-  // useEffect(() => {
-  //   const inter = setInterval(() => {
-  //     console.log(getValues());
-  //   }, 10000);
-  //   return () => clearInterval(inter);
-  // }, []);
+
 
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { mutate, isSuccess } = addChallengeMutation(reset);

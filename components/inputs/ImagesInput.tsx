@@ -10,6 +10,7 @@ import {
   MouseSensor,
   rectIntersection,
   TouchSensor,
+  UniqueIdentifier,
   useDroppable,
   useSensor,
   useSensors,
@@ -47,13 +48,13 @@ const ImagesUplouder = ({ errors }) => {
   };
 
   const removeImage = (name: string) => {
-    console.log('removed ');
-
     const newImageFiles = imageFiles.filter((file) => name !== file.name);
     setInputErrors([]);
     setImageFiles(newImageFiles);
   };
-
+  const setImageOrader = (images) => {
+    setValue('imagesOrder', images);
+  };
   useEffect(() => {
     setValue('images', imageFiles);
   }, [setValue, imageFiles]);
@@ -79,6 +80,7 @@ const ImagesUplouder = ({ errors }) => {
       />
       <span>{errors?.message}</span>
       <ImageItemsList
+        setImagesOrder={setImageOrader}
         imageFiles={imageFiles}
         removeImage={removeImage}
         addImage={() => imageInputRef.current.click()}
@@ -90,42 +92,42 @@ interface ImageItemsListProps {
   imageFiles: File[];
   removeImage: Function;
   addImage: Function;
-  setImagesOrder?: () => void;
+  setImagesOrder?: (images) => void;
 }
 const ImageItemsList = ({
   imageFiles,
   removeImage,
   addImage,
+  setImagesOrder,
 }: ImageItemsListProps) => {
-  const [localImagesUrl, setLocalImagesUrl] = useState([]);
+  const [localImages, setLocalImages] = useState<
+    { name: string; url: string }[]
+  >([]);
+
   const [activeImage, setActiveImage] = useState<string | null>(null);
-  useEffect(() => {
-    console.log('first');
-  }, []);
 
   useEffect(() => {
-    console.log('useEffect', localImagesUrl.length);
-
-    const imageURLs = imageFiles?.map((file) => URL.createObjectURL(file));
-    if (!localImagesUrl.length) {
-      setLocalImagesUrl(imageURLs);
-    } else {
-      console.log(111);
-
-      const addedImageUrls = imageURLs.filter(
-        (url) => !localImagesUrl.includes(url)
+    const newLocalImage = imageFiles.map((image) => {
+      const oldImage = localImages.find(
+        (localImage) => localImage.name === image.name
       );
-      const newOrderedUrls = localImagesUrl
-        .filter((url) => imageURLs.includes(url))
-        .concat(addedImageUrls);
-      console.log(newOrderedUrls, 'newOrderedURLS');
-      console.log(localImagesUrl, 'old localImagesUrl');
-      console.log(addedImageUrls, 'addedImageUrls');
+      if (oldImage) return oldImage;
+      return { name: image.name, url: URL.createObjectURL(image) };
+    });
+    const sortedNewLocalImages = newLocalImage.sort((a, b) => {
+      const indexA = localImages.findIndex(
+        (oldImage) => oldImage.name == a.name
+      );
+      const indexB = localImages.findIndex(
+        (oldImage) => oldImage.name == b.name
+      );
 
-      console.log(newOrderedUrls);
-
-      setLocalImagesUrl(newOrderedUrls);
-    }
+      const valueA = indexA === -1 ? 10 : indexA;
+      const valueB = indexB === -1 ? 10 : indexB;
+      return valueA - valueB;
+    });
+    setLocalImages(sortedNewLocalImages);
+    setImagesOrder(sortedNewLocalImages);
   }, [imageFiles.length, imageFiles]);
   // drag
   const mouseSensor = useSensor(MouseSensor, {
@@ -141,22 +143,20 @@ const ImageItemsList = ({
   };
 
   const dragEndhandler = useCallback(({ active, over }: DragEndEvent) => {
-    if (active.id != over?.id) {
-      setLocalImagesUrl((imageUrls) => {
-        const oldIndex = imageUrls.indexOf(active.id);
-        const newIndex = imageUrls.indexOf(over?.id);
-        return arrayMove(imageUrls, oldIndex, newIndex);
-      });
-    }
+     
+    setImagesOrder(localImages)
     setActiveImage(null);
-  }, []);
+  }, [localImages]);
   const dragMoveHandler = useCallback(
     ({ active, over, delta }: DragMoveEvent) => {
       if (active.id != over?.id) {
-        setLocalImagesUrl((imageUrls) => {
-          const oldIndex = imageUrls.indexOf(active.id);
-          const newIndex = imageUrls.indexOf(over?.id);
-          return arrayMove(imageUrls, oldIndex, newIndex);
+        setLocalImages((images) => {
+          const imagesUrls = images.map(
+            (image) => image.url
+          ) as UniqueIdentifier[];
+          const oldIndex = imagesUrls.indexOf(active.id);
+          const newIndex = imagesUrls.indexOf(over?.id);
+          return arrayMove(images, oldIndex, newIndex);
         });
       }
     },
@@ -179,11 +179,11 @@ const ImageItemsList = ({
         <div
           ref={setNodeRef}
           className='grid grid-cols-2 gap-4 gird w-full justify-between first '>
-          {localImagesUrl?.map((imageUrl, i) => (
+          {localImages?.map(({ url, name }, i) => (
             <ImageItem
-              key={imageUrl}
-              imageUrl={imageUrl}
-              name={imageFiles[i].name}
+              key={url}
+              imageUrl={url}
+              name={name}
               removeImage={removeImage}
             />
           ))}
