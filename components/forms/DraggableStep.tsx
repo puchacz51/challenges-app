@@ -2,18 +2,24 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 export const DraggableStep = ({ id, number, title }) => {
-  const { active, listeners, transform, attributes } = useSortable({ id });
+  const { isDragging, listeners, transform, attributes, setNodeRef } =
+    useSortable({
+      id,
+    });
   const style = {
     transform: CSS.Translate.toString(transform),
   };
 
   return (
-    <button
-      className={`p-4 border-4 border-black ${active && 'bg-slate-400'}`}
+    <div
       {...listeners}
       {...attributes}
+      ref={setNodeRef}
+      className={`p-2 border-4 border-black ${
+        isDragging && 'bg-slate-400 text-red-600'
+      }`}
       style={style}>
-      {title}
-    </button>
+      {title || 'unknown'} {id}
+    </div>
   );
 };

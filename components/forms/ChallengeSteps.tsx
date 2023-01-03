@@ -1,7 +1,9 @@
-import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { FormChallenge } from './AddChellenge';
 import { ChallengeStep } from './ChallengeStep';
+import { ChangeStepOrder } from './ChangeStepOrder';
 
 export interface ChallengeStepForm {
   title: string;
@@ -11,7 +13,7 @@ export interface ChallengeStepForm {
   stepID?: number;
 }
 export interface ChallengeStepsForm {
-  [key: `step${number}`]: ChallengeStepForm;
+  string: ChallengeStepForm;
 }
 export type ChallengeSteps = ChallengeStepForm[];
 
@@ -32,7 +34,6 @@ const challengeOrder = (steps: ChallengeSteps) => {
   return newOrderedSteps;
 };
 
-
 export const ChallengeStepForm = () => {
   const { getValues } = useFormContext();
   const currentValue = getValues();
@@ -41,8 +42,7 @@ export const ChallengeStepForm = () => {
     'addSteps'
   );
 
-  if (stepsLength === 0)
-    return <InitialStepsBtn handleInitialSteps={handleInitialSteps} />;
+
   return (
     <>
       <div className='mx-auto border-1  my-1  flex justify-around'>
@@ -74,26 +74,21 @@ export const ChallengeStepForm = () => {
 };
 
 export const AddChallengeSteps = ({ displayOrder }) => {
-  const [steps, setSteps] = useState([]);
   const [selectedStep, SetSelectedStep] = useState('');
-  const context = useFormContext();
+  const context = useFormContext<FormChallenge>();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
   const { setValue, trigger, getValues } = context;
-  const currentValues = getValues();
+  const { challengeSteps, challengStepOrder } = getValues();
   const removeStep = (name: string) => {
-    const newSteps = steps.filter((step) => step != name);
-    setSteps(newSteps);
+    const newSteps = challengStepOrder.filter((step) => step != name);
+    setValue('challengStepOrder', newSteps);
   };
 
-  const handleInitialSteps = () => {
-    handleAddStep();
-    trigger();
-  };
   const handleAddStep = () => {
-    if (steps.length < 6) {
+    if (challengStepOrder.length < 6) {
       const newStep = `step${Math.floor(Math.random() * 1000)}`;
-      const newSteps = [...steps, newStep];
-      setSteps(newSteps);
+      const newSteps = [...challengStepOrder, newStep];
+      setValue('challengStepOrder', newSteps);
       SetSelectedStep(newStep);
     }
   };
@@ -105,7 +100,7 @@ export const AddChallengeSteps = ({ displayOrder }) => {
           steps
         </h3>
         <div className=' border-black flex justify-around p-1'>
-          {steps.map((name, index) => (
+          {challengStepOrder?.map((name, index) => (
             <button
               type='button'
               onClick={() => SetSelectedStep(name)}
@@ -119,7 +114,7 @@ export const AddChallengeSteps = ({ displayOrder }) => {
             </button>
           ))}
 
-          {steps.length < 5 && (
+          {challengStepOrder?.length < 5 && (
             <div className='w-full flex justify-end '>
               <button
                 type='button'
@@ -137,7 +132,7 @@ export const AddChallengeSteps = ({ displayOrder }) => {
           change steps order
         </button>
         <div className='flex flex-col mx-1'>
-          {steps.map((name, i) => (
+          {challengStepOrder?.map((name, i) => (
             <ChallengeStep
               selected={name === selectedStep}
               context={context}

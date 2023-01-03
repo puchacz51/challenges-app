@@ -23,7 +23,9 @@ const initialValues = {
   startTime: new Date().toUTCString(),
   endTime: new Date().toUTCString(),
   images: {},
-  imagesOrder:null
+  imagesOrder: null,
+  challengeSteps: {},
+  challengStepOrder: [],
 };
 export interface FormChallenge {
   title: string;
@@ -32,8 +34,9 @@ export interface FormChallenge {
   endTime: any;
   images: FileList;
   challengeSteps: ChallengeStepsForm;
+  challengStepOrder: string[];
   userId: string;
-  imagesOrder:{name:string,url:string[]}[]|null
+  imagesOrder: { name: string; url: string[] }[] | null;
 }
 
 export const AddChallenge = () => {
@@ -69,7 +72,6 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     getValues,
     reset,
   } = methods;
-
 
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { mutate, isSuccess } = addChallengeMutation(reset);
