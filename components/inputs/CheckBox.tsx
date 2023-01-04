@@ -9,6 +9,7 @@ interface CheckBoxSwitchProps {
 interface SimpleCheckBoxProps {
   name: string;
   setValue: Function;
+  checked: boolean;
 }
 
 const CheckBoxSwitch = ({ name, errors, ...att }: CheckBoxSwitchProps) => {
@@ -36,6 +37,7 @@ const CheckBoxSwitch = ({ name, errors, ...att }: CheckBoxSwitchProps) => {
 export const SimpleCheckBoxSwitch = ({
   name,
   setValue,
+  checked
 }: SimpleCheckBoxProps) => {
   const id = useId();
   return (
@@ -50,6 +52,7 @@ export const SimpleCheckBoxSwitch = ({
           onChange={setValue}
           type='checkbox'
           value='1'
+          checked={checked}
           id={id}
           className='sr-only peer'
         />

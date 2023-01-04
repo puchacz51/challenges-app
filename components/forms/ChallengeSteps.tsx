@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormChallenge } from './AddChellenge';
@@ -41,7 +40,6 @@ export const ChallengeStepForm = () => {
   const [displayMode, setDisplayMode] = useState<'addSteps' | 'changeOrder'>(
     'addSteps'
   );
-
 
   return (
     <>
@@ -135,7 +133,6 @@ export const AddChallengeSteps = ({ displayOrder }) => {
           {challengStepOrder?.map((name, i) => (
             <ChallengeStep
               selected={name === selectedStep}
-              context={context}
               index={i}
               key={name}
               remove={() => removeStep(name)}
@@ -144,19 +141,6 @@ export const AddChallengeSteps = ({ displayOrder }) => {
           ))}
         </div>
       </div>
-    </div>
-  );
-};
-
-const InitialStepsBtn = ({ handleInitialSteps }) => {
-  return (
-    <div className='min-h-[50vh] flex justify-center items-center'>
-      <button
-        type='button'
-        className='bg-emerald-600  p-2 rounded-xl  '
-        onClick={handleInitialSteps}>
-        AddChallenge
-      </button>
     </div>
   );
 };

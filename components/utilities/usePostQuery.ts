@@ -86,7 +86,14 @@ const deleteImages = async (imagesPath: string[]) => async () => {
 };
 const addChallenge = async (values: FormChallenge) => {
   let imagesPath: string[];
-  const { challengeSteps, images, userId, imagesOrder, ...rest } = values;
+  const {
+    challengeSteps,
+    images,
+    userId,
+    imagesOrder,
+    challengStepOrder,
+    ...rest
+  } = values;
   let challengeres: Challenge;
   try {
     imagesPath = Array.from(images).map((image) => {
@@ -133,7 +140,7 @@ const fetchChallenges = async (userId) => {
   }
 };
 export const useChallengeQuery = (id: number, options?: UseQueryOptions) => {
-  return useQuery(['challenge', id], () => fetchChallenges(id));
+  return useQuery([id], () => fetchChallenges(id));
 };
 
 const getUrlFromFileList = (files: FileList) => {
@@ -158,8 +165,8 @@ export const addChallengeMutation = (resetForm: Function) => {
         ...values,
         images: localImagesUrl,
       };
-      queryClient.setQueryData([userId], () => {
-        return [optimisticChallenge];
+      queryClient.setQueryData([userId], (old) => {
+        return [optimisticChallenge, ...old];
       });
 
       return { optimisticChallenge };

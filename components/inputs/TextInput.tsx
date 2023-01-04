@@ -6,6 +6,7 @@ import {
   useFormContext,
   UseFormRegisterReturn,
 } from 'react-hook-form';
+import { FormChallenge } from '../forms/AddChellenge';
 interface TextInputProps {
   name: string;
   att?: Attributes;
@@ -15,12 +16,13 @@ interface TextInputProps {
 const TextInput = ({ name, errors, text, ...att }: TextInputProps) => {
   const {
     register,
-    setValue,
     formState: { touchedFields },
-  } = useFormContext();
-
-  const [isTouched, setIsTouched] = useState(touchedFields[name]);
+    getFieldState,
+  } = useFormContext<FormChallenge>();
+  const [isClicked, setIsClicked] = useState(false);
+  const isTouched = getFieldState(name).isTouched || isClicked;
   const displayError = isTouched && errors;
+
   return (
     <div
       className={`relative gap-1 pt-3 ${
@@ -31,7 +33,7 @@ const TextInput = ({ name, errors, text, ...att }: TextInputProps) => {
         type='text'
         name={name}
         {...register(name)}
-        onClick={() => setIsTouched(true)}
+        onClick={() => setIsClicked(true)}
       />
       <label
         className={`absolute left-0 border-b-2 border-transparent text-lg transition  ${

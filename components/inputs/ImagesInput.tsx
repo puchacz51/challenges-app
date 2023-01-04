@@ -142,7 +142,7 @@ const ImageItemsList = ({
     setActiveImage(active.id);
   };
 
-  const dragEndhandler = useCallback(({ active, over }: DragEndEvent) => {
+  const dragEndhandler = useCallback(() => {
      
     setImagesOrder(localImages)
     setActiveImage(null);

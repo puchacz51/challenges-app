@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { FieldValues, UseFormReturn } from "react-hook-form";
-import { SimpleCheckBoxSwitch } from "../inputs/CheckBox";
-import LongTextInput from "../inputs/LongTextInput";
-import TextInput from "../inputs/TextInput";
-import { TimeInput } from "../inputs/TimeInput";
+import { useEffect, useState } from 'react';
+import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
+import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
+import LongTextInput from '../inputs/LongTextInput';
+import TextInput from '../inputs/TextInput';
+import { TimeInput } from '../inputs/TimeInput';
+import { FormChallenge } from './AddChellenge';
 
 interface ChallengeStepProps {
-  context: UseFormReturn<FieldValues, any>;
   index: number;
   remove: Function;
   name: string;
@@ -14,22 +14,19 @@ interface ChallengeStepProps {
 }
 
 export const ChallengeStep = ({
-  context,
   index,
   remove,
   name,
   selected,
 }: ChallengeStepProps) => {
-  const { unregister, getFieldState, setValue} = context;
-  const { error } = getFieldState(`challengeSteps.${name}`);
-  const [stepWithTime, setStepWithTime] = useState(false);
-	
-  if (!stepWithTime) {
-    setValue(`challengeSteps.${name}.time`, null);
-  }
-  useEffect(() => {
-    return () => unregister(`challengeSteps.${name}.title`);
-  }, []);
+  const context = useForm<FormChallenge>();
+  const { getFieldState, getValues } = context;
+  const { error, isTouched } = getFieldState(`challengeSteps.${name}`);
+  const [stepWithTime, setStepWithTime] = useState(
+    getValues(`challengeSteps.${name}.time`)
+  );
+  console.log(stepWithTime);
+
   return (
     <div
       className={`w-full my-1 px-2 flex flex-col border-4 ${
@@ -46,8 +43,9 @@ export const ChallengeStep = ({
         name={`challengeSteps.${name}.description`}
       />
       <SimpleCheckBoxSwitch
+        checked={stepWithTime}
         name='addTime'
-        setValue={() => setStepWithTime((value) => !value)}
+        setValue={() => setStepWithTime((is) => !is)}
       />
       {stepWithTime && <TimeInput name={`challengeSteps.${name}.time`} />}
 
