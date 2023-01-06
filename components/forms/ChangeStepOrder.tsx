@@ -20,9 +20,9 @@ import { DraggableStep } from './DraggableStep';
 
 export const ChangeStepOrder = () => {
   const context = useFormContext<FormChallenge>();
-  const { setValue, formState, getValues } = context;
+  const { formState, getValues } = context;
   const challengeSteps = getValues().challengeSteps;
-  const errorsKey = Object.keys(formState?.errors.challengeSteps || {});
+  // const errorsKey = Object.keys(formState?.errors.challengeSteps || {});
   const [activeStep, setActiveStep] = useState();
   const [challengeStepkeys, setChallengeStepkeys] = useState(
     Object.keys(challengeSteps || {})
@@ -68,7 +68,7 @@ export const ChangeStepOrder = () => {
       sensors={sensors}
       autoScroll={false}
       collisionDetection={rectIntersection}>
-      <div ref={setNodeRef}>
+      <div ref={setNodeRef} className='flex flex-col gap-3 my-2 p-2 border-2 border-black' >
         {challengeStepkeys.map((stepKey, index) => {
           const step = challengeSteps[stepKey] as ValueOf<ChallengeStepsForm>;
           return (
@@ -82,9 +82,14 @@ export const ChangeStepOrder = () => {
           );
         })}
       </div>
-      <DragOverlay>
-        <div className='bg-green-400 h-3 w-4'></div>
-      </DragOverlay>
+
+      {activeStep && (
+        <DragOverlay>
+          <div className='bg-red-400 py-2 border-2 px-2 border-black'>
+            {challengeSteps[activeStep].title || 'UNKNOWN'}
+          </div>
+        </DragOverlay>
+      )}
     </DndContext>
   );
 };

@@ -1,10 +1,9 @@
-import { Attributes } from 'react';
+import { Attributes, InputHTMLAttributes } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 
 interface TimeInputProps {
   name: string;
-  att?: Attributes;
-
+  att?: InputHTMLAttributes<TimeInputProps>;
 }
 export const TimeInput = ({ name, ...att }: TimeInputProps) => {
   const { register, getFieldState } = useFormContext();
@@ -16,6 +15,7 @@ export const TimeInput = ({ name, ...att }: TimeInputProps) => {
         name={name}
         type='datetime-local'
         {...register(name)}
+        {...att}
         className={`resize-none w-full  border-2 border-black py-3`}
       />
       <label htmlFor={name} {...att} className={`hidden`}>

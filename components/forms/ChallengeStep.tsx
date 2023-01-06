@@ -5,6 +5,7 @@ import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
+import { ChallengeStepsForm } from './ChallengeSteps';
 
 interface ChallengeStepProps {
   index: number;
@@ -25,8 +26,7 @@ export const ChallengeStep = ({
   const [stepWithTime, setStepWithTime] = useState(
     getValues(`challengeSteps.${name}.time`)
   );
-  console.log(stepWithTime);
-
+  const handleTimeChange = () => {};
   return (
     <div
       className={`w-full my-1 px-2 flex flex-col border-4 ${
@@ -47,7 +47,14 @@ export const ChallengeStep = ({
         name='addTime'
         setValue={() => setStepWithTime((is) => !is)}
       />
-      {stepWithTime && <TimeInput name={`challengeSteps.${name}.time`} />}
+      {stepWithTime && (
+        <TimeInput
+          onChange={() => {
+            handleTimeChange;
+          }}
+          name={`challengeSteps.${name}.time`}
+        />
+      )}
 
       <button type='button' className='bg-red-600' onClick={remove}>
         X
@@ -55,3 +62,6 @@ export const ChallengeStep = ({
     </div>
   );
 };
+
+function sortTimeSteps(challengeSteps: ChallengeStepsForm) {
+}
