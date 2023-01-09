@@ -21,7 +21,6 @@ const compareStringDate = (date1: string, date2: string) => {
 };
 
 const challengeOrder = (steps: ChallengeSteps) => {
-  // const noTImeSteps = steps.filter(step => !step.time)
   const timeSteps = steps.filter((step) => step.time);
   const sortedTimeSteps = timeSteps.sort((date1, date2) =>
     compareStringDate(date1.time, date2.time)

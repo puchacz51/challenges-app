@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
 import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
@@ -63,5 +63,4 @@ export const ChallengeStep = ({
   );
 };
 
-function sortTimeSteps(challengeSteps: ChallengeStepsForm) {
-}
+function sortTimeSteps(challengeSteps: ChallengeStepsForm) {}
