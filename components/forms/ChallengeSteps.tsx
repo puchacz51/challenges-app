@@ -1,3 +1,5 @@
+import { UniqueIdentifier } from '@dnd-kit/core';
+import { nanoid } from '@reduxjs/toolkit';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormChallenge } from './AddChellenge';
@@ -12,9 +14,8 @@ export interface ChallengeStepForm {
   stepID?: number;
 }
 export interface ChallengeStepsForm {
-  string: ChallengeStepForm;
+  UniqueIdentifier: ChallengeStepForm;
 }
-export type ChallengeSteps = ChallengeStepForm[];
 
 const compareStringDate = (date1: string, date2: string) => {
   return Date.parse(date1) - Date.parse(date2);
@@ -69,14 +70,13 @@ export const ChallengeStepForm = () => {
     </>
   );
 };
-
 export const AddChallengeSteps = ({ displayOrder }) => {
-  const [selectedStep, SetSelectedStep] = useState('');
+  const [selectedStep, SetSelectedStep] = useState<UniqueIdentifier>('');
   const context = useFormContext<FormChallenge>();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
   const { setValue, trigger, getValues } = context;
   const { challengeSteps, challengStepOrder } = getValues();
-  const removeStep = (name: string) => {
+  const removeStep = (name: UniqueIdentifier) => {
     const newSteps = challengStepOrder.filter((step) => step != name);
     setValue('challengStepOrder', newSteps);
   };

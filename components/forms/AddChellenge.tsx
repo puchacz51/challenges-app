@@ -16,6 +16,7 @@ import {
   ChallengeStepForm,
   ChallengeStepsForm,
 } from './ChallengeSteps';
+import { UniqueIdentifier } from '@dnd-kit/core';
 const initialValues = {
   title: '',
   description: '',
@@ -34,7 +35,7 @@ export interface FormChallenge {
   endTime: any;
   images: FileList;
   challengeSteps: ChallengeStepsForm;
-  challengStepOrder: string[];
+  challengStepOrder: UniqueIdentifier[];
   userId: string;
   imagesOrder: { name: string; url: string[] }[] | null;
 }

@@ -1,3 +1,4 @@
+import { UniqueIdentifier } from '@dnd-kit/core';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { Attributes, InputHTMLAttributes, useRef } from 'react';
@@ -8,7 +9,7 @@ import {
 } from 'react-hook-form';
 import { FormChallenge } from '../forms/AddChellenge';
 interface TextInputProps {
-  name: string;
+  name: string | UniqueIdentifier;
   att?: Attributes;
   errors: FieldError;
   text: string;

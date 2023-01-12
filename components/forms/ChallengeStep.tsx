@@ -1,3 +1,4 @@
+import { UniqueIdentifier } from '@dnd-kit/core';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
@@ -10,7 +11,7 @@ import { ChallengeStepsForm } from './ChallengeSteps';
 interface ChallengeStepProps {
   index: number;
   remove: Function;
-  name: string;
+  name: keyof FormChallenge['challengeSteps'];
   selected: boolean;
 }
 
@@ -21,7 +22,7 @@ export const ChallengeStep = ({
   selected,
 }: ChallengeStepProps) => {
   const context = useForm<FormChallenge>();
-  const { getFieldState, getValues } = context;
+  const { getFieldState, getValues, } = context;
   const { error, isTouched } = getFieldState(`challengeSteps.${name}`);
   const [stepWithTime, setStepWithTime] = useState(
     getValues(`challengeSteps.${name}.time`)

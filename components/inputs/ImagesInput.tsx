@@ -4,7 +4,6 @@ import { useFormContext } from 'react-hook-form';
 import { FcAddImage, FcRemoveImage } from 'react-icons/fc';
 import {
   DndContext,
-  DragEndEvent,
   DragMoveEvent,
   DragOverlay,
   MouseSensor,
@@ -121,7 +120,6 @@ const ImageItemsList = ({
       const indexB = localImages.findIndex(
         (oldImage) => oldImage.name == b.name
       );
-
       const valueA = indexA === -1 ? 10 : indexA;
       const valueB = indexB === -1 ? 10 : indexB;
       return valueA - valueB;

@@ -12,7 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { ValueOf } from 'next/dist/shared/lib/constants';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormChallenge } from './AddChellenge';
 import { ChallengeStepsForm } from './ChallengeSteps';
@@ -23,9 +23,11 @@ export const ChangeStepOrder = () => {
   const { formState, getValues, setValue } = context;
   const { challengeSteps, challengStepOrder } = getValues();
   // const errorsKey = Object.keys(formState?.errors.challengeSteps || {});
-  const [activeStep, setActiveStep] = useState();
-  const [challengeStepkeys, setChallengeStepkeys] = useState(challengStepOrder);
+  const [activeStep, setActiveStep] = useState<UniqueIdentifier>();
+  const [challengeStepkeys, setChallengeStepkeys] =
+    useState<UniqueIdentifier[]>(challengStepOrder);
   const { setNodeRef, active } = useDroppable({ id: 'challengeSteps' });
+
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: { delay: 1, tolerance: 1 },
   });
@@ -36,23 +38,19 @@ export const ChangeStepOrder = () => {
   const dragStartHandler = ({ active }) => {
     setActiveStep(active.id);
   };
-  const dragEndhandler = useCallback(() => {
+  const dragEndhandler = () => {
     setActiveStep(null);
     setValue('challengStepOrder', challengeStepkeys);
-  }, []);
-  const dragMoveHandler = useCallback(
-    ({ active, over, delta }: DragMoveEvent) => {
-      if (active.id != over?.id) {
-        setChallengeStepkeys((images) => {
-          const oldIndex = challengeStepkeys.indexOf(active.id);
-          const newIndex = challengeStepkeys.indexOf(over.id);
-          return arrayMove(images, oldIndex, newIndex);
-        });
-      }
-    },
-
-    []
-  );
+  };
+  const dragMoveHandler = ({ active, over, delta }: DragMoveEvent) => {
+    if (active.id != over?.id) {
+      setChallengeStepkeys((images) => {
+        const oldIndex = challengeStepkeys.indexOf(active.id);
+        const newIndex = challengeStepkeys.indexOf(over.id);
+        return arrayMove(images, oldIndex, newIndex);
+      });
+    }
+  };
   const cancelDragHandler = useCallback(() => {
     setActiveStep(null);
   }, []);
@@ -74,9 +72,9 @@ export const ChangeStepOrder = () => {
           const step = challengeSteps[stepKey] as ValueOf<ChallengeStepsForm>;
           return (
             <DraggableStep
-              key={stepKey}
+              key={index}
               id={stepKey}
-              title={step.title}
+              title={stepKey}
               number={index}
               draggable={!!step.time}
             />
