@@ -21,8 +21,13 @@ const compareStringDate = (date1: string, date2: string) => {
   return Date.parse(date1) - Date.parse(date2);
 };
 
-const challengeOrder = (steps: ChallengeSteps) => {
-  const timeSteps = steps.filter((step) => step.time);
+const challengeOrder = (steps: ChallengeStepsForm) => {
+  const timeStepsCount = Object.keys(steps).reduce(
+    (prev, cur) => (steps[cur].time ? prev + 1 : prev),
+    0
+  );
+  if (timeStepsCount < 2) return;
+  const timeSteps = Object.keys(steps).filter((key) => steps[key].time);
   const sortedTimeSteps = timeSteps.sort((date1, date2) =>
     compareStringDate(date1.time, date2.time)
   );
@@ -71,11 +76,14 @@ export const ChallengeStepForm = () => {
   );
 };
 export const AddChallengeSteps = ({ displayOrder }) => {
-  const [selectedStep, SetSelectedStep] = useState<UniqueIdentifier>('');
   const context = useFormContext<FormChallenge>();
   const errorsKey = Object.keys(context.formState?.errors.challengeSteps || {});
-  const { setValue, trigger, getValues } = context;
-  const { challengeSteps, challengStepOrder } = getValues();
+  const { setValue, getValues } = context;
+  const { challengStepOrder } = getValues();
+  const [selectedStep, SetSelectedStep] = useState<UniqueIdentifier>(
+    challengStepOrder[0] || ''
+  );
+
   const removeStep = (name: UniqueIdentifier) => {
     const newSteps = challengStepOrder.filter((step) => step != name);
     setValue('challengStepOrder', newSteps);
@@ -122,12 +130,7 @@ export const AddChallengeSteps = ({ displayOrder }) => {
             </div>
           )}
         </div>
-        <button
-          className='mx-auto  w-3/5 bg-blue-500 font-bold uppercase px-2 py-1 rounded-xl '
-          type='button'
-          onClick={displayOrder}>
-          change steps order
-        </button>
+
         <div className='flex flex-col mx-1'>
           {challengStepOrder?.map((name, i) => (
             <ChallengeStep

@@ -20,7 +20,7 @@ export const DraggableStep = ({ id, number, title, draggable }) => {
         !draggable && ' border-green-500'
       } ${isDragging && 'bg-slate-400 text-red-600'}`}
       style={style}>
-      {number}.{title || 'unknown'} {id}
+      {number}.{title || 'unknown'}
     </div>
   );
 };

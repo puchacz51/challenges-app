@@ -1,18 +1,50 @@
-import { useEffect, useState } from 'react';
-import { ChallengeSteps } from '../forms/ChallengeSteps';
+import { UniqueIdentifier } from '@dnd-kit/core';
+import { ChallengeStepForm, ChallengeSteps } from '../forms/ChallengeSteps';
 
 interface ChallengeTimeLineProps {
-  challengeSteps: ChallengeSteps;
+  challengeSteps: ChallengeStepForm[];
   startTime: string;
   endTime: string;
 }
-const StepBtn = ({ step, position }: StepBtnProps) => {
+interface StepBtnProps {
+  step: ChallengeSteps[UniqueIdentifier];
+  position: number;
+  index: number;
+}
+interface StepListProps {
+  challengeSteps: ChallengeSteps;
+  activeStep: UniqueIdentifier;
+}
+interface StepBtnProps {
+  step: ChallengeSteps[0];
+  position: number;
+}
+
+const StepsList = ({ challengeSteps, activeStep }: StepListProps) => {
   return (
-    <button
-      className={`absolute `}
-      style={{ left: `${Math.round(position)}%` }}>
-      {step.title}
-    </button>
+    <div>
+      {challengeSteps.map((step) => (
+        <div key={step}>{step.title}</div>
+      ))}
+    </div>
+  );
+};
+
+const StepBtn = ({ step, position, number, index }: StepBtnProps) => {
+  return (
+    <div
+      className='absolute '
+      style={{
+        left: `${Math.round(position)}%`,
+        transform: 'translateX(-50%)',
+      }}>
+      <button className={`bg-slate-50 h-10 w-10 text-xl rounded-full peer `}>
+        {index}
+      </button>
+      <span className='text-xl absolute hidden peer-hover:block peer-hover:bg-slate-900 peer-hover:animate-stepUp top-0 '>
+        {step.title}
+      </span>
+    </div>
   );
 };
 const ChallengeTimeLine = ({
@@ -20,45 +52,38 @@ const ChallengeTimeLine = ({
   startTime,
   endTime,
 }: ChallengeTimeLineProps) => {
-  const stepeKeys = Object.keys(challengeSteps || {});
-  const stepsLength = stepeKeys.length;
-  const calStepPosition = () => {
-    const stepsWithTime = challengeSteps.filter((step) => !!step.time);
-    const stepsNoTime = challengeSteps.filter((step) => !step.time);
-
-    // const stepPosition = stepTimes.map(time => )
-  };
-
+  const stepsLength = challengeSteps.length
   if (!stepsLength) {
     return <h2>no steps </h2>;
   }
-
   return (
-    <div className='h-[30px] bg-zinc-700 relative '>
-      {stepeKeys.map((key, i) => (
+    <div className='h-[10px] bg-zinc-700 relative my-10 '>
+      {challengeSteps.map((step, i) => (
         <StepBtn
           position={(100 / (stepsLength + 1)) * (i + 1)}
-          step={challengeSteps[key]}
-          key={key}
+          step={step}
+          key={step.challengeId}
+          index={i}
         />
       ))}
     </div>
   );
-  interface StepBtnProps {
-    step: ChallengeSteps[0];
-    position: number;
-  }
-
-  // return (
-  //   <div className='flex flex-col'>
-  //     {challengeSteps.map((step) => (
-  //       <>
-  //         <h2 className='text-red-500'>{step.title}</h2>
-  //         {step.description}
-  //       </>
-  //     ))}
-  //   </div>
-  // );
 };
 
-export { ChallengeTimeLine };
+const ChallengeStepsView = ({
+  challengeSteps,
+  startTime,
+  endTime,
+}: ChallengeTimeLineProps) => {
+  return (
+    <>
+      <ChallengeTimeLine
+        challengeSteps={challengeSteps}
+        startTime={startTime}
+        endTime={endTime}
+      />
+    </>
+  );
+};
+
+export { ChallengeTimeLine, ChallengeStepsView };

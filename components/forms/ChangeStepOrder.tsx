@@ -22,7 +22,6 @@ export const ChangeStepOrder = () => {
   const context = useFormContext<FormChallenge>();
   const { formState, getValues, setValue } = context;
   const { challengeSteps, challengStepOrder } = getValues();
-  // const errorsKey = Object.keys(formState?.errors.challengeSteps || {});
   const [activeStep, setActiveStep] = useState<UniqueIdentifier>();
   const [challengeStepkeys, setChallengeStepkeys] =
     useState<UniqueIdentifier[]>(challengStepOrder);
@@ -74,7 +73,7 @@ export const ChangeStepOrder = () => {
             <DraggableStep
               key={index}
               id={stepKey}
-              title={stepKey}
+              title={step.title}
               number={index}
               draggable={!!step.time}
             />
