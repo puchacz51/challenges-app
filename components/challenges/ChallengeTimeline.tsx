@@ -30,7 +30,9 @@ const StepsList = ({ challengeSteps, activeStep }: StepListProps) => {
   );
 };
 
-const StepBtn = ({ step, position, number, index }: StepBtnProps) => {
+
+
+const StepBtn = ({ step, position,  index }: StepBtnProps) => {
   return (
     <div
       className='absolute '
