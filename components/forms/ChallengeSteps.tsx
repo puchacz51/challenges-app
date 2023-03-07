@@ -12,6 +12,7 @@ export interface ChallengeStepForm {
   time: string;
   challengeId?: number;
   stepID?: number;
+  completed?: boolean;
 }
 export interface ChallengeStepsForm {
   UniqueIdentifier: ChallengeStepForm;
