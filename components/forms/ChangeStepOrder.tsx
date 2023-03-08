@@ -18,7 +18,7 @@ import { FormChallenge } from './AddChellenge';
 import { ChallengeStepsForm } from './ChallengeSteps';
 import { DraggableStep } from './DraggableStep';
 
-export const ChangeStepOrder = () => {
+export const ChangeStepOrder = ({ displayAddSteps }) => {
   const context = useFormContext<FormChallenge>();
   const { formState, getValues, setValue } = context;
   const { challengeSteps, challengStepOrder } = getValues();

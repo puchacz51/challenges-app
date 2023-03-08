@@ -4,7 +4,6 @@ import { RootState } from '../../services/Store/store';
 import { useChallengeQuery } from '../utilities/usePostQuery';
 import Image from 'next/image';
 import moment from 'moment';
-import ImageSlider from './ImageSlider';
 const ChallengesList = () => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
   const { data: challenges, refetch, isLoading } = useChallengeQuery(user.id);

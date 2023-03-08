@@ -1,11 +1,10 @@
-import { UniqueIdentifier } from '@dnd-kit/core';
 import { ChallengeStepForm } from '../forms/ChallengeSteps';
 import { motion, useAnimation, useAnimationControls } from 'framer-motion';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
-import { doo, setSelectedStep } from '../../services/Store/challengesSlice';
+import { useEffect, useRef, useState } from 'react';
+import { setSelectedStep } from '../../services/Store/challengesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
-
+import { HiOutlineArrowCircleDown } from 'react-icons/hi';
 interface ChallengeTimeLineProps {
   challengeSteps: ChallengeStepForm[];
   startTime: string;
@@ -20,21 +19,11 @@ interface StepListProps {
 }
 interface StepListProps {
   challengeSteps: ChallengeStepForm[];
-  activeStep: UniqueIdentifier;
 }
 interface StepListElementProps {
   step: ChallengeStepForm;
 }
 
-const StepsList = ({ challengeSteps, activeStep }: StepListProps) => {
-  return (
-    <div>
-      {challengeSteps.map((step) => (
-        <div key={step.stepID}>{step.title}</div>
-      ))}
-    </div>
-  );
-};
 type ProgressBarProps = {
   endPositon: number;
 };
@@ -74,15 +63,15 @@ const StepInfo = ({ title }: { title: string }) => {
   );
 };
 const StepBtn = ({ step, index }: StepBtnProps) => {
-  const { completed, title } = step;
+  const { completed, title, stepID } = step;
   const btnRef = useRef<HTMLButtonElement>(null);
   const [titleIsVisible, settitleIsVisible] = useState(false);
-  const { selectedStepId } = useSelector<RootState>(
-    (state) => state.challenges
+  const selectedStepId = useSelector<RootState>(
+    (state) => state.challenges.selectedStepId
   );
   const dispatch = useDispatch();
 
-  const isSelected = selectedStepId == index;
+  const isSelected = selectedStepId == stepID;
 
   useEffect(() => {
     setSelectedStep(3);
@@ -101,7 +90,7 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
     <div className={`relative`}>
       <button
         ref={btnRef}
-        onClick={() => dispatch(setSelectedStep(index))}
+        onClick={() => dispatch(setSelectedStep(stepID))}
         className={` h-full aspect-square text-xl rounded-full -z-10 border-2 border-black  ${
           completed ? 'bg-green-600' : 'bg-slate-500'
         }
@@ -128,7 +117,6 @@ const ChallengeTimeLine = ({
   useEffect(() => {
     if (stepBtnContainerRef.current) {
       if (completedCount) {
-        const stepBtnContainerWidth = stepBtnContainerRef.current?.offsetWidth;
         const stepWidth = 100 / stepsLength;
         const endPosition = stepWidth / 2 + stepWidth * completedCount;
         setProgressLinePosition(endPosition);
@@ -140,7 +128,7 @@ const ChallengeTimeLine = ({
   }
 
   return (
-    <div className='h-[50px] flex justify-between bg-zinc-700  my-14 border-y-2 z-10 max-w-full'>
+    <div className='h-[50px] flex justify-between bg-zinc-700  mt-14 border-y-2 z-10 max-w-full'>
       <span className='left-0 relative top-0 bottom-0 px-2 flex items-center uppercase bg-green-600'>
         Start{' '}
       </span>
@@ -161,19 +149,56 @@ const ChallengeTimeLine = ({
 };
 
 const StepListElement = ({ step }: StepListElementProps) => {
+  const selectedStepId = useSelector<RootState>(
+    (state) => state.challenges.selectedStepId
+  );
+  const animate = useAnimation();
+
+  useEffect(() => {
+    animate.start({
+      translateX: '0%',
+      transition: { duration: 0.4, delay: 0.4 * step.stepID },
+      position: 'static',
+      scale: 1,
+    });
+  }, []);
+
   return (
-    <div className='grid grid-cols-4 '>
-      <h2>{step.title}</h2>
-    </div>
+    <motion.div
+      animate={animate}
+      initial={{ translateX: '-120%', position: 'absolute', scale: 1.2 }}
+      className={`grid  gridStepMobile border-2 border-black my-1 ${
+        selectedStepId === step.stepID && 'border-red-700'
+      }`}>
+      <h3 className='px-2 w-fit '>{step.stepID}</h3>
+      <h3 className=''>{step.title}</h3>
+      <span>{step.description}</span>
+      {step.completed ? 'yes' : 'no'}
+    </motion.div>
   );
 };
 
 const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!isOpen)
+    return (
+      <button
+        type='button'
+        onClick={() => setIsOpen(true)}
+        className='uppercase content-center w-full text-2xl border-2 border-black'>
+        challenge steps{' '}
+        <HiOutlineArrowCircleDown className='inline-block h-full ' />{' '}
+      </button>
+    );
+
   return (
     <div>
-      {challengeSteps.map((step) => (
-        <div key={step.stepID}></div>
-      ))}
+      <div className='overflow-hidden border-2 border-black px-2  '>
+        {challengeSteps.map((step) => (
+          <StepListElement key={step.stepID} step={step} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -189,6 +214,7 @@ const ChallengeStepsView = ({
         startTime={startTime}
         endTime={endTime}
       />
+      <ChallengeStepsList challengeSteps={challengeSteps} />
     </>
   );
 };

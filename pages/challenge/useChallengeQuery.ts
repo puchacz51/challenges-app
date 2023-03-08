@@ -1,20 +1,20 @@
 import { useQuery } from 'react-query';
 import { Reaction } from '../../components/challenges/ChallengeReactions';
-import { ChallengeStepForm, ChallengeSteps } from '../../components/forms/ChallengeSteps';
+import { ChallengeStepForm } from '../../components/forms/ChallengeSteps';
 import { supabase } from '../../services/supabase/supabase';
 export interface Challenge {
   id: string;
   title: string;
   description: string;
   userId: string;
-  isActive: boolean;
+  isActive?: boolean;
   isPublic: boolean;
-  createdAt: string;
+  createdAt?: string;
   images: string[];
-  status: 'Active' | 'Poused' | 'Banned';
+  status?: 'Active' | 'Poused' | 'Banned';
   endTime?: string;
   startTime?: string;
-  challengeSteps: ChallengeStepForm;
+  challengeSteps?: ChallengeStepForm[];
 }
 
 export interface ChallengeReactionsData {
@@ -24,7 +24,7 @@ export interface ChallengeReactionsData {
 }
 
 export const fetchChallenge = async (
-  idChallenge:string
+  idChallenge: string
 ): Promise<Challenge> => {
   try {
     const challenge = await supabase
@@ -48,19 +48,19 @@ export const fetchChallengeReactions = async (
   challegeId: string,
   userId: string
 ) => {
-  
   const reactions = await supabase
     .from<Reaction>('reactions')
     .select('reactionId,userId')
     .eq('challengeId', challegeId);
   let userReaction = null;
-  
-  if(!reactions.data.length) return { reactions: [], userReaction: [] };
-  
+
+  if (!reactions.data.length) return { reactions: [], userReaction: [] };
+
   if (userId) {
-    userReaction = reactions?.data?.find((reaction) => reaction.userId == userId)||null;;
+    userReaction =
+      reactions?.data?.find((reaction) => reaction.userId == userId) || null;
   }
-  
+
   return { reactions: reactions.data, userReaction: userReaction };
 };
 

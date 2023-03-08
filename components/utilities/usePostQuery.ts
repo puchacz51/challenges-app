@@ -9,6 +9,16 @@ import { Challenge } from '../../pages/challenge/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
 import { FormChallenge } from '../forms/AddChellenge';
 import { ChallengeStepsForm } from '../forms/ChallengeSteps';
+type AddChallenge = {
+  title: string;
+  description: string;
+  userId: string;
+  isPublic: boolean;
+  createdAt?: string;
+  images: string[];
+  endTime?: string;
+  startTime?: string;
+};
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
   try {
@@ -27,7 +37,7 @@ const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
 };
 const deleteSteps = async (challengeId: string) => async () => {
   try {
-    const result = await supabase
+    await supabase
       .from('challengeSteps')
       .delete()
       .eq('challengeId', challengeId);
@@ -65,7 +75,7 @@ const deleteFromDB = async (challengeId: string) => {
     };
   }
 };
-const addToDB = async (formData: Challenge) => {
+const addToDB = async (formData: AddChallenge) => {
   try {
     const { error, data } = await supabase
       .from<Challenge>('challenges')
@@ -139,7 +149,7 @@ const fetchChallenges = async (userId) => {
     throw error;
   }
 };
-export const useChallengeQuery = (id: number, options?: UseQueryOptions) => {
+export const useChallengeQuery = (id: string, options?: UseQueryOptions) => {
   return useQuery([id], () => fetchChallenges(id));
 };
 
@@ -155,8 +165,10 @@ export const addChallengeMutation = (resetForm: Function) => {
   return useMutation({
     mutationFn: async (values) => await addChallenge(values),
     onMutate: async (values: FormChallenge) => {
-      const { userId, images } = values;
-
+      const { userId, images, challengeSteps } = values;
+      const challengeStepsArray = Object.keys(challengeSteps).map(
+        (key) => challengeSteps[key]
+      );
       const localImagesUrl = getUrlFromFileList(images);
 
       await queryClient.cancelQueries([userId]);
@@ -164,8 +176,9 @@ export const addChallengeMutation = (resetForm: Function) => {
         id: nanoid(),
         ...values,
         images: localImagesUrl,
+        challengeSteps: challengeStepsArray,
       };
-      queryClient.setQueryData([userId], (old) => {
+      queryClient.setQueryData<Challenge[]>([userId], (old) => {
         return [optimisticChallenge, ...old];
       });
 

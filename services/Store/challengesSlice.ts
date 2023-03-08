@@ -2,27 +2,33 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 type ChallengesSlice = {
   selectedStepId: number | null;
+  listIsOpen: boolean;
 };
 
 let initialState: ChallengesSlice = {
-  selectedStepId: 2,
+  selectedStepId: null,
+  listIsOpen: false,
 };
 
 const challengesSlice = createSlice({
   name: 'challenges',
   initialState,
   reducers: {
-    doo: () => {
-      console.log(23);
-    },
     setSelectedStep: (state, action: PayloadAction<number>) => {
-      console.log(23);
-      state.selectedStepId = action.payload;
+      if (state.selectedStepId === action.payload) {
+        state.selectedStepId = null;
+      } else {
+        state.selectedStepId = action.payload;
+      }
+      return state;
+    },
+    setIsOpenList: (state, action: PayloadAction<boolean>) => {
+      state.listIsOpen = action.payload;
       return state;
     },
   },
 });
 
-export const { setSelectedStep, doo } = challengesSlice.actions;
+export const { setSelectedStep } = challengesSlice.actions;
 
 export default challengesSlice.reducer;

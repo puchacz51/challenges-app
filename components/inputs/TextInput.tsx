@@ -9,7 +9,7 @@ import {
 } from 'react-hook-form';
 import { FormChallenge } from '../forms/AddChellenge';
 interface TextInputProps {
-  name: string | UniqueIdentifier;
+  name: keyof FormChallenge;
   att?: Attributes;
   errors: FieldError;
   text: string;

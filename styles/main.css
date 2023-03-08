@@ -4,6 +4,9 @@
 
 @layer components {
   .reactionBtn {
-    @apply border border-gray-300 rounded;;
+    @apply border border-gray-300 rounded;
+  }
+  .gridStepMobile {
+    grid-template-columns: fit-content(10%) 1fr 3fr fit-content(10%);
   }
 }

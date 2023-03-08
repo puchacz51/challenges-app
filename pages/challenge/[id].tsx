@@ -2,8 +2,8 @@ import { User } from '@supabase/supabase-js';
 import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import ChallengeReactions, {
-  Reaction,
+import {
+  ChallengeReactions,
 } from '../../components/challenges/ChallengeReactions';
 import { ChallengeTimeLine } from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
@@ -14,7 +14,6 @@ import {
   fetchChallenge,
   fetchChallengeReactions,
   useChallengeQuery,
-  useChallengeReactionQuery,
 } from './useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -27,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   store.dispatch(setCredentials({ user: userData, token }));
 
   const user = userData || { id: null, token: null };
-console.log(error);
+  console.log(error);
 
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id as string;

@@ -22,10 +22,12 @@ export const ChallengeStep = ({
   selected,
 }: ChallengeStepProps) => {
   const context = useForm<FormChallenge>();
-  const { getFieldState, getValues, } = context;
-  const { error, isTouched } = getFieldState(`challengeSteps.${name}`);
+  const { getFieldState, getValues, formState } = context;
+  const error = formState.errors.challengeSteps[name];
+  // const { error } = getFieldState(`challengeSteps.${name}`);
+
   const [stepWithTime, setStepWithTime] = useState(
-    getValues(`challengeSteps.${name}.time`)
+    !!getValues(`challengeSteps.${name}.time`)
   );
   const handleTimeChange = () => {};
   return (
@@ -35,7 +37,7 @@ export const ChallengeStep = ({
       } ${!selected && 'hidden'} `}>
       <h4 className='mt-1'>step {index + 1} </h4>
       <TextInput
-        name={`challengeSteps.${name}.title`}
+        name={`challengeSteps.${name}.title` as keyof FormChallenge}
         errors={error?.title}
         text={'step title'}></TextInput>
       <LongTextInput
@@ -44,20 +46,18 @@ export const ChallengeStep = ({
         name={`challengeSteps.${name}.description`}
       />
       <SimpleCheckBoxSwitch
-        checked={stepWithTime}
+        checked={!!stepWithTime}
         name='addTime'
-        setValue={() => setStepWithTime((is) => !is)}
+        setValue={() => setStepWithTime((state) => !state)}
       />
       {stepWithTime && (
         <TimeInput
-          onChange={() => {
-            handleTimeChange;
-          }}
+          onChange={handleTimeChange as any}
           name={`challengeSteps.${name}.time`}
         />
       )}
 
-      <button type='button' className='bg-red-600' onClick={remove}>
+      <button type='button' className='bg-red-600' onClick={() => remove}>
         X
       </button>
     </div>

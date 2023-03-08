@@ -8,38 +8,36 @@ import { privateChellengeschema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { User } from '@supabase/supabase-js';
 
-import {
-  AddChallengeSteps,
-  ChallengeStepForm,
-  ChallengeStepsForm,
-} from './ChallengeSteps';
+import { ChallengeStepForm, ChallengeStepsForm } from './ChallengeSteps';
 import { UniqueIdentifier } from '@dnd-kit/core';
-const initialValues = {
+
+export interface FormChallenge {
+  title: string;
+  description: string;
+  isPublic: boolean;
+  startTime?: any;
+  endTime?: any;
+  images: FileList | null;
+  challengeSteps?: ChallengeStepsForm | null;
+  challengStepOrder: UniqueIdentifier[];
+  userId: string;
+  imagesOrder: { name: string; url: string[] }[] | null;
+}
+const initialValues: FormChallenge = {
   title: '',
   description: '',
   isPublic: false,
   startTime: new Date().toUTCString(),
   endTime: new Date().toUTCString(),
-  images: {},
+  images: null,
   imagesOrder: null,
-  challengeSteps: {},
+  challengeSteps: null,
+  userId: null,
   challengStepOrder: [],
 };
-export interface FormChallenge {
-  title: string;
-  description: string;
-  startTime: any;
-  endTime: any;
-  images: FileList;
-  challengeSteps: ChallengeStepsForm;
-  challengStepOrder: UniqueIdentifier[];
-  userId: string;
-  imagesOrder: { name: string; url: string[] }[] | null;
-}
-
 export const AddChallenge = () => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
   return (
@@ -60,7 +58,6 @@ interface ChallengeFormProps {
 }
 
 const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
-  // const [oldFromData, setOldFormData] = useState<ChallengeFormProps>();
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
@@ -70,7 +67,6 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
-    getValues,
     reset,
   } = methods;
 

@@ -6,38 +6,39 @@ import { FormChallenge } from './AddChellenge';
 import { ChallengeStep } from './ChallengeStep';
 import { ChangeStepOrder } from './ChangeStepOrder';
 
-export interface ChallengeStepForm {
+export type ChallengeStepForm = {
   title: string;
   description?: string;
   time: string;
   challengeId?: number;
   stepID?: number;
   completed?: boolean;
-}
-export interface ChallengeStepsForm {
+};
+export type ChallengeStepsForm = {
   UniqueIdentifier: ChallengeStepForm;
-}
+};
+export interface ChallengeSteps {}
 
 const compareStringDate = (date1: string, date2: string) => {
   return Date.parse(date1) - Date.parse(date2);
 };
 
-const challengeOrder = (steps: ChallengeStepsForm) => {
-  const timeStepsCount = Object.keys(steps).reduce(
-    (prev, cur) => (steps[cur].time ? prev + 1 : prev),
-    0
-  );
-  if (timeStepsCount < 2) return;
-  const timeSteps = Object.keys(steps).filter((key) => steps[key].time);
-  const sortedTimeSteps = timeSteps.sort((date1, date2) =>
-    compareStringDate(date1.time, date2.time)
-  );
-  const newOrderedSteps = steps.map((step) =>
-    step.time ? sortedTimeSteps.shift() : step
-  );
+// const challengeOrder = (steps: ChallengeStepsForm) => {
+//   const timeStepsCount = Object.keys(steps).reduce(
+//     (prev, cur) => (steps[cur].time ? prev + 1 : prev),
+//     0
+//   );
+//   if (timeStepsCount < 2) return;
+//   const timeSteps = Object.keys(steps).filter((key) => steps[key].time);
+//   const sortedTimeSteps = timeSteps.sort((date1, date2) =>
+//     compareStringDate(date1.time, date2.time)
+//   );
+//   const newOrderedSteps = steps.map((step) =>
+//     step.time ? sortedTimeSteps.shift() : step
+//   );
 
-  return newOrderedSteps;
-};
+//   return newOrderedSteps;
+// };
 
 export const ChallengeStepForm = () => {
   const { getValues } = useFormContext();
@@ -114,7 +115,9 @@ export const AddChallengeSteps = ({ displayOrder }) => {
               className={`shrink-0  text-lg w-7 h-7 mx-1  box-content text-center rounded-full ${
                 name === selectedStep && 'border-2 border-black'
               } ${
-                errorsKey.includes(name) ? 'bg-red-600' : 'bg-emerald-400 '
+                errorsKey.includes(name as string)
+                  ? 'bg-red-600'
+                  : 'bg-emerald-400 '
               }`}>
               {index + 1}
             </button>
@@ -139,7 +142,7 @@ export const AddChallengeSteps = ({ displayOrder }) => {
               index={i}
               key={name}
               remove={() => removeStep(name)}
-              name={name}
+              name={name as 'UniqueIdentifier'}
             />
           ))}
         </div>

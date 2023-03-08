@@ -9,13 +9,16 @@ export const getServerSidePropsWrapper =
   async (ctx: GetServerSidePropsContext) => {
     const { user, token } = await supabase.auth.api.getUserByCookie(ctx.req);
     if (protectedRoute && !token) {
-     return { redirect: { destination: '/login', permanent: false }, props: {} };
+      return {
+        redirect: { destination: '/login', permanent: false },
+        props: {},
+      };
     }
 
     store.dispatch(setCredentials({ user, token }));
     let callbackProps = { props: {} } as any;
     if (getServerSideProps) {
-      callbackProps = await getServerSideProps(ctx,user);
+      callbackProps = await getServerSideProps(ctx);
     }
 
     return { props: { store: store.getState(), ...callbackProps } };
