@@ -1,9 +1,8 @@
 import { PostgrestResponse } from '@supabase/supabase-js';
-import { SupabaseQueryBuilder } from '@supabase/supabase-js/dist/module/lib/SupabaseQueryBuilder';
 import { useMutation, useQueryClient } from 'react-query';
 import { ChallengeReactionsData } from '../../pages/challenge/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
-import { Reaction } from './challengeReactions';
+import { Reaction } from './ChallengeReactions';
 
 interface MutateReactionProps {
   challegeId: number;
@@ -44,7 +43,6 @@ const changeReactions = (
 };
 
 export const useReactionMutation = (challengeId: number, userId: string) => {
-
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newReaction: Reaction) => {
@@ -102,7 +100,7 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
     },
     onError: (err, newReaction, oldReactions) => {
       console.log(oldReactions);
-      
+
       queryClient.setQueryData(
         ['reactions', challengeId, userId],
         oldReactions

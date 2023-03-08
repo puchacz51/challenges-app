@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { supabase } from '../../services/supabase/supabase';
 import { motion } from 'framer-motion';
-import { url } from 'inspector';
 interface ImageSliderProps {
   imagesUrl: string[];
 }
@@ -30,14 +28,14 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
   const imageContianerRef = useRef<HTMLDivElement>();
   const touchPosition = useRef<TouchPosition>(initialPositionData);
   const [currentImage, setCurrentImage] = useState<number>(0);
-  const handleStartTouch = (event: TouchEvent<HTMLDivElement>) => {
+  const handleStartTouch = (event: TouchEvent) => {
     const { current, imageWidth } = touchPosition.current;
 
     touchPosition.current.start =
       event.touches[0].clientX + currentImage * imageWidth;
   };
-  const handleMovetouch = (e: TouchEvent<HTMLDivElement>) => {
-    const shift = touchPosition.current.start - e.touches[0].clientX;
+  const handleMovetouch = (event: TouchEvent) => {
+    const shift = touchPosition.current.start - event.touches[0].clientX;
     touchPosition.current.current = shift;
 
     if (shift < 0) {
@@ -49,7 +47,7 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
       return;
     }
   };
-  const handleEndTouch = (e: TouchEvent<HTMLDivElement>) => {
+  const handleEndTouch = (event: TouchEvent) => {
     const { current: currentPosition, imageWidth } = touchPosition.current;
     const nextImageIndex = Math.round(currentPosition / imageWidth);
     touchPosition.current = {
@@ -69,16 +67,15 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
       maxPosition: imageContainerWidth * (imagesUrl.length - 1),
       imageWidth: imageContainerWidth,
     };
-
   }, [imagesUrl.length, currentImage]);
   return (
     <div className='relative overflow-hidden border-4 border-black'>
       <motion.div
         ref={imageContianerRef}
-        animate={{x:-touchPosition.current.current}}
-        onTouchStart={handleStartTouch}
-        onTouchMove={handleMovetouch}
-        onTouchEnd={handleEndTouch}
+        animate={{ x: -touchPosition.current.current }}
+        onTouchStart={handleStartTouch as any}
+        onTouchMove={handleMovetouch as any}
+        onTouchEnd={handleEndTouch as any}
         className={` flex flex-nowrap  h-[200px] bg-slate-200  `}>
         {imagesUrl.map((url, index) => {
           return (

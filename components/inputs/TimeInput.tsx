@@ -1,9 +1,10 @@
-import { Attributes, InputHTMLAttributes } from 'react';
+import { Attributes, DOMAttributes, InputHTMLAttributes } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 
 interface TimeInputProps {
   name: string;
-  att?: InputHTMLAttributes<TimeInputProps>;
+  att?: DOMAttributes<HTMLButtonElement>;
+  onChange?: any;
 }
 export const TimeInput = ({ name, ...att }: TimeInputProps) => {
   const { register, getFieldState } = useFormContext();

@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
-import { useSelector } from 'react-redux';
 import { useChallengeReactionQuery } from '../../pages/challenge/useChallengeQuery';
-import { RootState } from '../../services/Store/store';
 import { useReactionMutation } from './useReactionMutate';
 const reactionsOptions = [
   { id: 0, name: 'like', Icon: AiTwotoneLike, color: '' },
@@ -20,7 +18,7 @@ export interface Reaction {
 
 const countReactions = (reactions: Reaction[]) => {
   const initialValue = [0, 0, 0, 0];
-  
+
   const countedReactions = reactions.reduce((prev, current) => {
     prev[current.reactionId]++;
     return prev;
@@ -28,11 +26,15 @@ const countReactions = (reactions: Reaction[]) => {
   return countedReactions;
 };
 
-const ReactionElement = ({ reactionId, amount, selected,action }) => {
+const ReactionElement = ({ reactionId, amount, selected, action }) => {
   const { Icon, name } = reactionsOptions[reactionId];
 
   return (
-    <button onClick={action} className={`reactionBtn relative border-none  ${selected&&'text-blue-500'}`}>
+    <button
+      onClick={action}
+      className={`reactionBtn relative border-none  ${
+        selected && 'text-blue-500'
+      }`}>
       <span className='hidden'>{reactionsOptions[reactionId].name}</span>
       <Icon></Icon>
       <span className='absolute flex items-center justify-center text-base  bg-white  rounded-xl w-5 h-5 translate-x-2 -translate-y-2 top-0 right-0'>
@@ -42,14 +44,13 @@ const ReactionElement = ({ reactionId, amount, selected,action }) => {
   );
 };
 
-const ChallengeReactions = ({ userId, challengeId }) => {
+export const ChallengeReactions = ({ userId, challengeId }) => {
   const [amountOfReactions, setAmountOfReactions] = useState([0, 0, 0, 0]);
   const { data: reactionsData } = useChallengeReactionQuery(
     challengeId,
     userId
   );
-  
-   
+
   const { mutate } = useReactionMutation(challengeId, userId);
   const { reactions, userReaction } = reactionsData;
   useEffect(() => {
@@ -71,5 +72,3 @@ const ChallengeReactions = ({ userId, challengeId }) => {
     </div>
   );
 };
-
-export default ChallengeReactions;
