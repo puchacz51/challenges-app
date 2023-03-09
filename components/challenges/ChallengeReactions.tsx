@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
-import { useChallengeReactionQuery } from '../../pages/challenge/useChallengeQuery';
+import { useChallengeReactionQuery } from '../utilities/useChallengeQuery';
 import { useReactionMutation } from './useReactionMutate';
 const reactionsOptions = [
   { id: 0, name: 'like', Icon: AiTwotoneLike, color: '' },

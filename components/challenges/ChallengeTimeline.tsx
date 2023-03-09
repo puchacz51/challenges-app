@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { setSelectedStep } from '../../services/Store/challengesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
-import { HiOutlineArrowCircleDown } from 'react-icons/hi';
+import { HiOutlineArrowCircleDown, HiOutlineArrowCircleUp } from 'react-icons/hi';
 interface ChallengeTimeLineProps {
   challengeSteps: ChallengeStepForm[];
   startTime: string;
@@ -157,7 +157,7 @@ const StepListElement = ({ step }: StepListElementProps) => {
   useEffect(() => {
     animate.start({
       translateX: '0%',
-      transition: { duration: 0.4, delay: 0.4 * step.stepID },
+      transition: { duration: 0.4, delay: 0.2 * (step.stepID - 1) },
       position: 'static',
       scale: 1,
     });
@@ -199,6 +199,13 @@ const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
           <StepListElement key={step.stepID} step={step} />
         ))}
       </div>
+      <button
+        type='button'
+        onClick={() => setIsOpen(false)}
+        className='uppercase content-center w-full text-2xl border-2 border-black'>
+        
+        <HiOutlineArrowCircleUp className='inline-block h-full ' />{' '}
+      </button>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { PostgrestResponse } from '@supabase/supabase-js';
 import { useMutation, useQueryClient } from 'react-query';
-import { ChallengeReactionsData } from '../../pages/challenge/useChallengeQuery';
+import { ChallengeReactionsData } from '../utilities/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
 import { Reaction } from './ChallengeReactions';
 

@@ -49,7 +49,7 @@ export const SimpleCheckBoxSwitch = ({
         htmlFor={id}
         className='inline-flex relative my-2 items-center cursor-pointer'>
         <input
-          onChange={() => setValue}
+          onChange={() => setValue()}
           type='checkbox'
           value='1'
           checked={checked}

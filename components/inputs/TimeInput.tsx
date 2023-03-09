@@ -8,7 +8,7 @@ interface TimeInputProps {
 }
 export const TimeInput = ({ name, ...att }: TimeInputProps) => {
   const { register, getFieldState } = useFormContext();
-  const isTouched = getFieldState(name);
+  // const isTouched = getFieldState(name);
 
   return (
     <div className={`relative gap-1 pt-3 mt-5 ${0 && 'text-red-600'}`}>

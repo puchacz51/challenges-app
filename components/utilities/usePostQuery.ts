@@ -5,7 +5,7 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
-import { Challenge } from '../../pages/challenge/useChallengeQuery';
+import { Challenge } from './useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
 import { FormChallenge } from '../forms/AddChellenge';
 import { ChallengeStepsForm } from '../forms/ChallengeSteps';

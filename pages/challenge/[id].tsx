@@ -2,9 +2,7 @@ import { User } from '@supabase/supabase-js';
 import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import {
-  ChallengeReactions,
-} from '../../components/challenges/ChallengeReactions';
+import { ChallengeReactions } from '../../components/challenges/ChallengeReactions';
 import { ChallengeTimeLine } from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
@@ -14,7 +12,7 @@ import {
   fetchChallenge,
   fetchChallengeReactions,
   useChallengeQuery,
-} from './useChallengeQuery';
+} from '../../components/utilities/useChallengeQuery';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const {

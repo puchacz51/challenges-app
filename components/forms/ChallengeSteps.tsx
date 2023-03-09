@@ -15,7 +15,7 @@ export type ChallengeStepForm = {
   completed?: boolean;
 };
 export type ChallengeStepsForm = {
-  UniqueIdentifier: ChallengeStepForm;
+  [key: UniqueIdentifier]: ChallengeStepForm;
 };
 export interface ChallengeSteps {}
 

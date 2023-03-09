@@ -1,12 +1,19 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import {
+  FieldError,
+  FieldErrors,
+  FieldErrorsImpl,
+  Merge,
+  useForm,
+  useFormContext,
+} from 'react-hook-form';
 import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
 import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
-import { ChallengeStepsForm } from './ChallengeSteps';
+import { ChallengeStepsForm, ChallengeStepForm } from './ChallengeSteps';
 
 interface ChallengeStepProps {
   index: number;
@@ -21,15 +28,22 @@ export const ChallengeStep = ({
   name,
   selected,
 }: ChallengeStepProps) => {
-  const context = useForm<FormChallenge>();
+  const context = useFormContext<FormChallenge>();
   const { getFieldState, getValues, formState } = context;
-  const error = formState.errors.challengeSteps[name];
-  // const { error } = getFieldState(`challengeSteps.${name}`);
 
+  const error = getFieldState(`challengeSteps.${name}`)?.error as Merge<
+    FieldError,
+    FieldErrorsImpl<ChallengeStepForm>
+  >;
+  // console.log(cos);
+
+  // const error = formState.errors?.challengeSteps?.name;
   const [stepWithTime, setStepWithTime] = useState(
     !!getValues(`challengeSteps.${name}.time`)
   );
   const handleTimeChange = () => {};
+  console.log(stepWithTime);
+
   return (
     <div
       className={`w-full my-1 px-2 flex flex-col border-4 ${
@@ -46,7 +60,7 @@ export const ChallengeStep = ({
         name={`challengeSteps.${name}.description`}
       />
       <SimpleCheckBoxSwitch
-        checked={!!stepWithTime}
+        checked={stepWithTime}
         name='addTime'
         setValue={() => setStepWithTime((state) => !state)}
       />

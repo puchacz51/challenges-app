@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
-import { Reaction } from '../../components/challenges/ChallengeReactions';
-import { ChallengeStepForm } from '../../components/forms/ChallengeSteps';
+import { Reaction } from '../challenges/ChallengeReactions';
+import { ChallengeStepForm } from '../forms/ChallengeSteps';
 import { supabase } from '../../services/supabase/supabase';
 export interface Challenge {
   id: string;
