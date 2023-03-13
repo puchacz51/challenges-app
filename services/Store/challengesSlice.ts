@@ -19,6 +19,7 @@ const challengesSlice = createSlice({
         state.selectedStepId = null;
       } else {
         state.selectedStepId = action.payload;
+        state.listIsOpen = true;
       }
       return state;
     },
@@ -29,6 +30,6 @@ const challengesSlice = createSlice({
   },
 });
 
-export const { setSelectedStep } = challengesSlice.actions;
+export const { setSelectedStep, setIsOpenList } = challengesSlice.actions;
 
 export default challengesSlice.reducer;

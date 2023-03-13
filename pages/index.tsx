@@ -18,7 +18,7 @@ const steps: ChallengeStepForm[] = [
     description: 'Description for Step 1',
     time: '2022-05-15T12:30:00.000Z',
     challengeId: 1,
-    stepID: 1,
+    stepId: 1,
     completed: true,
   },
   {
@@ -26,27 +26,31 @@ const steps: ChallengeStepForm[] = [
     description: 'Description for Step 2',
     time: '2022-05-16T08:45:00.000Z',
     challengeId: 1,
-    stepID: 2,
+    stepId: 2,
     completed: true,
   },
   {
     title: 'Step 3',
     time: '2022-05-17T15:20:00.000Z',
+    description: 'Description for Step 5',
+
     challengeId: 1,
-    stepID: 3,
+    stepId: 3,
   },
   {
     title: 'Step 4',
     description: 'Description for Step 4',
     time: '2022-05-18T17:00:00.000Z',
     challengeId: 1,
-    stepID: 4,
+    stepId: 4,
   },
   {
     title: 'Step 5',
+    description: 'Description for Step 5',
+
     time: '2022-05-19T09:10:00.000Z',
     challengeId: 1,
-    stepID: 5,
+    stepId: 5,
   },
 ];
 

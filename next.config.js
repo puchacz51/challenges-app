@@ -4,12 +4,9 @@ const nextConfig = {
   swcMinify: true,
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '**.co' }],
-    domains: [
-      '(oquugzeadwlzhzcgwish.supabase.co/',
-    ],
+    domains: ['(oquugzeadwlzhzcgwish.supabase.co/'],
   },
+
 };
 
 module.exports = nextConfig;
-
-

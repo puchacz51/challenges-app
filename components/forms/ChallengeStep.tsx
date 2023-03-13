@@ -1,11 +1,8 @@
-import { UniqueIdentifier } from '@dnd-kit/core';
 import { useState } from 'react';
 import {
   FieldError,
-  FieldErrors,
   FieldErrorsImpl,
   Merge,
-  useForm,
   useFormContext,
 } from 'react-hook-form';
 import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
@@ -13,7 +10,7 @@ import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
-import { ChallengeStepsForm, ChallengeStepForm } from './ChallengeSteps';
+import {  ChallengeStepForm } from './ChallengeSteps';
 
 interface ChallengeStepProps {
   index: number;
@@ -29,7 +26,7 @@ export const ChallengeStep = ({
   selected,
 }: ChallengeStepProps) => {
   const context = useFormContext<FormChallenge>();
-  const { getFieldState, getValues, formState } = context;
+  const { getFieldState, getValues, setValue } = context;
 
   const error = getFieldState(`challengeSteps.${name}`)?.error as Merge<
     FieldError,
@@ -41,8 +38,28 @@ export const ChallengeStep = ({
   const [stepWithTime, setStepWithTime] = useState(
     !!getValues(`challengeSteps.${name}.time`)
   );
-  const handleTimeChange = () => {};
-  console.log(stepWithTime);
+  const handleTimeChange = () => {
+    const currentSteps = getValues('challengeSteps');
+    const stepTimeKeys = Object.keys(currentSteps).filter(
+      (key) => currentSteps[key].time
+    );
+    if (!stepTimeKeys.length) return;
+
+    const j = new Date(currentSteps[stepTimeKeys[0]].time);
+
+    const sortedTimeKeys = stepTimeKeys.sort(
+      (keyA, keyB) =>
+        Date.parse(currentSteps[keyA].time) -
+        Date.parse(currentSteps[keyB].time)
+    );
+    let tempIndex = 0;
+    const newStepsOrder = Object.keys(currentSteps).map((key) =>
+      currentSteps[key].time ? sortedTimeKeys[tempIndex++] : key
+    );
+    console.log(newStepsOrder,currentSteps);
+    
+    setValue('challengStepOrder', newStepsOrder);
+  };
 
   return (
     <div
@@ -77,5 +94,3 @@ export const ChallengeStep = ({
     </div>
   );
 };
-
-function sortTimeSteps(challengeSteps: ChallengeStepsForm) {}

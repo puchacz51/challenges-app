@@ -11,34 +11,13 @@ export type ChallengeStepForm = {
   description?: string;
   time: string;
   challengeId?: number;
-  stepID?: number;
+  stepId?: number;
   completed?: boolean;
 };
 export type ChallengeStepsForm = {
   [key: UniqueIdentifier]: ChallengeStepForm;
 };
 export interface ChallengeSteps {}
-
-const compareStringDate = (date1: string, date2: string) => {
-  return Date.parse(date1) - Date.parse(date2);
-};
-
-// const challengeOrder = (steps: ChallengeStepsForm) => {
-//   const timeStepsCount = Object.keys(steps).reduce(
-//     (prev, cur) => (steps[cur].time ? prev + 1 : prev),
-//     0
-//   );
-//   if (timeStepsCount < 2) return;
-//   const timeSteps = Object.keys(steps).filter((key) => steps[key].time);
-//   const sortedTimeSteps = timeSteps.sort((date1, date2) =>
-//     compareStringDate(date1.time, date2.time)
-//   );
-//   const newOrderedSteps = steps.map((step) =>
-//     step.time ? sortedTimeSteps.shift() : step
-//   );
-
-//   return newOrderedSteps;
-// };
 
 export const ChallengeStepForm = () => {
   const { getValues } = useFormContext();

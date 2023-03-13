@@ -1,14 +1,15 @@
 import { GetServerSideProps, NextPage } from 'next';
-
-import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
 import { dehydrate, QueryClient } from 'react-query';
-
 import { ChallengesList } from '../../components/challenges/ChallengesList';
-
-import { AddChallenge } from '../../components/forms/AddChellenge';
 import { setCredentials } from '../../services/Store/authSlice';
-import { RootState, store } from '../../services/Store/store';
+import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
+import { RiAddFill } from 'react-icons/ri';
+const ChallangeForm = dynamic(
+  () => import('../../components/forms/AddChellenge')
+);
 
 interface ServerProps {
   initialState: Object;
@@ -44,13 +45,18 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
 export { getServerSideProps };
 
 const MyChallenges: NextPage = (props: ServerProps) => {
-  const { bucketPath } = props;
-  useEffect(() => {}, []);
+  const [challangeFormIsVisible, setChallangeFormIsVisible] = useState(false);
 
   return (
     <main className='flex flex-col '>
-      <AddChallenge />
-      <ChellengesOption />
+      {challangeFormIsVisible && (
+        <ChallangeForm cancelForm={() => setChallangeFormIsVisible(false)} />
+      )}
+      <button
+        className='fixed right-4 bottom-4 z-20 leading-none p-1 bg-yellow-300 rounded-xl text-6xl font-extrabold'
+        onClick={() => setChallangeFormIsVisible(true)}>
+        <RiAddFill />
+      </button>
       <ChallengesList />
     </main>
   );
@@ -58,8 +64,8 @@ const MyChallenges: NextPage = (props: ServerProps) => {
 
 export default MyChallenges;
 
-const ChellengesOption = (): JSX.Element => {
-  return (
-    <div className='text-lg px-[5%] py-2 text-white bg-slate-900 '>Options</div>
-  );
-};
+// const ChellengesOption = (): JSX.Element => {
+//   return (
+//     <div className='text-lg px-[5%] py-2 text-white bg-slate-900 '>Options</div>
+//   );
+// };

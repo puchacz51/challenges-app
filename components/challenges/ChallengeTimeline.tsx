@@ -1,10 +1,16 @@
 import { ChallengeStepForm } from '../forms/ChallengeSteps';
 import { motion, useAnimation, useAnimationControls } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { setSelectedStep } from '../../services/Store/challengesSlice';
+import {
+  setIsOpenList,
+  setSelectedStep,
+} from '../../services/Store/challengesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
-import { HiOutlineArrowCircleDown, HiOutlineArrowCircleUp } from 'react-icons/hi';
+import {
+  HiOutlineArrowCircleDown,
+  HiOutlineArrowCircleUp,
+} from 'react-icons/hi';
 interface ChallengeTimeLineProps {
   challengeSteps: ChallengeStepForm[];
   startTime: string;
@@ -63,7 +69,7 @@ const StepInfo = ({ title }: { title: string }) => {
   );
 };
 const StepBtn = ({ step, index }: StepBtnProps) => {
-  const { completed, title, stepID } = step;
+  const { completed, title, stepId } = step;
   const btnRef = useRef<HTMLButtonElement>(null);
   const [titleIsVisible, settitleIsVisible] = useState(false);
   const selectedStepId = useSelector<RootState>(
@@ -71,7 +77,7 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
   );
   const dispatch = useDispatch();
 
-  const isSelected = selectedStepId == stepID;
+  const isSelected = selectedStepId == stepId;
 
   useEffect(() => {
     setSelectedStep(3);
@@ -87,10 +93,10 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
     };
   }, []);
   return (
-    <div className={`relative`}>
+    <div className={`relative w-1/6`}>
       <button
         ref={btnRef}
-        onClick={() => dispatch(setSelectedStep(stepID))}
+        onClick={() => dispatch(setSelectedStep(stepId))}
         className={` h-full aspect-square text-xl rounded-full -z-10 border-2 border-black  ${
           completed ? 'bg-green-600' : 'bg-slate-500'
         }
@@ -113,6 +119,11 @@ const ChallengeTimeLine = ({
   challengeSteps.forEach((step) => {
     step.completed && completedCount++;
   });
+  const [startLabel] = new Date(startTime).toLocaleString().split(',');
+  const [endLabel] = endTime
+    ? new Date(startTime).toLocaleString().split(',')
+    : ['end'];
+
   const stepBtnContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (stepBtnContainerRef.current) {
@@ -130,7 +141,7 @@ const ChallengeTimeLine = ({
   return (
     <div className='h-[50px] flex justify-between bg-zinc-700  mt-14 border-y-2 z-10 max-w-full'>
       <span className='left-0 relative top-0 bottom-0 px-2 flex items-center uppercase bg-green-600'>
-        Start{' '}
+        start
       </span>
 
       <div
@@ -138,7 +149,7 @@ const ChallengeTimeLine = ({
         className='flex justify-around w-full  relative'>
         <ProgressLine endPositon={progressLinePosition}></ProgressLine>
         {challengeSteps.map((step, i) => (
-          <StepBtn step={step} key={step.stepID} index={i} />
+          <StepBtn step={step} key={step.stepId} index={i} />
         ))}
       </div>
       <span className='right-0  top-0 bottom-0 px-2 flex items-center uppercase bg-green-600'>
@@ -153,11 +164,14 @@ const StepListElement = ({ step }: StepListElementProps) => {
     (state) => state.challenges.selectedStepId
   );
   const animate = useAnimation();
-
+  const [stepDate, stepTime] = new Date(step.time).toLocaleString().split(',');
   useEffect(() => {
     animate.start({
       translateX: '0%',
-      transition: { duration: 0.4, delay: 0.2 * (step.stepID - 1) },
+      transition: {
+        duration: 0.4,
+        delay: 0.2 * (step.stepId - 1),
+      },
       position: 'static',
       scale: 1,
     });
@@ -167,26 +181,36 @@ const StepListElement = ({ step }: StepListElementProps) => {
     <motion.div
       animate={animate}
       initial={{ translateX: '-120%', position: 'absolute', scale: 1.2 }}
-      className={`grid  gridStepMobile border-2 border-black my-1 ${
-        selectedStepId === step.stepID && 'border-red-700'
+      className={`grid gridStepMobile border-2 border-black my-1 ${
+        selectedStepId === step.stepId && 'border-red-700'
       }`}>
-      <h3 className='px-2 w-fit '>{step.stepID}</h3>
-      <h3 className=''>{step.title}</h3>
-      <span>{step.description}</span>
-      {step.completed ? 'yes' : 'no'}
+      <h3
+        className={`px-2 w-fit border-2 rounded-full m-1 border-black  ${
+          step.completed ? 'bg-green-600' : 'bg-gray-500'
+        }`}>
+        {step.stepId}
+      </h3>
+      <h3 className='  m-1'>{step.title}</h3>
+      <span>{stepDate}</span>
+      <span className='row-start-2 col-span-3 border-t-2 border-black '>
+        {step.description}
+      </span>
     </motion.div>
   );
 };
 
 const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const listIsOpen = useSelector<RootState>(
+    (state) => state.challenges.listIsOpen
+  );
+  const dispatch = useDispatch();
 
-  if (!isOpen)
+  if (!listIsOpen)
     return (
       <button
         type='button'
-        onClick={() => setIsOpen(true)}
-        className='uppercase content-center w-full text-2xl border-2 border-black'>
+        onClick={() => dispatch(setIsOpenList(true))}
+        className='uppercase content-center w-full text-2xl border-2 border-black '>
         challenge steps{' '}
         <HiOutlineArrowCircleDown className='inline-block h-full ' />{' '}
       </button>
@@ -196,14 +220,13 @@ const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
     <div>
       <div className='overflow-hidden border-2 border-black px-2  '>
         {challengeSteps.map((step) => (
-          <StepListElement key={step.stepID} step={step} />
+          <StepListElement key={step.stepId} step={step} />
         ))}
       </div>
       <button
         type='button'
-        onClick={() => setIsOpen(false)}
+        onClick={() => dispatch(setIsOpenList(false))}
         className='uppercase content-center w-full text-2xl border-2 border-black'>
-        
         <HiOutlineArrowCircleUp className='inline-block h-full ' />{' '}
       </button>
     </div>

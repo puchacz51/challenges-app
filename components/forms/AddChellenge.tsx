@@ -8,7 +8,7 @@ import { privateChellengeschema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
-import {  useState } from 'react';
+import { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 
 import { ChallengeStepForm, ChallengeStepsForm } from './ChallengeSteps';
@@ -38,22 +38,22 @@ const initialValues: FormChallenge = {
   userId: null,
   challengStepOrder: [],
 };
-export const AddChallenge = () => {
-  const [isVisible, setIsVisible] = useState<boolean>(true);
-  return (
-    <div className='h-min-screen'>
-      <button
-        className='bg-red-200'
-        onClick={() => setIsVisible((isVisible) => !isVisible)}>
-        Add new challenge
-      </button>
-      {isVisible && <ChallengeForm cancelForm={() => setIsVisible(false)} />}
-    </div>
-  );
-};
+// export const AddChallenge = () => {
+//   const [isVisible, setIsVisible] = useState<boolean>(true);
+//   return (
+//     <div className='h-min-screen'>
+//       <button
+//         className='bg-red-200'
+//         onClick={() => setIsVisible((isVisible) => !isVisible)}>
+//         Add new challenge
+//       </button>
+//       {isVisible && <ChallengeForm cancelForm={() => setIsVisible(false)} />}
+//     </div>
+//   );
+// };
 
 interface ChallengeFormProps {
-  initialData?: FormChallenge;
+  initialData?: FormChallenge ;
   cancelForm: Function;
 }
 
@@ -136,3 +136,4 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     </FormProvider>
   );
 };
+export default ChallengeForm;
