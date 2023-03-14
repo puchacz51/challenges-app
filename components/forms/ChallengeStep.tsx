@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import {
   FieldError,
   FieldErrorsImpl,
@@ -10,7 +10,7 @@ import LongTextInput from '../inputs/LongTextInput';
 import TextInput from '../inputs/TextInput';
 import { TimeInput } from '../inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
-import {  ChallengeStepForm } from './ChallengeSteps';
+import { ChallengeStepForm } from './ChallengeSteps';
 
 interface ChallengeStepProps {
   index: number;
@@ -27,26 +27,24 @@ export const ChallengeStep = ({
 }: ChallengeStepProps) => {
   const context = useFormContext<FormChallenge>();
   const { getFieldState, getValues, setValue } = context;
-
   const error = getFieldState(`challengeSteps.${name}`)?.error as Merge<
     FieldError,
     FieldErrorsImpl<ChallengeStepForm>
   >;
-  // console.log(cos);
 
-  // const error = formState.errors?.challengeSteps?.name;
   const [stepWithTime, setStepWithTime] = useState(
     !!getValues(`challengeSteps.${name}.time`)
   );
-  const handleTimeChange = () => {
+  const handleTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const currentValue = e.currentTarget.value || null;
     const currentSteps = getValues('challengeSteps');
+    currentSteps[name].time = currentValue;
     const stepTimeKeys = Object.keys(currentSteps).filter(
       (key) => currentSteps[key].time
     );
-    if (!stepTimeKeys.length) return;
-
-    const j = new Date(currentSteps[stepTimeKeys[0]].time);
-
+    if (!stepTimeKeys.length) {
+      return;
+    }
     const sortedTimeKeys = stepTimeKeys.sort(
       (keyA, keyB) =>
         Date.parse(currentSteps[keyA].time) -
@@ -56,11 +54,17 @@ export const ChallengeStep = ({
     const newStepsOrder = Object.keys(currentSteps).map((key) =>
       currentSteps[key].time ? sortedTimeKeys[tempIndex++] : key
     );
-    console.log(newStepsOrder,currentSteps);
-    
     setValue('challengStepOrder', newStepsOrder);
   };
 
+  const handleAddTimeBtn = () => {
+    if (stepWithTime) {
+      setValue(`challengeSteps.${name}.time`, null);
+      setStepWithTime(false);
+    } else {
+      setStepWithTime(true);
+    }
+  };
   return (
     <div
       className={`w-full my-1 px-2 flex flex-col border-4 ${
@@ -79,15 +83,14 @@ export const ChallengeStep = ({
       <SimpleCheckBoxSwitch
         checked={stepWithTime}
         name='addTime'
-        setValue={() => setStepWithTime((state) => !state)}
+        setValue={() => handleAddTimeBtn()}
       />
       {stepWithTime && (
         <TimeInput
-          onChange={handleTimeChange as any}
+          onChange={handleTimeChange}
           name={`challengeSteps.${name}.time`}
         />
       )}
-
       <button type='button' className='bg-red-600' onClick={() => remove}>
         X
       </button>

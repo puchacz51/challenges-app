@@ -3,7 +3,10 @@ import { GetServerSideProps, NextPage } from 'next';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { ChallengeReactions } from '../../components/challenges/ChallengeReactions';
-import { ChallengeStepsView, ChallengeTimeLine } from '../../components/challenges/ChallengeTimeline';
+import {
+  ChallengeStepsView,
+  ChallengeTimeLine,
+} from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
 import { RootState, store } from '../../services/Store/store';
@@ -65,12 +68,14 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
         </h2>
         <ImageSlider imagesUrl={images}></ImageSlider>
         <ChallengeReactions userId={user?.id} challengeId={challengeId} />
-        <p>{description}</p>
+
         <ChallengeStepsView
           challengeSteps={challengeSteps}
           startTime={challenge.startTime}
           endTime={challenge.endTime}
         />
+        <p>{description}</p>
+
         <span>created at {new Date(createdAt).toDateString()}</span>
       </div>
     </>

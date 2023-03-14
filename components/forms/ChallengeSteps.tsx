@@ -1,6 +1,6 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { nanoid } from '@reduxjs/toolkit';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormChallenge } from './AddChellenge';
 import { ChallengeStep } from './ChallengeStep';
@@ -20,12 +20,14 @@ export type ChallengeStepsForm = {
 export interface ChallengeSteps {}
 
 export const ChallengeStepForm = () => {
-  const { getValues } = useFormContext();
-  const currentValue = getValues();
-  const stepsLength = currentValue?.challengeSteps;
+  const { getValues } = useFormContext<FormChallenge>();
   const [displayMode, setDisplayMode] = useState<'addSteps' | 'changeOrder'>(
     'addSteps'
   );
+  const steps = getValues().challengeSteps;
+  useEffect(() => {
+    console.log('step chaneg');
+  }, [steps]);
 
   return (
     <>

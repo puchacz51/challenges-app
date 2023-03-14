@@ -41,7 +41,7 @@ const ProgressLine = ({ endPositon }: ProgressBarProps) => {
       width: endPositon + '%',
       transition: { duration: 0.5 },
     });
-  }, [endPositon]);
+  }, []);
   return (
     <motion.span
       className='bg-green-200 z-0'
@@ -93,11 +93,11 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
     };
   }, []);
   return (
-    <div className={`relative w-1/6`}>
+    <div className={`relative w-[17%]`}>
       <button
         ref={btnRef}
         onClick={() => dispatch(setSelectedStep(stepId))}
-        className={` h-full aspect-square text-xl rounded-full -z-10 border-2 border-black  ${
+        className={` w-full aspect-square text-[100%] rounded-full -z-10 border-4 border-black  ${
           completed ? 'bg-green-600' : 'bg-slate-500'
         }
            ${isSelected && 'border-red-600'}
@@ -139,7 +139,7 @@ const ChallengeTimeLine = ({
   }
 
   return (
-    <div className='h-[50px] flex justify-between bg-zinc-700  mt-14 border-y-2 z-10 max-w-full'>
+    <div className='flex justify-between bg-zinc-700  border-y-2 z-10 max-w-full'>
       <span className='left-0 relative top-0 bottom-0 px-2 flex items-center uppercase bg-green-600'>
         start
       </span>
@@ -165,6 +165,7 @@ const StepListElement = ({ step }: StepListElementProps) => {
   );
   const animate = useAnimation();
   const [stepDate, stepTime] = new Date(step.time).toLocaleString().split(',');
+  const isSelected = selectedStepId === step.stepId;
   useEffect(() => {
     animate.start({
       translateX: '0%',
@@ -181,18 +182,21 @@ const StepListElement = ({ step }: StepListElementProps) => {
     <motion.div
       animate={animate}
       initial={{ translateX: '-120%', position: 'absolute', scale: 1.2 }}
-      className={`grid gridStepMobile border-2 border-black my-1 ${
-        selectedStepId === step.stepId && 'border-red-700'
-      }`}>
+      className={`grid gridStepMobile border-2 border-black my-1`}>
       <h3
-        className={`px-2 w-fit border-2 rounded-full m-1 border-black  ${
-          step.completed ? 'bg-green-600' : 'bg-gray-500'
-        }`}>
+        className={`px-2 w-fit border-2 rounded-full m-1 border-black
+         ${selectedStepId == step.stepId ? 'border-red-600' : ' border-black  '}
+        ${step.completed ? 'bg-green-600' : 'bg-gray-500'}
+        
+        `}>
         {step.stepId}
       </h3>
       <h3 className='  m-1'>{step.title}</h3>
       <span>{stepDate}</span>
-      <span className='row-start-2 col-span-3 border-t-2 border-black '>
+      <span
+        className={`row-start-2 col-span-3 border-t-2  border-black ${
+          !isSelected && 'hidden'
+        }`}>
         {step.description}
       </span>
     </motion.div>

@@ -52,11 +52,13 @@ const MyChallenges: NextPage = (props: ServerProps) => {
       {challangeFormIsVisible && (
         <ChallangeForm cancelForm={() => setChallangeFormIsVisible(false)} />
       )}
-      <button
-        className='fixed right-4 bottom-4 z-20 leading-none p-1 bg-yellow-300 rounded-xl text-6xl font-extrabold'
-        onClick={() => setChallangeFormIsVisible(true)}>
-        <RiAddFill />
-      </button>
+      {!challangeFormIsVisible && (
+        <button
+          className='fixed right-4 bottom-4 z-20 leading-none p-1 bg-yellow-300 rounded-xl text-6xl font-extrabold'
+          onClick={() => setChallangeFormIsVisible(true)}>
+          <RiAddFill />
+        </button>
+      )}
       <ChallengesList />
     </main>
   );
