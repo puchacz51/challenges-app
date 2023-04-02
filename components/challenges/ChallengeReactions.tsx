@@ -50,7 +50,6 @@ export const ChallengeReactions = ({ userId, challengeId }) => {
     challengeId,
     userId
   );
-
   const { mutate } = useReactionMutation(challengeId, userId);
   const { reactions, userReaction } = reactionsData;
   useEffect(() => {

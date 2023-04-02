@@ -99,8 +99,6 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
       return reactionsData;
     },
     onError: (err, newReaction, oldReactions) => {
-      console.log(oldReactions);
-
       queryClient.setQueryData(
         ['reactions', challengeId, userId],
         oldReactions
