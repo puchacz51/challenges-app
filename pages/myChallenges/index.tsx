@@ -29,7 +29,9 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
     const result = await supabase
       .from('challenges')
       .select('*')
-      .eq('userId', user.id);
+      .eq('userId', user.id)
+      .limit(10)
+      .order('createdAt');
     return result.data;
   });
 

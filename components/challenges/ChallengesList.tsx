@@ -4,6 +4,30 @@ import { RootState } from '../../services/Store/store';
 import { useChallengeQuery } from '../utilities/usePostQuery';
 import Image from 'next/image';
 import moment from 'moment';
+import { useState } from 'react';
+import { MdFilterAlt, MdFilterAltOff } from 'react-icons/md';
+import { AiFillCloseCircle } from 'react-icons/ai';
+
+const ChallengeListFilter = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!isOpen)
+    return (
+      <button onClick={() => setIsOpen(true)}>
+        <MdFilterAlt />
+      </button>
+    );
+
+  return (
+    <div className=''>
+      <button onClick={() => setIsOpen(false)}>
+        <AiFillCloseCircle />
+      </button>
+      <button className=' uppercase '>clear</button>
+    </div>
+  );
+};
+
 const ChallengesList = () => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
   const { data: challenges, refetch, isLoading } = useChallengeQuery(user.id);
@@ -17,6 +41,7 @@ const ChallengesList = () => {
       <h3 className='text-center mx-auto p-1 uppercase text-2xl font-bold bg-slate-500 '>
         your Challenges
       </h3>
+      <ChallengeListFilter />
       <div className='min-h-[200px]  border-4  '>
         {challenges?.map((challenge) => (
           <ChallengeNode key={challenge.id} challengeData={challenge} />
