@@ -1,12 +1,24 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextApiRequest } from 'next';
 import LoginOptions from '../components/forms/LoginOptions';
 import { store } from '../services/Store/store';
-import { supabase } from '../services/supabase/supabase';
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  resolvedUrl,
-}) => {
-  const user = await supabase.auth.api.getUserByCookie(req);
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  console.log(ctx.req.cookies, ctx.req.headers);
+
+  try {
+    const supabaseServerClient = createServerSupabaseClient(ctx);
+    const {
+      data: { session },
+      error,
+    } = await supabaseServerClient.auth.getSession();
+    if (error) throw error;
+    if (!session) throw new Error('no session');
+    console.log(session);
+  } catch (err) {
+    console.log(err);
+  }
+  console.log(store.getState());
 
   return {
     props: {
@@ -15,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   };
 };
 
-const LoginPage = (): JSX.Element => {
+const LoginPage = () => {
   return (
     <main className='min-h-full h-full w-full bg-red-500'>
       <LoginOptions></LoginOptions>

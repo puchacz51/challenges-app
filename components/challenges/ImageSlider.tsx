@@ -21,9 +21,6 @@ const initialPositionData: TouchPosition = {
 
 const bucketPath = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/challenges/`;
 
-// const transformX = (shift: number, imageContainer: HTMLDivElement) => {
-//   // imageContainer.style.transform = `translateX(${-shift}px)`;
-// };
 const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
   const imageContianerRef = useRef<HTMLDivElement>();
   const touchPosition = useRef<TouchPosition>(initialPositionData);

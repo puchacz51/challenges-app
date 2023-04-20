@@ -9,6 +9,8 @@ import {
 } from '../components/challenges/ChallengeTimeline';
 import { ChallengeStepForm } from '../components/forms/ChallengeSteps';
 const cos: GetServerSideProps = async (ctx) => {
+
+  
   return { props: { value: 1 } };
 };
 
@@ -57,7 +59,7 @@ const steps: ChallengeStepForm[] = [
 const challengeStart = new Date(2021, 11, 1).toISOString();
 const challengeEnd = new Date(2022, 2, 2).toISOString();
 const stepList = Object.keys(steps).map((key) => ({ ...steps[key], id: key }));
-export const getServerSideProps = getServerSidePropsWrapper(cos);
+
 
 export default function Home(props) {
   return (

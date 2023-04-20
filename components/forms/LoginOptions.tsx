@@ -25,7 +25,7 @@ const LoginOptions = (): JSX.Element => {
         <FaGithub />
       </button>
       <Link href='/register'>
-        <a>register</a>
+        register
       </Link>
     </div>
   );
