@@ -7,6 +7,10 @@ import { setCredentials } from '../../services/Store/authSlice';
 import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
 import { RiAddFill } from 'react-icons/ri';
+import {
+  createBrowserSupabaseClient,
+  createServerSupabaseClient,
+} from '@supabase/auth-helpers-nextjs';
 const ChallangeForm = dynamic(
   () => import('../../components/forms/AddChellenge')
 );
@@ -18,10 +22,17 @@ interface ServerProps {
 }
 
 const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const result = await supabase.auth.api.getUserByCookie(ctx.req);
-  const { user, token } = result || { user: null, token: null };
-  if (!user?.id || !token)
+  const supabaseServer = createServerSupabaseClient(ctx);
+
+  const {
+    data: { session },
+  } = await supabaseServer.auth.getSession();
+  if (!session || !session.user) {
     return { redirect: { destination: '/login', permanent: false }, props: {} };
+  }
+
+  const { user = null, access_token: token = null } = session;
+
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const bucketPath = await supabase.storage.getBucket('challenge');
@@ -30,16 +41,14 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
       .from('challenges')
       .select('*')
       .eq('userId', user.id)
-      .limit(10)
-      .order('createdAt');
+      .limit(5)
+      .order('createdAt', { ascending: false });
     return result.data;
   });
-
   return {
     props: {
       store: store.getState(),
       queryState: dehydrate(queryClient),
-      bucketPath,
     },
   };
 };
@@ -67,9 +76,3 @@ const MyChallenges: NextPage = (props: ServerProps) => {
 };
 
 export default MyChallenges;
-
-// const ChellengesOption = (): JSX.Element => {
-//   return (
-//     <div className='text-lg px-[5%] py-2 text-white bg-slate-900 '>Options</div>
-//   );
-// };

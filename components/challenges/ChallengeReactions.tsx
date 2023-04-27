@@ -2,19 +2,15 @@ import { useEffect, useState } from 'react';
 import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
-import { useChallengeReactionQuery } from '../utilities/useChallengeQuery';
+import { Reaction, useChallengeReactionQuery } from '../utilities/useChallengeQuery';
 import { useReactionMutation } from './useReactionMutate';
+import { Database } from '../../services/supabase/schema';
 const reactionsOptions = [
   { id: 0, name: 'like', Icon: AiTwotoneLike, color: '' },
   { id: 1, name: 'wow', Icon: DiCodeigniter },
   { id: 2, name: 'dislike', Icon: AiFillDislike },
   { id: 3, name: 'smart', Icon: GiBrain },
 ];
-export interface Reaction {
-  challengeId: string;
-  userId: string;
-  reactionId: number;
-}
 
 const countReactions = (reactions: Reaction[]) => {
   const initialValue = [0, 0, 0, 0];

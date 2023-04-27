@@ -28,6 +28,7 @@ interface StepListProps {
 }
 interface StepListElementProps {
   step: ChallengeStepForm;
+  setIsSelected: () => void;
 }
 
 type ProgressBarProps = {
@@ -35,18 +36,14 @@ type ProgressBarProps = {
 };
 
 const ProgressLine = ({ endPositon }: ProgressBarProps) => {
-  const animation = useAnimation();
-  useEffect(() => {
-    animation.start({
-      width: endPositon + '%',
-      transition: { duration: 0.5 },
-    });
-  }, []);
   return (
     <motion.span
       className='bg-green-200 z-0'
       initial={{ height: '100%', left: 0, top: 0, position: 'absolute' }}
-      animate={animation}></motion.span>
+      animate={{
+        width: endPositon + '%',
+        transition: { duration: 0.5, delay: 0.2 },
+      }}></motion.span>
   );
 };
 
@@ -224,7 +221,11 @@ const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
     <div>
       <div className='overflow-hidden border-2 border-black px-2  '>
         {challengeSteps.map((step) => (
-          <StepListElement key={step.stepId} step={step} />
+          <StepListElement
+            key={step.stepId}
+            step={step}
+            setIsSelected={() => dispatch(setSelectedStep(step.stepId))}
+          />
         ))}
       </div>
       <button

@@ -1,9 +1,9 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import TextInput from '../inputs/TextInput';
-import LongTextInput from '../inputs/LongTextInput';
-import CheckBox from '../inputs/CheckBox';
-import ImagesInput from '../inputs/ImagesInput';
+import TextInput from './inputs/TextInput';
+import LongTextInput from './inputs/LongTextInput';
+import CheckBox from './inputs/CheckBox';
+import ImagesInput from './inputs/ImagesInput';
 import { privateChellengeschema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';

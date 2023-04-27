@@ -1,36 +1,18 @@
 import { User } from '@supabase/supabase-js';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
-import { useChallengeQuery } from '../utilities/usePostQuery';
 import Image from 'next/image';
 import moment from 'moment';
-import { useState } from 'react';
-import { MdFilterAlt, MdFilterAltOff } from 'react-icons/md';
-import { AiFillCloseCircle } from 'react-icons/ai';
-
-const ChallengeListFilter = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!isOpen)
-    return (
-      <button onClick={() => setIsOpen(true)}>
-        <MdFilterAlt />
-      </button>
-    );
-
-  return (
-    <div className=''>
-      <button onClick={() => setIsOpen(false)}>
-        <AiFillCloseCircle />
-      </button>
-      <button className=' uppercase '>clear</button>
-    </div>
-  );
-};
+import { ChallengeListFilter } from './ChallengeListFilter';
+import { useChallengesQuery } from '../utilities/useChallengeQuery';
 
 const ChallengesList = () => {
   const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
-  const { data: challenges, refetch, isLoading } = useChallengeQuery(user.id);
+  const {
+    data: challenges,
+    refetch,
+    isLoading,
+  } = useChallengesQuery(user.id, { enabled: false });
 
   if (isLoading && !challenges) {
     return <h2>loading ...</h2>;
@@ -65,9 +47,11 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
       <div className='col-span-4 row-span-4   bg-slate-200 relative h-[150px]'>
         <Image
           src={src}
-          objectFit='cover'
-          layout='fill'
-          alt='title image'></Image>
+          fill
+          alt='title image'
+          style={{ objectFit: 'cover' }}
+          priority
+        />
         <h3 className=' text-4xl absolute bottom-0 w-full bg-opacity-30 bg-white '>
           {title}
         </h3>

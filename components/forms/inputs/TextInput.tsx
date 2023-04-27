@@ -7,7 +7,7 @@ import {
   useFormContext,
   UseFormRegisterReturn,
 } from 'react-hook-form';
-import { FormChallenge } from '../forms/AddChellenge';
+import { FormChallenge } from '../AddChellenge';
 interface TextInputProps {
   name: keyof FormChallenge;
   att?: Attributes;

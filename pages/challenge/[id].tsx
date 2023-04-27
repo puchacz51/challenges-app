@@ -16,22 +16,27 @@ import {
   fetchChallengeReactions,
   useChallengeQuery,
 } from '../../components/utilities/useChallengeQuery';
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const supabaseServerClient = createServerSupabaseClient(ctx);
+
   const {
-    data: userData,
-    token,
+    data: { session },
     error,
-    user: aa,
-  } = await supabase.auth.api.getUserByCookie(ctx.req);
-  store.dispatch(setCredentials({ user: userData, token }));
+  } = await supabaseServerClient.auth.getSession();
+  console.log(session, 'session');
 
-  const user = userData || { id: null, token: null };
-  console.log(error);
+  if (!session) {
+    return {
+      redirect: { destination: '/login', permanent: 'false' },
+    };
+  }
 
+  const { user = null, access_token: token } = session;
+  store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const challengeId = ctx.query.id as string;
-
   await queryClient.fetchQuery(['challenge', challengeId], async () =>
     fetchChallenge(challengeId)
   );

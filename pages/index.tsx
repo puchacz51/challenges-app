@@ -1,16 +1,10 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { supabase } from '../services/supabase/supabase';
-import { store } from '../services/Store/store';
-import { setCredentials } from '../services/Store/authSlice';
-import { getServerSidePropsWrapper } from '../components/getServerSidePropsWrapper';
-import { useQuery } from 'react-query';
-import {
-  ChallengeStepsView,
-} from '../components/challenges/ChallengeTimeline';
+import { ChallengeStepsView } from '../components/challenges/ChallengeTimeline';
 import { ChallengeStepForm } from '../components/forms/ChallengeSteps';
-const cos: GetServerSideProps = async (ctx) => {
+import Link from 'next/link';
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  console.log(ctx.query, 'sdsd');
 
-  
   return { props: { value: 1 } };
 };
 
@@ -60,15 +54,15 @@ const challengeStart = new Date(2021, 11, 1).toISOString();
 const challengeEnd = new Date(2022, 2, 2).toISOString();
 const stepList = Object.keys(steps).map((key) => ({ ...steps[key], id: key }));
 
-
 export default function Home(props) {
   return (
     <main>
-      <ChallengeStepsView
+      {/* <ChallengeStepsView
         challengeSteps={stepList}
         endTime={challengeEnd}
         startTime={challengeStart}
-      />
+      /> */}
+      <Link href='/myChallenges'>myChallenges</Link>
     </main>
   );
 }

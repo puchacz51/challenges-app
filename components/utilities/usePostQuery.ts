@@ -78,10 +78,10 @@ const deleteFromDB = async (challengeId: string) => {
 const addToDB = async (formData: AddChallenge) => {
   try {
     const { error, data } = await supabase
-      .from<Challenge>('challenges')
-      .insert(formData);
+      .from('challenges')
+      .insert(formData)
+      .select();
     if (error) throw error;
-
     return data[0];
   } catch (err) {
     throw err;
@@ -104,7 +104,7 @@ const addChallenge = async (values: FormChallenge) => {
     challengStepOrder,
     ...rest
   } = values;
-  let challengeres: Challenge;
+  let challengeRes: Challenge;
   try {
     imagesPath = Array.from(images).map((image) => {
       const name = nanoid() + '.' + image.type.split('/')[1];
@@ -120,38 +120,24 @@ const addChallenge = async (values: FormChallenge) => {
 
     await uploadImage(images, imagesPath);
     const dbData = { ...rest, userId, images: orderedPaths };
-    challengeres = await addToDB(dbData);
+    challengeRes = await addToDB(dbData);
     let steps = [];
     if (Object.keys(challengeSteps).length) {
-      steps = await addSteps(challengeSteps, challengeres.id);
+      steps = await addSteps(challengeSteps, challengeRes.id);
     }
-    return { ...challengeres, steps };
+    return { ...challengeRes, steps };
   } catch (err) {
     await Promise.allSettled([
-      deleteFromDB(challengeres.id),
+      deleteFromDB(challengeRes.id),
       deleteImages(imagesPath),
-      deleteSteps(challengeres.id),
+      deleteSteps(challengeRes.id),
     ]);
 
     console.log(err);
   }
 };
 
-const fetchChallenges = async (userId) => {
-  try {
-    const result = await supabase
-      .from('challenges')
-      .select('*')
-      .eq('userId', userId)
-      .order('createdAt', { ascending: false });
-    return result.data;
-  } catch (error) {
-    throw error;
-  }
-};
-export const useChallengeQuery = (id: string, options?: UseQueryOptions) => {
-  return useQuery([id], () => fetchChallenges(id));
-};
+
 
 const getUrlFromFileList = (files: FileList) => {
   const result = ['local', URL.createObjectURL(files[0])];
@@ -177,7 +163,9 @@ export const addChallengeMutation = (resetForm: Function) => {
         ...values,
         images: localImagesUrl,
         challengeSteps: challengeStepsArray,
-      };
+        createdAt: Date.now().toLocaleString(),
+        status: 'ACTIVE',
+      } as Challenge;
       queryClient.setQueryData<Challenge[]>([userId], (old) => {
         return [optimisticChallenge, ...old];
       });

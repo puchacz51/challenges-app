@@ -5,10 +5,10 @@ import {
   Merge,
   useFormContext,
 } from 'react-hook-form';
-import { SimpleCheckBoxSwitch } from '../inputs/CheckBox';
-import LongTextInput from '../inputs/LongTextInput';
-import TextInput from '../inputs/TextInput';
-import { TimeInput } from '../inputs/TimeInput';
+import { SimpleCheckBoxSwitch } from './inputs/CheckBox';
+import LongTextInput from './inputs/LongTextInput';
+import TextInput from './inputs/TextInput';
+import { TimeInput } from './inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
 import { ChallengeStepForm } from './ChallengeSteps';
 
