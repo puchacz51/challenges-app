@@ -1,8 +1,14 @@
-import { UseQueryOptions, useQuery } from 'react-query';
-import { ChallengeStepForm } from '../forms/ChallengeSteps';
+import {
+  QueryOptions,
+  UseQueryOptions,
+  useInfiniteQuery,
+  useQuery,
+} from 'react-query';
 import { supabase } from '../../services/supabase/supabase';
 import { Database } from '../../services/supabase/schema';
-import { useState } from 'react';
+import { store } from '../../services/Store/store';
+import { ChallengesFilterSlice } from '../../services/Store/challengesFilterSlice';
+import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 
 export type Challenge = Database['public']['Tables']['challenges']['Row'];
 export interface ChallengeReactionsData {
@@ -14,7 +20,8 @@ export type Reaction = Database['public']['Tables']['reactions']['Row'];
 
 type FetchChallenge = (
   userId: string,
-  paginationData?: { from: number; to: number }
+  filterParams: ChallengesFilterSlice,
+  paginationData?: number
 ) => Promise<Challenge[]>;
 
 export const fetchChallenge = async (
@@ -30,13 +37,6 @@ export const fetchChallenge = async (
     throw err;
   }
 };
-
-export const useChallengeQuery = (challengeId: string) =>
-  useQuery<Challenge>(['challenge', challengeId], {
-    queryFn: () => fetchChallenge(challengeId),
-    enabled: false,
-  });
-
 export const fetchChallengeReactions = async (
   challegeId: string,
   userId: string
@@ -56,7 +56,68 @@ export const fetchChallengeReactions = async (
 
   return { reactions: reactions.data, userReaction };
 };
+const CHALLENGEQUERYAMOUNT = 5;
+const fetchChallengesbyUserId = async (userId: string, amount = 4) => {
+  try {
+    const response = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('userId', userId)
+      .order('createdAt', { ascending: false })
+      .limit(amount-1);
+    if (response.data.length === 0) throw new Error('no data available');
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
 
+const fetchInfinityChallenges: FetchChallenge = async (
+  userId,
+  filterParams,
+  page = 0
+) => {
+  const { filterCategory, filterData, filterIsPublic, filterStatus } =
+    filterParams;
+
+  try {
+    let query = () =>
+      supabase
+        .from('challenges')
+        .select('*')
+        .eq('userId', userId)
+        .order('createdAt', { ascending: false })
+        .range(
+          page * CHALLENGEQUERYAMOUNT,
+          page * CHALLENGEQUERYAMOUNT + CHALLENGEQUERYAMOUNT - 1
+        )
+        .in('category', ['SPORT']);
+
+    // if (!filterCategory.includes('ALL')) {
+    //   query = () => query().in('category', filterCategory);
+    // }
+    // if (filterData != new Date(0, 0, 0).toISOString()) {
+    //   query = () => query().gte('createdAt', filterData);
+    // }
+    // if (filterIsPublic != 'ALL') {
+    //   query = () => query().eq('isPublic', filterIsPublic === 'PUBLIC');
+    // }
+    // if (filterStatus != 'ALL') {
+    //   query = () => query().in('status', [filterStatus]);
+    // }
+    const result = await query();
+
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const useChallengeQuery = (challengeId: string) =>
+  useQuery<Challenge>(['challenge', challengeId], {
+    queryFn: () => fetchChallenge(challengeId),
+    enabled: false,
+  });
 export const useChallengeReactionQuery = (
   challengeId: string,
   userId: string
@@ -66,36 +127,43 @@ export const useChallengeReactionQuery = (
     enabled: false,
   });
 
-const fetchChallenges: FetchChallenge = async (userId, paginationData) => {
-  const { from, to } = paginationData;
+export const useChallengesInifitinityQuery = (
+  id: string,
+  queryAmount: number,
+  options?: UseQueryOptions,
+  filterData?: any
+) => {
+  return useInfiniteQuery([id, 'myChallenges'], {
+    queryFn: async (pageParam) => {
+      const currentFilterParams = store.getState().challengesFilter;
 
-  try {
-    const result = await supabase
-      .from('challenges')
-      .select('*')
-      .eq('userId', userId)
-      .order('createdAt', { ascending: false })
-      .range(from, to);
-    return result.data;
-  } catch (error) {
-    throw error;
-  }
+      return await fetchInfinityChallenges(
+        id,
+        currentFilterParams,
+        pageParam.pageParam
+      );
+    },
+    keepPreviousData: true,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage?.length < CHALLENGEQUERYAMOUNT) return undefined;
+      if (allPages?.length === 0) {
+        return 1;
+      }
+      return allPages.length + 1;
+    },
+    getPreviousPageParam: (firstPage, allPages) => {
+      if (allPages.length === 0) return undefined;
+      return allPages.length;
+    },
+  });
 };
 
 export const useChallengesQuery = (
-  id: string,
-  queryAmount: number,
-  options?: UseQueryOptions
-) => {
-  const [queryCount, setQueryCount] = useState(0);
-
-  const currentPagination = {
-    from: queryCount * queryAmount,
-    to: (queryCount + 1) * queryAmount,
-  };
-
-  return useQuery([id], {
-    queryFn: () => fetchChallenges(id, currentPagination),
-    onSuccess(data) {},
+  userId: string,
+  amount = 5,
+  queryOptions: QueryOptions<Challenge[]> = {}
+) =>
+  useQuery<Challenge[]>({
+    queryFn: () => fetchChallengesbyUserId(userId, amount),
+    ...queryOptions,
   });
-};

@@ -2,6 +2,7 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { ChallengeStepsView } from '../components/challenges/ChallengeTimeline';
 import { ChallengeStepForm } from '../components/forms/ChallengeSteps';
 import Link from 'next/link';
+import { useAppSelector } from '../services/Store/store';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   console.log(ctx.query, 'sdsd');
 
@@ -54,7 +55,9 @@ const challengeStart = new Date(2021, 11, 1).toISOString();
 const challengeEnd = new Date(2022, 2, 2).toISOString();
 const stepList = Object.keys(steps).map((key) => ({ ...steps[key], id: key }));
 
-export default function Home(props) {
+export default function Home() {
+  const { user } = useAppSelector((state) => state.authInfo);
+
   return (
     <main>
       {/* <ChallengeStepsView
@@ -63,6 +66,8 @@ export default function Home(props) {
         startTime={challengeStart}
       /> */}
       <Link href='/myChallenges'>myChallenges</Link>
+      <br />
+      <Link href={`/${user.id}`}>myProfile</Link>
     </main>
   );
 }

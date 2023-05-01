@@ -1,15 +1,20 @@
-import { HTMLAttributes, useId } from 'react';
-interface DateInputProps extends HTMLAttributes<HTMLInputElement> {
+import {
+  HTMLAttributes,
+  HtmlHTMLAttributes,
+  InputHTMLAttributes,
+  useId,
+} from 'react';
+interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
 }
 export const DateInput = ({ name, ...props }: DateInputProps) => {
   const id = useId();
   return (
-    <div className='flex flex-col space-y-1'>
+    <div className='flex flex-row items-center space-y-1 justify-between'>
       <label
         htmlFor={`date${id}`}
         className='text-gray-600 text-sm font-medium mb-1'>
-        Data
+        {name}
       </label>
       <input
         {...props}

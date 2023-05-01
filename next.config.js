@@ -3,10 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: '**.co' }],
-    domains: ['(oquugzeadwlzhzcgwish.supabase.co/'],
+    domains: [
+      'oquugzeadwlzhzcgwish.supabase.co',
+      'avatars.githubusercontent.com',
+    ],
   },
-
 };
 
 module.exports = nextConfig;

@@ -1,22 +1,25 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  CombinedState,
+  combineReducers,
+  configureStore,
+} from '@reduxjs/toolkit';
+import { TypedUseSelectorHook, useSelector } from 'react-redux';
 import authSlice from './authSlice';
 import challengesSlice from './challengesSlice';
 import pageSlice from './pageSlice';
-import supabaseClient from './supabaseSlice';
+import challengesFilterSlice from './challengesFilterSlice';
 
 const reducer = combineReducers({
   authInfo: authSlice,
   page: pageSlice,
   challenges: challengesSlice,
-  // supabase: supabaseClient,
+  challengesFilter: challengesFilterSlice,
 });
-
 const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   devTools: true,
 });
-console.log('store created');
-
 export { store };
 export type RootState = ReturnType<typeof store.getState>;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

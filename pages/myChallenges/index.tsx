@@ -7,10 +7,8 @@ import { setCredentials } from '../../services/Store/authSlice';
 import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
 import { RiAddFill } from 'react-icons/ri';
-import {
-  createBrowserSupabaseClient,
-  createServerSupabaseClient,
-} from '@supabase/auth-helpers-nextjs';
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import { useChallengesInifitinityQuery } from '../../components/utilities/useChallengeQuery';
 const ChallangeForm = dynamic(
   () => import('../../components/forms/AddChellenge')
 );
@@ -23,28 +21,17 @@ interface ServerProps {
 
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const supabaseServer = createServerSupabaseClient(ctx);
-
   const {
     data: { session },
   } = await supabaseServer.auth.getSession();
   if (!session || !session.user) {
     return { redirect: { destination: '/login', permanent: false }, props: {} };
   }
-
   const { user = null, access_token: token = null } = session;
-
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
   const bucketPath = await supabase.storage.getBucket('challenge');
-  await queryClient.fetchQuery([user.id], async () => {
-    const result = await supabase
-      .from('challenges')
-      .select('*')
-      .eq('userId', user.id)
-      .limit(5)
-      .order('createdAt', { ascending: false });
-    return result.data;
-  });
+
   return {
     props: {
       store: store.getState(),

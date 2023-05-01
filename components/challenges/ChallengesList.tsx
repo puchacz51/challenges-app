@@ -1,23 +1,25 @@
-import { User } from '@supabase/supabase-js';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../services/Store/store';
+import { useAppSelector } from '../../services/Store/store';
 import Image from 'next/image';
 import moment from 'moment';
 import { ChallengeListFilter } from './ChallengeListFilter';
-import { useChallengesQuery } from '../utilities/useChallengeQuery';
+import {
+  Challenge,
+  useChallengesInifitinityQuery,
+} from '../utilities/useChallengeQuery';
+import { ColHTMLAttributes, HTMLAttributes } from 'react';
 
 const ChallengesList = () => {
-  const user = useSelector<RootState>((state) => state.authInfo?.user) as User;
+  const user = useAppSelector((state) => state.authInfo?.user);
   const {
     data: challenges,
-    refetch,
     isLoading,
-  } = useChallengesQuery(user.id, { enabled: false });
+    fetchNextPage,
+    hasNextPage,
+  } = useChallengesInifitinityQuery(user.id, 5);
 
   if (isLoading && !challenges) {
     return <h2>loading ...</h2>;
   }
-
   return (
     <div className='mx-[5%]'>
       <h3 className='text-center mx-auto p-1 uppercase text-2xl font-bold bg-slate-500 '>
@@ -25,15 +27,32 @@ const ChallengesList = () => {
       </h3>
       <ChallengeListFilter />
       <div className='min-h-[200px]  border-4  '>
-        {challenges?.map((challenge) => (
-          <ChallengeNode key={challenge.id} challengeData={challenge} />
-        ))}
+        {challenges?.pages.map((page) =>
+          page?.map((challenge) => (
+            <ChallengeNode key={challenge.id} challengeData={challenge} />
+          ))
+        )}
+        {hasNextPage && (
+          <button
+            className='text-lg bg-yellow-400 w-full uppercase'
+            onClick={() => fetchNextPage()}>
+            see more
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-const ChallengeNode = ({ challengeData }): JSX.Element => {
+type ChallengeNodeProps = {
+  challengeData: Challenge;
+  className?: HTMLAttributes<HTMLLinkElement>['className'];
+};
+
+export const ChallengeNode = ({
+  challengeData,
+  className = '',
+}: ChallengeNodeProps) => {
   const { title, images, createdAt, status } = challengeData;
   const time = moment(new Date(createdAt).getTime()).fromNow();
   const src =
@@ -42,9 +61,12 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
       : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/challenges/${images[0]}`;
   return (
     <a
-      className='w-full grid  grid-rows-5 grid-cols-4 my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black '
+      className={
+        ' my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black ' +
+        className
+      }
       href={`challenge/${challengeData.id}`}>
-      <div className='col-span-4 row-span-4   bg-slate-200 relative h-[150px]'>
+      <div className='w-full bg-slate-200 relative  aspect-video'>
         <Image
           src={src}
           fill
@@ -52,12 +74,14 @@ const ChallengeNode = ({ challengeData }): JSX.Element => {
           style={{ objectFit: 'cover' }}
           priority
         />
-        <h3 className=' text-4xl absolute bottom-0 w-full bg-opacity-30 bg-white '>
+        <h3 className='text-4xl absolute bottom-0 w-full bg-opacity-40 bg-white '>
           {title}
         </h3>
       </div>
-      <span className='col-span-2 uppercase text-white px-2'>{time}</span>
-      <span className='col-span-2 uppercase text-white'>{status}</span>
+      <div className='w-full flex  justify-between min-h-max'>
+        <span className='uppercase  text-white px-2'>{time}</span>
+        <span className='uppercase  text-white '>{status}</span>
+      </div>
     </a>
   );
 };

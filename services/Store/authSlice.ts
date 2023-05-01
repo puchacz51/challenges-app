@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 type AuthState = {
-  user: User | null;
+  user: Session['user'] | null;
   token: string | null;
 };
 

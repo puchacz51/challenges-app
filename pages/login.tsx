@@ -4,8 +4,6 @@ import { store } from '../services/Store/store';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  console.log(ctx.req.cookies, ctx.req.headers);
-
   try {
     const supabaseServerClient = createServerSupabaseClient(ctx);
     const {
@@ -18,12 +16,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   } catch (err) {
     console.log(err);
   }
-  console.log(store.getState());
 
   return {
-    props: {
-      store: store.getState(),
-    },
+    props: {},
   };
 };
 
