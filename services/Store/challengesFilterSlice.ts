@@ -1,12 +1,10 @@
 import { Action } from '@dnd-kit/core/dist/store';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
 export const CHALLENGECATEGORIES = [
   'SPORT',
   'CREATIVITY',
   'PERSONAL IMPROVEMENT',
-  'ALL',
 ] as const;
 export const CHALLENGESTATUSES = [
   'COMPLETED',
@@ -25,10 +23,10 @@ export type ChallengesFilterSlice = {
   filterCategory: ChallengeCategory[];
 };
 const initialState: ChallengesFilterSlice = {
-  filterData: null,
+  filterData: new Date(0, 0, 0).toUTCString(),
   filterStatus: 'ALL',
   filterIsPublic: 'ALL',
-  filterCategory: ['ALL'],
+  filterCategory: ['CREATIVITY', 'PERSONAL IMPROVEMENT', 'SPORT'],
 };
 const challengesFilterSlice = createSlice({
   name: 'challenges',
@@ -36,24 +34,20 @@ const challengesFilterSlice = createSlice({
   reducers: {
     setCategory: (state, action: PayloadAction<ChallengeCategory>) => {
       const { payload } = action;
-      if (payload === 'ALL') {
-        state.filterCategory = ['ALL'];
-      } else if (state.filterCategory.includes(payload)) {
+      if (state.filterCategory.includes(payload)) {
         state.filterCategory = state.filterCategory.filter(
-          (cat) => cat !== payload && cat !== 'ALL'
+          (cat) => cat !== payload
         );
-        if (state.filterCategory.length === 0) state.filterCategory = ['ALL'];
       } else {
-        state.filterCategory = [
-          ...state.filterCategory.filter((cat) => cat !== 'ALL'),
-          payload,
-        ];
+        state.filterCategory = [...state.filterCategory, payload];
       }
       return state;
     },
     setFilterDate: (state, action: PayloadAction<string>) => {
       if (action.payload) {
         state.filterData = action.payload;
+      } else {
+        state.filterData = initialState.filterData;
       }
     },
     setIsPublic: (

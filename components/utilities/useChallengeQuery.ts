@@ -64,7 +64,7 @@ const fetchChallengesbyUserId = async (userId: string, amount = 4) => {
       .select('*')
       .eq('userId', userId)
       .order('createdAt', { ascending: false })
-      .limit(amount-1);
+      .limit(amount - 1);
     if (response.data.length === 0) throw new Error('no data available');
     return response.data;
   } catch (err) {
@@ -77,25 +77,9 @@ const fetchInfinityChallenges: FetchChallenge = async (
   filterParams,
   page = 0
 ) => {
-  const { filterCategory, filterData, filterIsPublic, filterStatus } =
+  let { filterCategory, filterData, filterIsPublic, filterStatus } =
     filterParams;
-
   try {
-    let query = () =>
-      supabase
-        .from('challenges')
-        .select('*')
-        .eq('userId', userId)
-        .order('createdAt', { ascending: false })
-        .range(
-          page * CHALLENGEQUERYAMOUNT,
-          page * CHALLENGEQUERYAMOUNT + CHALLENGEQUERYAMOUNT - 1
-        )
-        .in('category', ['SPORT']);
-
-    // if (!filterCategory.includes('ALL')) {
-    //   query = () => query().in('category', filterCategory);
-    // }
     // if (filterData != new Date(0, 0, 0).toISOString()) {
     //   query = () => query().gte('createdAt', filterData);
     // }
@@ -105,8 +89,13 @@ const fetchInfinityChallenges: FetchChallenge = async (
     // if (filterStatus != 'ALL') {
     //   query = () => query().in('status', [filterStatus]);
     // }
-    const result = await query();
-
+    console.log(filterData);
+    
+    const result = await supabase
+      .from('challenges')
+      .select('*')
+      .in('category', filterCategory)
+      .gte('createdAt', filterData);
     return result.data;
   } catch (error) {
     throw error;

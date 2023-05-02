@@ -6,17 +6,23 @@ import {
   Challenge,
   useChallengesInifitinityQuery,
 } from '../utilities/useChallengeQuery';
-import { ColHTMLAttributes, HTMLAttributes } from 'react';
+import { ColHTMLAttributes, HTMLAttributes, useEffect } from 'react';
+import Link from 'next/link';
 
 const ChallengesList = () => {
   const user = useAppSelector((state) => state.authInfo?.user);
+  const challegesFilter = useAppSelector((state) => state.challengesFilter);
   const {
     data: challenges,
     isLoading,
     fetchNextPage,
     hasNextPage,
+    refetch,
   } = useChallengesInifitinityQuery(user.id, 5);
-
+  useEffect(() => {
+    console.log('fitler change');
+    refetch();
+  }, [challegesFilter]);
   if (isLoading && !challenges) {
     return <h2>loading ...</h2>;
   }
@@ -60,9 +66,9 @@ export const ChallengeNode = ({
       ? images[1]
       : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/challenges/${images[0]}`;
   return (
-    <a
+    <Link
       className={
-        ' my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black ' +
+        'block  my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black  ' +
         className
       }
       href={`challenge/${challengeData.id}`}>
@@ -74,15 +80,15 @@ export const ChallengeNode = ({
           style={{ objectFit: 'cover' }}
           priority
         />
-        <h3 className='text-4xl absolute bottom-0 w-full bg-opacity-40 bg-white '>
+        <h3 className='text-[2.25em] font-semibold  absolute bottom-0 w-full bg-opacity-40 bg-white p-1'>
           {title}
         </h3>
       </div>
-      <div className='w-full flex  justify-between min-h-max'>
-        <span className='uppercase  text-white px-2'>{time}</span>
+      <div className=' flex  justify-between w-full font-[.7em] items-center p-2 '>
+        <span className='uppercase  text-white '>{time}</span>
         <span className='uppercase  text-white '>{status}</span>
       </div>
-    </a>
+    </Link>
   );
 };
 

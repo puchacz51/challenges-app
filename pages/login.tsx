@@ -4,6 +4,9 @@ import { store } from '../services/Store/store';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { req, resolvedUrl } = ctx;
+  console.log(resolvedUrl);
+
   try {
     const supabaseServerClient = createServerSupabaseClient(ctx);
     const {
@@ -11,8 +14,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       error,
     } = await supabaseServerClient.auth.getSession();
     if (error) throw error;
-    if (!session) throw new Error('no session');
-    console.log(session);
+
+    if (session) return { redirect: { destination: '/', permanent: true  } };
   } catch (err) {
     console.log(err);
   }

@@ -16,7 +16,6 @@ const findUserPhoto = (user: User) => {
 };
 const Header = (): JSX.Element => {
   const authInfo = useAppSelector((state) => state.authInfo);
-  const path = useAppSelector((state) => state.page.path);
 
   return (
     <>

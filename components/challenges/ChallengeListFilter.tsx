@@ -36,14 +36,12 @@ const CategoriesList = ({
           {category}
         </button>
       ))}
-      
     </div>
   );
 };
 const SelectStatus = () => {
   const dispatch = useDispatch();
   const { filterStatus } = useAppSelector((state) => state.challengesFilter);
-
   return (
     <Select
       value={{ value: filterStatus, label: filterStatus }}

@@ -11,6 +11,9 @@ import {
   useChallengesQuery,
 } from '../components/utilities/useChallengeQuery';
 import { ChallengeNode } from '../components/challenges/ChallengesList';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { ProfileSections } from '../components/userProfile/ProfileSections';
 
 interface ServerProps {
   initialState: Object;
@@ -39,66 +42,26 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 export { getServerSideProps };
 
-const UserProfileChallnges = () => {
-  const { user } = useAppSelector((state) => state.authInfo);
-  const {
-    data: challengesData,
-    error,
-    isLoading,
-  } = useChallengesQuery(user.id, 5);
-
-  return (
-    <div className='flex border-blue border-2 flex-row flex-wrap justify-around'>
-      {challengesData?.length > 0
-        ? challengesData.map((challengeData) => (
-            <ChallengeNode
-              className='w-5/12'
-              key={challengeData.id}
-              challengeData={challengeData}
-            />
-          ))
-        : 'no challenges'}
-    </div>
-  );
-};
-
-const userProfileSectionSelector = {
-  CHALLENGES: <UserProfileChallnges />,
-};
-
 const UserProfile = () => {
   const { user } = useAppSelector((state) => state.authInfo);
 
-  const [selectedSection, setSelectedSection] =
-    useState<'CHALLENGES'>('CHALLENGES');
+  const [selectedSection, setSelectedSection] = useState<
+    'CHALLENGES' | 'STATS'
+  >('CHALLENGES');
 
   return (
     <main>
       <div className='border-2 border-black flex row  items-center p-2 gap-2'>
         <div className='w-20 aspect-square relative p-6 rounded-full overflow-hidden border-4 border-black'>
           <Image
+            alt='challenge image'
             src={'https://avatars.githubusercontent.com/u/71950600?v=4'}
             fill
           />
         </div>
         <h3>{user?.email}</h3>
       </div>
-      <div className='border-2 border-black'>
-        <div className='border-b-2 border-black p-1 flex justify-center gap-3 uppercase text-lg font-bold'>
-          <button onClick={() => setSelectedSection('CHALLENGES')}>
-            challenges
-          </button>
-          <button onClick={() => setSelectedSection('CHALLENGES')}>
-            stats
-          </button>
-          <button onClick={() => setSelectedSection('CHALLENGES')}>
-            contribution
-          </button>
-        </div>
-        challlenges
-      </div>
-      {userProfileSectionSelector[selectedSection]}
-      {JSON.stringify(user)}
+      <ProfileSections />
     </main>
   );
 };

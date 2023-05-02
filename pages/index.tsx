@@ -4,7 +4,6 @@ import { ChallengeStepForm } from '../components/forms/ChallengeSteps';
 import Link from 'next/link';
 import { useAppSelector } from '../services/Store/store';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  console.log(ctx.query, 'sdsd');
 
   return { props: { value: 1 } };
 };
@@ -67,7 +66,7 @@ export default function Home() {
       /> */}
       <Link href='/myChallenges'>myChallenges</Link>
       <br />
-      <Link href={`/${user.id}`}>myProfile</Link>
+      <Link href={`/${user?.id}`}>myProfile</Link>
     </main>
   );
 }
