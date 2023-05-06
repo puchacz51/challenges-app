@@ -137,8 +137,6 @@ const addChallenge = async (values: FormChallenge) => {
   }
 };
 
-
-
 const getUrlFromFileList = (files: FileList) => {
   const result = ['local', URL.createObjectURL(files[0])];
   return result;
@@ -152,9 +150,12 @@ export const addChallengeMutation = (resetForm: Function) => {
     mutationFn: async (values) => await addChallenge(values),
     onMutate: async (values: FormChallenge) => {
       const { userId, images, challengeSteps } = values;
-      const challengeStepsArray = Object.keys(challengeSteps).map(
-        (key) => challengeSteps[key]
-      );
+      let challengeStepsArray;
+      if (challengeSteps) {
+        challengeStepsArray = Object.keys(challengeSteps).map(
+          (key) => challengeSteps[key]
+        );
+      }
       const localImagesUrl = getUrlFromFileList(images);
 
       await queryClient.cancelQueries([userId]);
@@ -166,9 +167,14 @@ export const addChallengeMutation = (resetForm: Function) => {
         createdAt: Date.now().toLocaleString(),
         status: 'ACTIVE',
       } as Challenge;
-      queryClient.setQueryData<Challenge[]>([userId], (old) => {
-        return [optimisticChallenge, ...old];
-      });
+      queryClient.setQueryData<Challenge[]>(
+        [[userId, 'myChallenges']],
+        (old) => {
+          console.log(old, userId);
+
+          return [optimisticChallenge, ...old];
+        }
+      );
 
       return { optimisticChallenge };
     },

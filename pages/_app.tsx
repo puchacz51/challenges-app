@@ -10,8 +10,6 @@ import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
 import { middleware } from '../middleware';
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
-  console.log(pageProps);
-
   const dispatch = store.dispatch;
   store.dispatch(setCredentials(pageProps.store?.authInfo));
   supabase.auth.onAuthStateChange((event, session) => {

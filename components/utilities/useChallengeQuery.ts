@@ -11,6 +11,11 @@ import { ChallengesFilterSlice } from '../../services/Store/challengesFilterSlic
 import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 
 export type Challenge = Database['public']['Tables']['challenges']['Row'];
+export type ChallengeStep = Database['public']['Tables']['challengeSteps']['Row']
+type ChallengeWithSteps = Challenge & {
+  challengeSteps: ChallengeStep[];
+};
+
 export interface ChallengeReactionsData {
   reactions: Reaction[];
   userReaction: Reaction;
@@ -26,13 +31,13 @@ type FetchChallenge = (
 
 export const fetchChallenge = async (
   idChallenge: string
-): Promise<Challenge> => {
+): Promise<ChallengeWithSteps> => {
   try {
     const challenge = await supabase
       .from('challenges')
       .select('*,challengeSteps(*)')
       .eq('id', idChallenge);
-    return challenge.data[0];
+    return challenge.data[0] as ChallengeWithSteps;
   } catch (err) {
     throw err;
   }
@@ -89,13 +94,17 @@ const fetchInfinityChallenges: FetchChallenge = async (
     // if (filterStatus != 'ALL') {
     //   query = () => query().in('status', [filterStatus]);
     // }
-    console.log(filterData);
-    
+
     const result = await supabase
       .from('challenges')
       .select('*')
       .in('category', filterCategory)
-      .gte('createdAt', filterData);
+      .gte('createdAt', filterData)
+      .order('createdAt', { ascending: false })
+      .range(
+        page * CHALLENGEQUERYAMOUNT,
+        page * CHALLENGEQUERYAMOUNT + CHALLENGEQUERYAMOUNT - 1
+      );
     return result.data;
   } catch (error) {
     throw error;
@@ -103,7 +112,7 @@ const fetchInfinityChallenges: FetchChallenge = async (
 };
 
 export const useChallengeQuery = (challengeId: string) =>
-  useQuery<Challenge>(['challenge', challengeId], {
+  useQuery<ChallengeWithSteps>(['challenge', challengeId], {
     queryFn: () => fetchChallenge(challengeId),
     enabled: false,
   });
@@ -153,6 +162,7 @@ export const useChallengesQuery = (
   queryOptions: QueryOptions<Challenge[]> = {}
 ) =>
   useQuery<Challenge[]>({
+    queryKey: ['challenges', userId],
     queryFn: () => fetchChallengesbyUserId(userId, amount),
     ...queryOptions,
   });

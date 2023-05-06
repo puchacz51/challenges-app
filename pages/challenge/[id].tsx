@@ -25,14 +25,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     data: { session },
     error,
   } = await supabaseServerClient.auth.getSession();
-  console.log(session, 'session');
-
   if (!session) {
     return {
       redirect: { destination: '/login', permanent: 'false' },
+      props: {},
     };
   }
-
   const { user = null, access_token: token } = session;
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
@@ -43,7 +41,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   await queryClient.fetchQuery(['reactions', challengeId, user.id], () =>
     fetchChallengeReactions(challengeId, user.id)
   );
-
   return {
     props: {
       challengeId,

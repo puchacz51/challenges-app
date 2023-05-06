@@ -1,4 +1,4 @@
-import { ChallengeStepForm } from '../forms/ChallengeSteps';
+import { ChallengeStepForm, ChallengeSteps } from '../forms/ChallengeSteps';
 import { motion, useAnimation, useAnimationControls } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -11,20 +11,21 @@ import {
   HiOutlineArrowCircleDown,
   HiOutlineArrowCircleUp,
 } from 'react-icons/hi';
+import { ChallengeStep } from '../utilities/useChallengeQuery';
 interface ChallengeTimeLineProps {
-  challengeSteps: ChallengeStepForm[];
+  challengeSteps: ChallengeSteps[];
   startTime: string;
   endTime: string;
 }
 interface StepBtnProps {
-  step: ChallengeStepForm;
+  step: ChallengeStep;
   index: number;
 }
 interface StepListProps {
-  challengeSteps: ChallengeStepForm[];
+  challengeSteps: ChallengeStep[];
 }
 interface StepListProps {
-  challengeSteps: ChallengeStepForm[];
+  challengeSteps: ChallengeStep[];
 }
 interface StepListElementProps {
   step: ChallengeStepForm;
@@ -47,28 +48,9 @@ const ProgressLine = ({ endPositon }: ProgressBarProps) => {
   );
 };
 
-const StepInfo = ({ title }: { title: string }) => {
-  return (
-    <motion.span
-      className='-z-10  border-2 w-[150px] border-black py-x text-center'
-      initial={{
-        left: '50%',
-        top: 0,
-        position: 'absolute',
-        translateX: '-50%',
-      }}
-      animate={{
-        transition: { duration: 0.3 },
-        translateY: '-100%',
-      }}>
-      {title}
-    </motion.span>
-  );
-};
 const StepBtn = ({ step, index }: StepBtnProps) => {
   const { completed, title, stepId } = step;
   const btnRef = useRef<HTMLButtonElement>(null);
-  const [titleIsVisible, settitleIsVisible] = useState(false);
   const selectedStepId = useSelector<RootState>(
     (state) => state.challenges.selectedStepId
   );
@@ -76,19 +58,6 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
 
   const isSelected = selectedStepId == stepId;
 
-  useEffect(() => {
-    setSelectedStep(3);
-    btnRef.current?.addEventListener('mouseover', () =>
-      settitleIsVisible(true)
-    );
-    btnRef.current?.addEventListener('mouseleave', () =>
-      settitleIsVisible(false)
-    );
-    return () => {
-      removeEventListener('mouseover', () => settitleIsVisible(true));
-      removeEventListener('mouseleave', () => settitleIsVisible(false));
-    };
-  }, []);
   return (
     <div className={`relative w-[17%]`}>
       <button
@@ -101,7 +70,6 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
          `}>
         {index}
       </button>
-      {titleIsVisible && <StepInfo title={title} />}
     </div>
   );
 };
@@ -114,7 +82,7 @@ const ChallengeTimeLine = ({
   const [progressLinePosition, setProgressLinePosition] = useState(0);
   let completedCount = 0;
   challengeSteps.forEach((step) => {
-    step.completed && completedCount++;
+    step
   });
   const [startLabel] = new Date(startTime).toLocaleString().split(',');
   const [endLabel] = endTime

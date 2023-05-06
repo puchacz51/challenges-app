@@ -30,7 +30,6 @@ const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user = null, access_token: token = null } = session;
   store.dispatch(setCredentials({ user, token }));
   const queryClient = new QueryClient();
-  const bucketPath = await supabase.storage.getBucket('challenge');
 
   return {
     props: {

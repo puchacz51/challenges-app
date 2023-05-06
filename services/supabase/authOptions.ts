@@ -5,15 +5,19 @@ const getCurrentUrl = () => {
 };
 
 const signInWithEmail = (email: string, password: string) => {
-  supabase.auth.signInWithPassword({ email, password });
+  return supabase.auth.signInWithPassword({ email, password });
 };
 const signUpWithEmail = (email, password) => {
-  supabase.auth.signUp({ email, password });
+  return supabase.auth.signUp({ email, password });
 };
 const signInWithGitHub = async () => {
-  await supabase.auth.signInWithOAuth({
+  return await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: { redirectTo: getCurrentUrl() },
   });
 };
-export { signInWithEmail, signUpWithEmail, signInWithGitHub };
+const signOut = async () => {
+  await supabase.auth.signOut();
+};
+
+export { signInWithEmail, signUpWithEmail, signInWithGitHub, signOut };

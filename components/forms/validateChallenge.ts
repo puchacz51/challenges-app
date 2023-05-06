@@ -1,4 +1,5 @@
 import { string, object, boolean, array, mixed, date, lazy } from 'yup';
+import { CHALLENGECATEGORIES } from '../../services/Store/challengesFilterSlice';
 export const validateSize = (files: FileList) => {
   if (!files) {
     return false;
@@ -48,6 +49,9 @@ const challengeStepsSchema = lazy((value) => {
 export const privateChellengeschema = object({
   title: string().required().max(30),
   description: string().required().max(200),
+  category: string()
+    .required()
+    .oneOf(CHALLENGECATEGORIES as unknown as string[]),
   images: mixed()
     .required('you need to provide at least a one image')
     .test(

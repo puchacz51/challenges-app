@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import TextInput from './inputs/TextInput';
+import { FormTextInput } from './inputs/TextInput';
 import LongTextInput from './inputs/LongTextInput';
 import CheckBox from './inputs/CheckBox';
 import ImagesInput from './inputs/ImagesInput';
@@ -13,6 +13,11 @@ import { User } from '@supabase/supabase-js';
 import { MdCancel } from 'react-icons/md';
 import { ChallengeStepForm, ChallengeStepsForm } from './ChallengeSteps';
 import { UniqueIdentifier } from '@dnd-kit/core';
+import { SelectBox, SelectBoxForm } from '../inputs/SelectBox';
+import {
+  CHALLENGECATEGORIES,
+  ChallengeCategory,
+} from '../../services/Store/challengesFilterSlice';
 
 export interface FormChallenge {
   title: string;
@@ -25,6 +30,7 @@ export interface FormChallenge {
   challengStepOrder: UniqueIdentifier[];
   userId: string;
   imagesOrder: { name: string; url: string[] }[] | null;
+  category: ChallengeCategory | null;
 }
 const initialValues: FormChallenge = {
   title: '',
@@ -37,6 +43,7 @@ const initialValues: FormChallenge = {
   challengeSteps: null,
   userId: null,
   challengStepOrder: [],
+  category: null,
 };
 export const AddChallenge = () => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -74,7 +81,7 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const { mutate, isSuccess } = addChallengeMutation(reset);
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
   if (isSuccess) cancelForm();
-  const onSubmitHandler = async (data, userId) => {
+  const onSubmitHandler = async (data: FormChallenge, userId) => {
     try {
       mutate({ ...data, userId });
     } catch (err) {
@@ -110,15 +117,22 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
         </div>
 
         <div className={`${selectedForm !== 'INFO' && 'hidden'}`}>
-          <TextInput
+          <FormTextInput
             name='title'
             errors={errors.title}
-            text={'title'}></TextInput>
+            text={'title'}></FormTextInput>
           <LongTextInput
             name='description'
             errors={errors.description}
             title='description'></LongTextInput>
-          <CheckBox errors={null} name='isPublic'></CheckBox>
+          <SelectBoxForm
+            title='category'
+            name='category'
+            defaultValue='select category'
+            errors={errors.category}
+            values={CHALLENGECATEGORIES.map((cat) => cat)}
+          />
+          <CheckBox errors={null} name='isPublic' />
           <ImagesInput errors={errors.images} />
         </div>
         <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>
