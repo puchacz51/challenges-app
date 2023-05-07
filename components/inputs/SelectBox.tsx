@@ -53,11 +53,12 @@ export const SelectBoxForm = ({
   return (
     <div
       className={
-        'border-2 border-black uppercase flex items-center my-2 flex-wrap' +
-        wrapperClass
+        `border-2 border-black uppercase flex items-center mb-[1.2em] flex-wrap relative ${
+          displayError && 'text-red-600'
+        }` + wrapperClass
       }>
       {displayError && (
-        <span className=' block w-full text-red-600 text-center'>
+        <span className=' block w-full text-red-600 text-center absolute top-[110%]   '>
           {errors.message}
         </span>
       )}

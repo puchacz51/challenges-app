@@ -3,9 +3,8 @@ import { ChallengeStepsView } from '../components/challenges/ChallengeTimeline';
 import { ChallengeStepForm } from '../components/forms/ChallengeSteps';
 import Link from 'next/link';
 import { useAppSelector } from '../services/Store/store';
-import { HeaderLoginForm } from '../components/forms/HeaderLoginForm';
+import { HeaderLoginForm } from '../components/forms/LoginForm';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
   return { props: { value: 1 } };
 };
 
@@ -68,9 +67,8 @@ export default function Home() {
       <Link href='/myChallenges'>myChallenges</Link>
       <br />
       <Link href={`/${user?.id}`}>myProfile</Link>
-<HeaderLoginForm/>
-
-
+      <br />
+      <Link href={`/login`}>login page</Link>
     </main>
   );
 }

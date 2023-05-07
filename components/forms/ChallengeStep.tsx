@@ -7,7 +7,7 @@ import {
 } from 'react-hook-form';
 import { SimpleCheckBoxSwitch } from './inputs/CheckBox';
 import LongTextInput from './inputs/LongTextInput';
-import TextInput from './inputs/TextInput';
+import {FormTextInput} from './inputs/TextInput';
 import { TimeInput } from './inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
 import { ChallengeStepForm } from './ChallengeSteps';
@@ -71,10 +71,10 @@ export const ChallengeStep = ({
         error ? 'border-t-red-600' : 'border-black'
       } ${!selected && 'hidden'} `}>
       <h4 className='mt-1'>step {index + 1} </h4>
-      <TextInput
+      <FormTextInput
         name={`challengeSteps.${name}.title` as keyof FormChallenge}
         errors={error?.title}
-        text={'step title'}></TextInput>
+        text={'step title'}/>
       <LongTextInput
         errors={error?.description}
         title='desciption'

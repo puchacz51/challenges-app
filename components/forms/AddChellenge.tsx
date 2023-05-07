@@ -92,7 +92,7 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   return (
     <FormProvider {...methods}>
       <form
-        className='flex flex-col relative uppercase mx-auto my-8 w-11/12 border-2 border-black pt-5 px-2 '
+        className='flex flex-col relative uppercase mx-auto my-8 w-11/12 border-2 border-black pt-5 text-xl '
         onSubmit={handleSubmit((data) => onSubmitHandler(data, user.id))}>
         <h2 className='absolute text-2xl left-1/2 bg-white font-bold border-4 border-black rounded-xl px-3 -translate-x-1/2 -translate-y-10 z-10 '>
           challenge
@@ -115,25 +115,26 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
             steps
           </button>
         </div>
-
         <div className={`${selectedForm !== 'INFO' && 'hidden'}`}>
-          <FormTextInput
-            name='title'
-            errors={errors.title}
-            text={'title'}></FormTextInput>
-          <LongTextInput
-            name='description'
-            errors={errors.description}
-            title='description'></LongTextInput>
-          <SelectBoxForm
-            title='category'
-            name='category'
-            defaultValue='select category'
-            errors={errors.category}
-            values={CHALLENGECATEGORIES.map((cat) => cat)}
-          />
-          <CheckBox errors={null} name='isPublic' />
-          <ImagesInput errors={errors.images} />
+          <div className='px-3'>
+            <FormTextInput
+              name='title'
+              errors={errors.title}
+              text={'title'}></FormTextInput>
+            <LongTextInput
+              name='description'
+              errors={errors.description}
+              title='description'></LongTextInput>
+            <SelectBoxForm
+              title='category'
+              name='category'
+              defaultValue='select category'
+              errors={errors.category}
+              values={CHALLENGECATEGORIES.map((cat) => cat)}
+            />
+            <CheckBox errors={null} name='isPublic' />
+            <ImagesInput errors={errors.images} />
+          </div>
         </div>
         <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>
           <ChallengeStepForm />

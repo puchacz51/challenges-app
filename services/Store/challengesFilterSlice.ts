@@ -4,7 +4,8 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 export const CHALLENGECATEGORIES = [
   'SPORT',
   'CREATIVITY',
-  'PERSONAL IMPROVEMENT',
+  'SELF-IMPROVMENT',
+  'FINANCE',
 ] as const;
 export const CHALLENGESTATUSES = [
   'COMPLETED',
@@ -21,12 +22,14 @@ export type ChallengesFilterSlice = {
   filterStatus: ChallengeStatus;
   filterIsPublic: 'PUBLIC' | 'PRIVATE' | 'ALL';
   filterCategory: ChallengeCategory[];
+  filterIsOpen: boolean;
 };
 const initialState: ChallengesFilterSlice = {
   filterData: new Date(0, 0, 0).toUTCString(),
   filterStatus: 'ALL',
   filterIsPublic: 'ALL',
-  filterCategory: ['CREATIVITY', 'PERSONAL IMPROVEMENT', 'SPORT'],
+  filterCategory: ['CREATIVITY', 'SELF-IMPROVMENT', 'SPORT', 'FINANCE'],
+  filterIsOpen: false,
 };
 const challengesFilterSlice = createSlice({
   name: 'challenges',
@@ -68,6 +71,9 @@ const challengesFilterSlice = createSlice({
       state = initialState;
       return state;
     },
+    toggleFilterIsOpen: (state) => {
+      state.filterIsOpen = !state.filterIsOpen;
+    },
   },
 });
 
@@ -78,4 +84,5 @@ export const {
   setIsPublic,
   setFiterStatus,
   clearFilter,
+  toggleFilterIsOpen,
 } = challengesFilterSlice.actions;

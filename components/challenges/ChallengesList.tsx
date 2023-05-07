@@ -6,12 +6,19 @@ import {
   Challenge,
   useChallengesInifitinityQuery,
 } from '../utilities/useChallengeQuery';
-import { ColHTMLAttributes, HTMLAttributes, useEffect } from 'react';
+import { HTMLAttributes, useEffect } from 'react';
 import Link from 'next/link';
+import { AiFillCloseCircle } from 'react-icons/ai';
+import { useDispatch } from 'react-redux';
+import { toggleFilterIsOpen } from '../../services/Store/challengesFilterSlice';
+import { MdFilterAlt } from 'react-icons/md';
 
 const ChallengesList = () => {
   const user = useAppSelector((state) => state.authInfo?.user);
   const challegesFilter = useAppSelector((state) => state.challengesFilter);
+  const dispatch = useDispatch();
+  const { filterIsOpen } = useAppSelector((state) => state.challengesFilter);
+
   const {
     data: challenges,
     isLoading,
@@ -28,9 +35,22 @@ const ChallengesList = () => {
   }
   return (
     <div className='mx-[5%]'>
-      <h3 className='text-center mx-auto p-1 uppercase text-2xl font-bold bg-slate-500 '>
-        your Challenges
-      </h3>
+      <div className='mx-auto p-1 uppercase text-2xl font-bold bg-slate-500 flex justify-center gap-2 items-center'>
+        <h3 className='block'>your Challenges</h3>
+        {!filterIsOpen ? (
+          <button
+            className='text-blue-900 text-2xl bg-slate-100 p-1 rounded-full'
+            onClick={() => dispatch(toggleFilterIsOpen())}>
+            <MdFilterAlt />
+          </button>
+        ) : (
+          <button
+            className='text-red-600 text-2xl bg-slate-100 p-1 rounded-full'
+            onClick={() => dispatch(toggleFilterIsOpen())}>
+            <AiFillCloseCircle />
+          </button>
+        )}
+      </div>
       <ChallengeListFilter />
       <div className='min-h-[200px]  border-4  '>
         {challenges?.pages.map((page) =>

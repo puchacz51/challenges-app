@@ -43,11 +43,11 @@ export const FormTextInput = <T extends FieldValues>({
 
   return (
     <div
-      className={`relative gap-1 pt-3 ${
+      className={`relative gap-1 pt-[1em] my-[.5em]  text-[.8em] ${
         displayError && errors && 'text-red-600'
       }`}>
       <input
-        className={`outline-none border-b-2 w-full focus:border-black text-lg `}
+        className={`outline-none border-b-2 w-full focus:border-black text-[1em] `}
         type='text'
         name={name as string}
         {...att}
@@ -55,13 +55,15 @@ export const FormTextInput = <T extends FieldValues>({
         onClick={() => setIsClicked(true)}
       />
       <label
-        className={`absolute left-0 border-b-2 border-transparent text-lg transition  ${
+        className={`absolute left-0 border-b-2 border-transparent text-[1em] transition  ${
           isTouched && '-translate-y-5'
         } `}
         htmlFor={name as string}>
         {`${text}`}
       </label>
-      {displayError && <p>{errors?.message}</p>}
+      <p className={`${!displayError && 'hidden '} min-h-[1em] block`}>
+        {errors?.message}
+      </p>
     </div>
   );
 };

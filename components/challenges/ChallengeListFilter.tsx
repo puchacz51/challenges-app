@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { AiFillCloseCircle } from 'react-icons/ai';
-import { MdFilterAlt } from 'react-icons/md';
+import { MdSelfImprovement } from 'react-icons/md';
+import { TbReportMoney } from 'react-icons/tb';
+import { SiMusicbrainz } from 'react-icons/si';
+import { BiRun } from 'react-icons/bi';
 import { DateInput } from '../inputs/DateInput';
 import Select from 'react-select';
 import {
@@ -14,6 +17,16 @@ import {
 } from '../../services/Store/challengesFilterSlice';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../services/Store/store';
+import { IconType } from 'react-icons/lib';
+
+type CategoryIconsType = { [key in ChallengeCategory]: IconType };
+
+const CategoriesIcons: CategoryIconsType = {
+  SPORT: BiRun,
+  CREATIVITY: SiMusicbrainz,
+  'SELF-IMPROVMENT': MdSelfImprovement,
+  FINANCE: TbReportMoney,
+};
 
 const CategoriesList = ({
   selectCategory,
@@ -23,19 +36,23 @@ const CategoriesList = ({
   const { filterCategory } = useAppSelector((state) => state.challengesFilter);
   const isSelected = (category: ChallengeCategory) =>
     filterCategory.includes(category);
-
   return (
-    <div className='flex flex-wrap justify-around '>
-      {CHALLENGECATEGORIES.map((category) => (
-        <button
-          className={`border-2 border-black rounded-md p-1 ${
-            isSelected(category) && 'bg-green-600'
-          }`}
-          key={category}
-          onClick={() => selectCategory(category)}>
-          {category}
-        </button>
-      ))}
+    <div className='flex flex-wrap justify-around  py-2
+    '>
+      {CHALLENGECATEGORIES.map((category) => {
+        const CategoryIcon = CategoriesIcons[category];
+
+        return (
+          <button
+            className={`border-2 border-black rounded-md text-2xl p-1 ${
+              isSelected(category) && 'bg-green-600'
+            }`}
+            key={category}
+            onClick={() => selectCategory(category)}>
+            <CategoryIcon />
+          </button>
+        );
+      })}
     </div>
   );
 };
@@ -47,7 +64,6 @@ const SelectStatus = () => {
       value={{ value: filterStatus, label: filterStatus }}
       options={
         [
-          { value: '*', label: 'ALL' },
           { value: 'COMPLITED', label: 'COMPLITED' },
           { value: 'ACTIVE', label: 'ACTIVE' },
           { value: 'PAUSED', label: 'PAUSED' },
@@ -59,21 +75,12 @@ const SelectStatus = () => {
 };
 
 export const ChallengeListFilter = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const filterData = useAppSelector((state) => state.challengesFilter);
   const dispatch = useDispatch();
   useEffect(() => {}, [filterData]);
-  if (isOpen)
-    return (
-      <button onClick={() => setIsOpen(true)}>
-        <MdFilterAlt />
-      </button>
-    );
+  if (filterData.filterIsOpen) return <></>;
   return (
     <div className='border-2 border-black '>
-      <button onClick={() => setIsOpen(false)}>
-        <AiFillCloseCircle />
-      </button>
       <div className='border-2 border-violet-500'>
         <DateInput
           value={filterData.filterData}

@@ -9,9 +9,11 @@ import { Database } from '../../services/supabase/schema';
 import { store } from '../../services/Store/store';
 import { ChallengesFilterSlice } from '../../services/Store/challengesFilterSlice';
 import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { useId } from 'react';
 
 export type Challenge = Database['public']['Tables']['challenges']['Row'];
-export type ChallengeStep = Database['public']['Tables']['challengeSteps']['Row']
+export type ChallengeStep =
+  Database['public']['Tables']['challengeSteps']['Row'];
 type ChallengeWithSteps = Challenge & {
   challengeSteps: ChallengeStep[];
 };
@@ -85,19 +87,10 @@ const fetchInfinityChallenges: FetchChallenge = async (
   let { filterCategory, filterData, filterIsPublic, filterStatus } =
     filterParams;
   try {
-    // if (filterData != new Date(0, 0, 0).toISOString()) {
-    //   query = () => query().gte('createdAt', filterData);
-    // }
-    // if (filterIsPublic != 'ALL') {
-    //   query = () => query().eq('isPublic', filterIsPublic === 'PUBLIC');
-    // }
-    // if (filterStatus != 'ALL') {
-    //   query = () => query().in('status', [filterStatus]);
-    // }
-
-    const result = await supabase
+     const result = await supabase
       .from('challenges')
       .select('*')
+      .eq('userId', userId)
       .in('category', filterCategory)
       .gte('createdAt', filterData)
       .order('createdAt', { ascending: false })
@@ -126,17 +119,18 @@ export const useChallengeReactionQuery = (
   });
 
 export const useChallengesInifitinityQuery = (
-  id: string,
+  userId: string,
   queryAmount: number,
   options?: UseQueryOptions,
   filterData?: any
 ) => {
-  return useInfiniteQuery([id, 'myChallenges'], {
+  return useInfiniteQuery([userId, 'myChallenges'], {
     queryFn: async (pageParam) => {
       const currentFilterParams = store.getState().challengesFilter;
+      console.log(userId);
 
       return await fetchInfinityChallenges(
-        id,
+        userId,
         currentFilterParams,
         pageParam.pageParam
       );

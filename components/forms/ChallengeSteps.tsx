@@ -1,5 +1,4 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { nanoid } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormChallenge } from './AddChellenge';
