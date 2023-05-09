@@ -6,23 +6,33 @@
 // import { privateChellengeschema } from '../../components/forms/validateChallenge';
 // import { supabase } from '../../services/supabase/supabase';
 // import FormData from 'form-data';
+// import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 // export const config = {
 //   api: {
 //     bodyParser: false,
 //   },
 // };
 // const handler: NextApiHandler = async (req, res) => {
-//   const user = await supabase.auth.api.getUserByCookie(req);
-//   console.log(user.data.id);
-
-//   if (!user.data) {
-//     res.status(500).json('no user');
+//   const supabaseClient = createServerSupabaseClient({ req, res });
+//   const {
+//     data: { session },
+//     error,
+//   } = await supabaseClient.auth.getSession();
+//   if (!session) {
+//     res.status(403).json('no user');
 //   }
+// 	const { user } = session;
+
+//   if (req.method === 'POST'){
+	
+	
 //   try {
-//     const result = await challengeFormParser(req);
+//     const result = await challengeFormParser<>(req);
 //     await UploadImages(user, result.images);
 //     res.status(200).json('ddassaddsa');
-//   } catch (err) {
+
+// } catch (err) {
+
 //     res.status(500).json(error);
 //   }
 // };
@@ -36,7 +46,7 @@
 //     const sendImages = Object.keys(files).map((file) => {
 //       const ext = files[file].mimetype.split('/')[1];
 //       const formData = new FormData();
-//       const blobFile = new Blob()
+//       const blobFile = new Blob();
 //       const photoId = nanoid();
 
 //       const imagePath = bucketPath + photoId + '.' + ext;
@@ -80,6 +90,7 @@
 //     } catch (err) {
 //       reject(err);
 //     }
+
+	
 //   });
 // export default handler;
-export const t = null;

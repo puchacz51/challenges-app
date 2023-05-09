@@ -12,13 +12,10 @@ import { useChallengesInifitinityQuery } from '../../components/utilities/useCha
 const ChallangeForm = dynamic(
   () => import('../../components/forms/AddChellenge')
 );
-
 interface ServerProps {
   initialState: Object;
   userChallenges: Array<{}>;
-  bucketPath: string;
 }
-
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const supabaseServer = createServerSupabaseClient(ctx);
   const {

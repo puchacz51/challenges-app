@@ -37,8 +37,8 @@ export const FormTextInput = <T extends FieldValues>({
     formState: { touchedFields },
     getFieldState,
   } = useFormContext<T>();
-  const [isClicked, setIsClicked] = useState(false);
-  const isTouched = getFieldState(name)?.isTouched || isClicked;
+  const [isVisited, setIsVisited] = useState(false);
+  const isTouched = getFieldState(name)?.isTouched || isVisited;
   const displayError = isTouched && errors;
 
   return (
@@ -52,7 +52,7 @@ export const FormTextInput = <T extends FieldValues>({
         name={name as string}
         {...att}
         {...register(name)}
-        onClick={() => setIsClicked(true)}
+        onFocus={() => setIsVisited(true)}
       />
       <label
         className={`absolute left-0 border-b-2 border-transparent text-[1em] transition  ${

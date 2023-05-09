@@ -1,19 +1,16 @@
-import { ChallengeStepForm, ChallengeSteps } from '../forms/ChallengeSteps';
-import { motion, useAnimation, useAnimationControls } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import {
   setIsOpenList,
   setSelectedStep,
 } from '../../services/Store/challengesSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../services/Store/store';
-import {
-  HiOutlineArrowCircleDown,
-  HiOutlineArrowCircleUp,
-} from 'react-icons/hi';
+import { RootState, useAppSelector } from '../../services/Store/store';
+import { HiOutlineArrowCircleUp } from 'react-icons/hi';
 import { ChallengeStep } from '../utilities/useChallengeQuery';
+import { maxNameLength } from '../utilities/maxNameLength';
 interface ChallengeTimeLineProps {
-  challengeSteps: ChallengeSteps[];
+  challengeSteps: ChallengeStep[];
   startTime: string;
   endTime: string;
 }
@@ -28,7 +25,7 @@ interface StepListProps {
   challengeSteps: ChallengeStep[];
 }
 interface StepListElementProps {
-  step: ChallengeStepForm;
+  step: ChallengeStep;
   setIsSelected: () => void;
 }
 
@@ -55,9 +52,7 @@ const StepBtn = ({ step, index }: StepBtnProps) => {
     (state) => state.challenges.selectedStepId
   );
   const dispatch = useDispatch();
-
   const isSelected = selectedStepId == stepId;
-
   return (
     <div className={`relative w-[17%]`}>
       <button
@@ -82,7 +77,7 @@ const ChallengeTimeLine = ({
   const [progressLinePosition, setProgressLinePosition] = useState(0);
   let completedCount = 0;
   challengeSteps.forEach((step) => {
-    step
+    step;
   });
   const [startLabel] = new Date(startTime).toLocaleString().split(',');
   const [endLabel] = endTime
@@ -125,15 +120,13 @@ const ChallengeTimeLine = ({
 };
 
 const StepListElement = ({ step }: StepListElementProps) => {
-  const selectedStepId = useSelector<RootState>(
-    (state) => state.challenges.selectedStepId
-  );
   const animate = useAnimation();
-  const [stepDate, stepTime] = new Date(step.time).toLocaleString().split(',');
-  const isSelected = selectedStepId === step.stepId;
+  const [stepDate, stepTime] = step.time
+    ? new Date(step.time).toLocaleString().split(',')
+    : [null, null];
   useEffect(() => {
     animate.start({
-      translateX: '0%',
+      translateY: '0%',
       transition: {
         duration: 0.4,
         delay: 0.2 * (step.stepId - 1),
@@ -142,59 +135,87 @@ const StepListElement = ({ step }: StepListElementProps) => {
       scale: 1,
     });
   }, []);
+  return (
+    <motion.button
+      animate={animate}
+      initial={{ translateY: '-120%', scale: 1.2 }}
+      className={`flex flex-col border-2 border-black min-w-[9ch] `}>
+      <h3
+        className={`w-full border-2  border-black text-center text-xl 
+        ${step.completed ? 'bg-green-600' : 'bg-gray-500'}
+        `}>
+        {step.stepId} {maxNameLength(step.title, 6)}
+      </h3>
+      <span className='text-sm w-full text-center'>{stepDate}</span>
+    </motion.button>
+  );
+};
+const SelectedListElement = ({ step }: StepListElementProps) => {
+  const selectedStepId = useSelector<RootState>(
+    (state) => state.challenges.selectedStepId
+  );
+  console.log(step);
 
+  const animate = useAnimation();
+  const [stepDate, stepTime] = step?.time
+    ? new Date(step.time).toLocaleString().split(',')
+    : [null, null];
+  useEffect(() => {
+    animate.start({
+      translateX: '0%',
+      transition: {
+        duration: 0.4,
+        delay: 0.8,
+      },
+      position: 'static',
+    });
+  }, []);
   return (
     <motion.div
       animate={animate}
-      initial={{ translateX: '-120%', position: 'absolute', scale: 1.2 }}
-      className={`grid gridStepMobile border-2 border-black my-1`}>
+      initial={{ translateX: '-120%' }}
+      className={`flex flex-col border-2 border-yellow-500 w-4/5 `}>
       <h3
-        className={`px-2 w-fit border-2 rounded-full m-1 border-black
-         ${selectedStepId == step.stepId ? 'border-red-600' : ' border-black  '}
+        className={`w-full border-2  border-black text-center text-xl
+         border-red-600
         ${step.completed ? 'bg-green-600' : 'bg-gray-500'}
-        
         `}>
-        {step.stepId}
+        {maxNameLength(step.title, 30)}
       </h3>
-      <h3 className='  m-1'>{step.title}</h3>
-      <span>{stepDate}</span>
-      <span
-        className={`row-start-2 col-span-3 border-t-2  border-black ${
-          !isSelected && 'hidden'
-        }`}>
-        {step.description}
-      </span>
+      <p className='px-2 border-b-2 border-black'>{step.description}</p>
+
+      <span className='text-sm w-full text-center'>{stepDate}</span>
     </motion.div>
   );
 };
-
 const ChallengeStepsList = ({ challengeSteps }: StepListProps) => {
-  const listIsOpen = useSelector<RootState>(
-    (state) => state.challenges.listIsOpen
+  const { listIsOpen, selectedStepId } = useAppSelector(
+    (state) => state.challenges
   );
-  const dispatch = useDispatch();
+  console.log(challengeSteps);
 
-  if (!listIsOpen)
-    return (
-      <button
-        type='button'
-        onClick={() => dispatch(setIsOpenList(true))}
-        className='uppercase content-center w-full text-2xl border-2 border-black '>
-        challenge steps{' '}
-        <HiOutlineArrowCircleDown className='inline-block h-full ' />{' '}
-      </button>
-    );
+  const dispatch = useDispatch();
+  if (!listIsOpen) return <div></div>;
 
   return (
     <div>
-      <div className='overflow-hidden border-2 border-black px-2  '>
-        {challengeSteps.map((step) => (
-          <StepListElement
-            key={step.stepId}
-            step={step}
-            setIsSelected={() => dispatch(setSelectedStep(step.stepId))}
-          />
-        ))}
+      <div className='overflow-hidden border-2 border-black py-2 flex flex-wrap gap-2 justify-center '>
+        {challengeSteps.map((step) => {
+          if (step.stepId === selectedStepId) {
+            return <></>;
+          }
+          return (
+            <StepListElement
+              key={step.stepId}
+              step={step}
+              setIsSelected={() => dispatch(setSelectedStep(step.stepId))}
+            />
+          );
+        })}
+        <SelectedListElement
+          setIsSelected={() => null}
+          step={challengeSteps[selectedStepId]}
+        />
       </div>
       <button
         type='button'

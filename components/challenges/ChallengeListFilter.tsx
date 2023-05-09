@@ -37,8 +37,12 @@ const CategoriesList = ({
   const isSelected = (category: ChallengeCategory) =>
     filterCategory.includes(category);
   return (
-    <div className='flex flex-wrap justify-around  py-2
+    <div
+      className='flex flex-wrap justify-around   border-y border-black my-2
     '>
+      <h4 className='border-b-2 border-black w-full mb-2 p-2 text-center text-xl font-semibold uppercase'>
+        select categories
+      </h4>
       {CHALLENGECATEGORIES.map((category) => {
         const CategoryIcon = CategoriesIcons[category];
 

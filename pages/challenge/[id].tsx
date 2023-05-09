@@ -5,12 +5,10 @@ import { useSelector } from 'react-redux';
 import { ChallengeReactions } from '../../components/challenges/ChallengeReactions';
 import {
   ChallengeStepsView,
-  ChallengeTimeLine,
 } from '../../components/challenges/ChallengeTimeline';
 import ImageSlider from '../../components/challenges/ImageSlider';
 import { setCredentials } from '../../services/Store/authSlice';
 import { RootState, store } from '../../services/Store/store';
-import { supabase } from '../../services/supabase/supabase';
 import {
   fetchChallenge,
   fetchChallengeReactions,
@@ -63,24 +61,22 @@ const Challenge: NextPage = ({ challengeId }: { challengeId: string }) => {
     );
   const { title, description, createdAt, images, challengeSteps } = challenge;
   return (
-    <>
-      <div className='flex flex-col bg-slate-200'>
-        <h2 className='text-3xl uppercase text-center bg-slate-500 font-semibold'>
-          {title}
-        </h2>
-        <ImageSlider imagesUrl={images}></ImageSlider>
-        <ChallengeReactions userId={user?.id} challengeId={challengeId} />
+    <main className='flex flex-col bg-slate-200'>
+      <h2 className='text-3xl uppercase text-center bg-slate-500 font-semibold'>
+        {title}
+      </h2>
+      <ImageSlider imagesUrl={images}></ImageSlider>
+      <ChallengeReactions userId={user?.id} challengeId={challengeId} />
 
-        <ChallengeStepsView
-          challengeSteps={challengeSteps}
-          startTime={challenge.startTime}
-          endTime={challenge.endTime}
-        />
-        <p>{description}</p>
+      <ChallengeStepsView
+        challengeSteps={challengeSteps}
+        startTime={challenge.startTime}
+        endTime={challenge.endTime}
+      />
+      <p>{description}</p>
 
-        <span>created at {new Date(createdAt).toDateString()}</span>
-      </div>
-    </>
+      <span>created at {new Date(createdAt).toDateString()}</span>
+    </main>
   );
 };
 

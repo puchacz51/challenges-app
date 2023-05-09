@@ -23,7 +23,7 @@ const Header = (): JSX.Element => {
 
   return (
     <>
-      <header className='fixed   top-0 bg-fuchsia-600 w-full  text-4xl flex items-center justify-around  uppercase z-50'>
+      <header className='fixed top-0 bg-fuchsia-600 w-full  text-4xl flex items-center justify-around  uppercase z-50'>
         <FaBars />
         {authInfo.user ? (
           <UserProfileBtn profileUrl={findUserPhoto(authInfo.user)} />
@@ -31,7 +31,7 @@ const Header = (): JSX.Element => {
           <HeaderSignInOptions />
         )}
       </header>
-      <div className='w-full text-transparent p-2 text-4xl '>g</div>
+      <div className='w-full text-transparent text-4xl '>wrapper</div>
     </>
   );
 };

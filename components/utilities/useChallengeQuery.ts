@@ -14,7 +14,7 @@ import { useId } from 'react';
 export type Challenge = Database['public']['Tables']['challenges']['Row'];
 export type ChallengeStep =
   Database['public']['Tables']['challengeSteps']['Row'];
-type ChallengeWithSteps = Challenge & {
+export type ChallengeWithSteps = Challenge & {
   challengeSteps: ChallengeStep[];
 };
 

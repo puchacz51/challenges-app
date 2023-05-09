@@ -88,10 +88,10 @@ export const ChallengeNode = ({
   return (
     <Link
       className={
-        'block  my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black  ' +
+        'block my-3 overflow-hidden rounded-xl bg-slate-900  border-2 border-black  ' +
         className
       }
-      href={`challenge/${challengeData.id}`}>
+      href={`myChallenges/${challengeData.id}`}>
       <div className='w-full bg-slate-200 relative  aspect-video'>
         <Image
           src={src}
@@ -105,8 +105,8 @@ export const ChallengeNode = ({
         </h3>
       </div>
       <div className=' flex  justify-between w-full font-[.7em] items-center p-2 '>
-        <span className='uppercase  text-white '>{time}</span>
-        <span className='uppercase  text-white '>{status}</span>
+        <span className='uppercase  text-white'>{time}</span>
+        <span className='uppercase  text-white'>{status}</span>
       </div>
     </Link>
   );

@@ -81,8 +81,8 @@ const ImageSlider = ({ imagesUrl }: ImageSliderProps) => {
               key={url}
               className={`relative shrink-0 h-[200px] w-full`}>
               <Image
-                layout='fill'
-                objectFit='cover'
+                className='object-cover'
+                fill
                 alt='userPhoto'
                 src={`${bucketPath}${url}`}
               />

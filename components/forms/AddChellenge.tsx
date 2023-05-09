@@ -63,20 +63,17 @@ interface ChallengeFormProps {
   initialData?: FormChallenge;
   cancelForm: Function;
 }
-
 const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const methods = useForm({
     resolver: yupResolver(privateChellengeschema),
     defaultValues: initialData || initialValues,
     mode: 'onTouched',
   });
-
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
   } = methods;
-
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { mutate, isSuccess } = addChallengeMutation(reset);
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
@@ -88,7 +85,6 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
       console.log(err);
     }
   };
-
   return (
     <FormProvider {...methods}>
       <form
