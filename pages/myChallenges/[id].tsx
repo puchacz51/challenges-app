@@ -10,7 +10,10 @@ import {
 } from '../../components/utilities/useChallengeQuery';
 import { AiFillEdit } from 'react-icons/ai';
 import { useState } from 'react';
-import { useCompleteStepMutation } from '../../components/utilities/useCompleteMutation';
+import {
+  useCompleteChallengeMutation,
+  useCompleteStepMutation,
+} from '../../components/utilities/useCompleteMutation';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const supabaseServerClient = createServerSupabaseClient(ctx);
 
@@ -56,11 +59,19 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
   const { data: challengeData } = useChallengeQuery(challengeId);
   const { title, images, challengeSteps, endTime, startTime, status } =
     challengeData;
-  const { isLoading, mutate } = useCompleteStepMutation(challengeId);
+  const {
+    isLoading: stepIsMutating,
+    mutate,
+    variables: mutatingStep,
+  } = useCompleteStepMutation(challengeId);
   const [isEdited, setIsEdited] = useState();
   const changeStepStatus = (stepId: number, status: boolean) => {
     mutate({ stepId, status });
   };
+
+  const { isLoading: challengeIsMutating, mutate: mutateChallenge } =
+    useCompleteChallengeMutation(challengeId);
+
   return (
     <main className='flex flex-col bg-slate-200'>
       <h2 className='text-3xl uppercase text-center bg-slate-900 py-1 text-white font-semibold'>
@@ -81,15 +92,19 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
               {i + 1}.{step.title}
             </h3>
             <button
+              disabled={stepIsMutating}
               onClick={() => changeStepStatus(step.stepId, !step.completed)}
               className={`uppercase font-bold border-4 border-black p-2 ${
                 step.completed ? 'bg-green-600' : 'bg-red-600'
               }`}>
-              {step.completed ? 'cancel' : 'complete'}
+              {step.completed ? 'COMPLETED' : 'PENDING'}
             </button>
           </div>
         ))}
         <button
+          onClick={() =>
+            mutateChallenge(status !== 'COMPLETED' ? 'COMPLETED' : 'PENDING')
+          }
           className={`uppercase text-3xl font-bold border-4 border-black p-2 ${
             status === 'COMPLETED' ? 'bg-green-600' : 'bg-red-600'
           }`}>

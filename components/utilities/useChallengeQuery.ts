@@ -5,25 +5,10 @@ import {
   useQuery,
 } from 'react-query';
 import { supabase } from '../../services/supabase/supabase';
-import { Database } from '../../services/supabase/schema';
 import { store } from '../../services/Store/store';
 import { ChallengesFilterSlice } from '../../services/Store/challengesFilterSlice';
-import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
-import { useId } from 'react';
-
-export type Challenge = Database['public']['Tables']['challenges']['Row'];
-export type ChallengeStep =
-  Database['public']['Tables']['challengeSteps']['Row'];
-export type ChallengeWithSteps = Challenge & {
-  challengeSteps: ChallengeStep[];
-};
-
-export interface ChallengeReactionsData {
-  reactions: Reaction[];
-  userReaction: Reaction;
-  oldUserReaction?: Reaction;
-}
-export type Reaction = Database['public']['Tables']['reactions']['Row'];
+import { Challenge, ChallengeReactionsData, ChallengeWithSteps } from '../../types/challengeTypes';
+  
 
 type FetchChallenge = (
   userId: string,
@@ -35,11 +20,13 @@ export const fetchChallenge = async (
   idChallenge: string
 ): Promise<ChallengeWithSteps> => {
   try {
-    const challenge = await supabase
+    const { data: challenge, error } = await supabase
       .from('challenges')
       .select('*,challengeSteps(*)')
       .eq('id', idChallenge);
-    return challenge.data[0] as ChallengeWithSteps;
+    
+
+    return challenge[0] as ChallengeWithSteps;
   } catch (err) {
     throw err;
   }
@@ -87,7 +74,7 @@ const fetchInfinityChallenges: FetchChallenge = async (
   let { filterCategory, filterData, filterIsPublic, filterStatus } =
     filterParams;
   try {
-     const result = await supabase
+    const result = await supabase
       .from('challenges')
       .select('*')
       .eq('userId', userId)
@@ -127,8 +114,6 @@ export const useChallengesInifitinityQuery = (
   return useInfiniteQuery([userId, 'myChallenges'], {
     queryFn: async (pageParam) => {
       const currentFilterParams = store.getState().challengesFilter;
-      console.log(userId);
-
       return await fetchInfinityChallenges(
         userId,
         currentFilterParams,
@@ -147,6 +132,7 @@ export const useChallengesInifitinityQuery = (
       if (allPages.length === 0) return undefined;
       return allPages.length;
     },
+    refetchOnWindowFocus: false,
   });
 };
 

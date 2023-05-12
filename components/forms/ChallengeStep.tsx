@@ -11,6 +11,7 @@ import {FormTextInput} from './inputs/TextInput';
 import { TimeInput } from './inputs/TimeInput';
 import { FormChallenge } from './AddChellenge';
 import { ChallengeStepForm } from './ChallengeSteps';
+import { ChallengeStepForm } from '../../types/challengeFormTypes';
 
 interface ChallengeStepProps {
   index: number;

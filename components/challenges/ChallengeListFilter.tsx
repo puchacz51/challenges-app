@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { AiFillCloseCircle } from 'react-icons/ai';
 import { MdSelfImprovement } from 'react-icons/md';
 import { TbReportMoney } from 'react-icons/tb';
 import { SiMusicbrainz } from 'react-icons/si';
@@ -7,9 +6,6 @@ import { BiRun } from 'react-icons/bi';
 import { DateInput } from '../inputs/DateInput';
 import Select from 'react-select';
 import {
-  CHALLENGECATEGORIES,
-  ChallengeCategory,
-  ChallengeStatus,
   clearFilter,
   setCategory,
   setFilterDate,
@@ -18,16 +14,19 @@ import {
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../services/Store/store';
 import { IconType } from 'react-icons/lib';
+import {
+  CHALLENGECATEGORIES,
+  ChallengeCategory,
+  ChallengeStatus,
+} from '../../types/challengeTypes';
 
 type CategoryIconsType = { [key in ChallengeCategory]: IconType };
-
 const CategoriesIcons: CategoryIconsType = {
   SPORT: BiRun,
   CREATIVITY: SiMusicbrainz,
   'SELF-IMPROVMENT': MdSelfImprovement,
   FINANCE: TbReportMoney,
 };
-
 const CategoriesList = ({
   selectCategory,
 }: {

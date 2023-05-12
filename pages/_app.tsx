@@ -7,7 +7,6 @@ import { setCredentials } from '../services/Store/authSlice';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { store } from '../services/Store/store';
 import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
-import { middleware } from '../middleware';
 const queryClient = new QueryClient();
 const MyApp = ({ Component, pageProps }) => {
   const dispatch = store.dispatch;

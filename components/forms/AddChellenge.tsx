@@ -4,34 +4,21 @@ import { FormTextInput } from './inputs/TextInput';
 import LongTextInput from './inputs/LongTextInput';
 import CheckBox from './inputs/CheckBox';
 import ImagesInput from './inputs/ImagesInput';
-import { privateChellengeschema } from './validateChallenge';
+import { challengeSchema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
 import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { MdCancel } from 'react-icons/md';
-import { ChallengeStepForm, ChallengeStepsForm } from './ChallengeSteps';
-import { UniqueIdentifier } from '@dnd-kit/core';
-import { SelectBox, SelectBoxForm } from '../inputs/SelectBox';
-import {
-  CHALLENGECATEGORIES,
-  ChallengeCategory,
-} from '../../services/Store/challengesFilterSlice';
+import { SelectBoxForm } from '../inputs/SelectBox';
+import { FormChallenge } from '../../types/challengeFormTypes';
+import { ChallengeStepForm } from './ChallengeSteps';
+import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
+import { createChallengeFormData } from '../utilities/challengeFormData';
+import formidable from 'formidable';
+import axios from 'axios';
 
-export interface FormChallenge {
-  title: string;
-  description: string;
-  isPublic: boolean;
-  startTime?: any;
-  endTime?: any;
-  images: FileList | null;
-  challengeSteps?: ChallengeStepsForm | null;
-  challengStepOrder: UniqueIdentifier[];
-  userId: string;
-  imagesOrder: { name: string; url: string[] }[] | null;
-  category: ChallengeCategory | null;
-}
 const initialValues: FormChallenge = {
   title: '',
   description: '',
@@ -65,7 +52,7 @@ interface ChallengeFormProps {
 }
 const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const methods = useForm({
-    resolver: yupResolver(privateChellengeschema),
+    resolver: yupResolver(challengeSchema),
     defaultValues: initialData || initialValues,
     mode: 'onTouched',
   });
@@ -80,7 +67,16 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   if (isSuccess) cancelForm();
   const onSubmitHandler = async (data: FormChallenge, userId) => {
     try {
-      mutate({ ...data, userId });
+      const test = createChallengeFormData(data);
+      axios.post('/api/challenge', test, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 2000,
+      });
+
+      console.log();
+      // mutate({ ...data, userId });
     } catch (err) {
       console.log(err);
     }

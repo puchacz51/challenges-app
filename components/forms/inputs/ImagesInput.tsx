@@ -57,6 +57,7 @@ const ImagesUplouder = ({ errors }) => {
   useEffect(() => {
     setValue('images', imageFiles);
   }, [setValue, imageFiles]);
+  console.log(imageFiles);
 
   return (
     <>
@@ -124,6 +125,8 @@ const ImageItemsList = ({
       const valueB = indexB === -1 ? 10 : indexB;
       return valueA - valueB;
     });
+    console.log(sortedNewLocalImages);
+    
     setLocalImages(sortedNewLocalImages);
     setImagesOrder(sortedNewLocalImages);
   }, [imageFiles.length, imageFiles]);
@@ -141,8 +144,7 @@ const ImageItemsList = ({
   };
 
   const dragEndhandler = useCallback(() => {
-     
-    setImagesOrder(localImages)
+    setImagesOrder(localImages);
     setActiveImage(null);
   }, [localImages]);
   const dragMoveHandler = useCallback(

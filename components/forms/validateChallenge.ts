@@ -1,5 +1,5 @@
 import { string, object, boolean, array, mixed, date, lazy } from 'yup';
-import { CHALLENGECATEGORIES } from '../../services/Store/challengesFilterSlice';
+import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 export const validateSize = (files: FileList) => {
   if (!files) {
     return false;
@@ -46,7 +46,7 @@ const challengeStepsSchema = lazy((value) => {
   return mixed().notRequired();
 });
 
-export const privateChellengeschema = object({
+export const challengeSchema = object({
   title: string().required().max(30),
   description: string().required().max(200),
   category: string()

@@ -1,24 +1,15 @@
 import { nanoid } from '@reduxjs/toolkit';
 import {
   useMutation,
-  useQuery,
   useQueryClient,
-  UseQueryOptions,
 } from 'react-query';
-import { Challenge } from './useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
 import { FormChallenge } from '../forms/AddChellenge';
 import { ChallengeStepsForm } from '../forms/ChallengeSteps';
-type AddChallenge = {
-  title: string;
-  description: string;
-  userId: string;
-  isPublic: boolean;
-  createdAt?: string;
-  images: string[];
-  endTime?: string;
-  startTime?: string;
-};
+import axios from 'axios';
+import { Challenge } from '../../types/challengeTypes';
+import { AddChallenge } from '../../types/challengeFormTypes';
+
 
 const uploadImage = async (images: FileList, imagesPath: Array<string>) => {
   try {
@@ -142,10 +133,8 @@ const getUrlFromFileList = (files: FileList) => {
   return result;
 };
 export const addChallengeMutation = (resetForm: Function) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const queryClient = useQueryClient();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation({
     mutationFn: async (values) => await addChallenge(values),
     onMutate: async (values: FormChallenge) => {
@@ -157,7 +146,6 @@ export const addChallengeMutation = (resetForm: Function) => {
         );
       }
       const localImagesUrl = getUrlFromFileList(images);
-
       await queryClient.cancelQueries([userId]);
       const optimisticChallenge = {
         id: nanoid(),
@@ -170,8 +158,6 @@ export const addChallengeMutation = (resetForm: Function) => {
       queryClient.setQueryData<Challenge[]>(
         [[userId, 'myChallenges']],
         (old) => {
-          console.log(old, userId);
-
           return [optimisticChallenge, ...old];
         }
       );
@@ -188,13 +174,77 @@ export const addChallengeMutation = (resetForm: Function) => {
     },
     onSuccess: (data, variables, context) => {
       const { userId } = variables;
-
       queryClient.setQueryData<Challenge[]>([userId], (old) =>
         old.map((challege) =>
           challege.id === context.optimisticChallenge.id ? data : challege
         )
       );
       resetForm();
+    },
+  });
+};
+
+const sendChallengeFormData = (challengeObj: FormChallenge) => {
+  try {
+    axios.post('/challenge');
+    const challengeFormData = new FormData();
+    challengeFormData.append('title', challengeObj.title);
+    challengeFormData.append('description', challengeObj.description);
+    challengeFormData.append(
+      'challengeSteps',
+      JSON.stringify(challengeObj.challengeSteps)
+    );
+    challengeFormData.append('isPublic', challengeObj.isPublic);
+  } catch (err) {}
+};
+
+export const addChallengeMutation2 = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (values) => await addChallenge(values),
+    onMutate: async (values: FormChallenge) => {
+      const { userId, images, challengeSteps } = values;
+      let challengeStepsArray;
+      if (challengeSteps) {
+        challengeStepsArray = Object.keys(challengeSteps).map(
+          (key) => challengeSteps[key]
+        );
+      }
+      const localImagesUrl = getUrlFromFileList(images);
+      await queryClient.cancelQueries([userId]);
+      const optimisticChallenge = {
+        id: nanoid(),
+        ...values,
+        images: localImagesUrl,
+        challengeSteps: challengeStepsArray,
+        createdAt: Date.now().toLocaleString(),
+        status: 'ACTIVE',
+      } as Challenge;
+      queryClient.setQueryData<Challenge[]>(
+        [[userId, 'myChallenges']],
+        (old) => {
+          return [optimisticChallenge, ...old];
+        }
+      );
+
+      return { optimisticChallenge };
+    },
+    onError: (err, values, context) => {
+      const { userId } = values;
+      queryClient.setQueryData<Challenge[]>([userId], (old) =>
+        old.filter(
+          (challenge) => challenge.id === context.optimisticChallenge.id
+        )
+      );
+    },
+    onSuccess: (data, variables, context) => {
+      const { userId } = variables;
+      queryClient.setQueryData<Challenge[]>([userId], (old) =>
+        old.map((challege) =>
+          challege.id === context.optimisticChallenge.id ? data : challege
+        )
+      );
     },
   });
 };

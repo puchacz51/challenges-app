@@ -1,21 +1,7 @@
 import { Action } from '@dnd-kit/core/dist/store';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-export const CHALLENGECATEGORIES = [
-  'SPORT',
-  'CREATIVITY',
-  'SELF-IMPROVMENT',
-  'FINANCE',
-] as const;
-export const CHALLENGESTATUSES = [
-  'COMPLETED',
-  'ACTIVE',
-  'ALL',
-  'PAUSED',
-] as const;
-
-export type ChallengeCategory = (typeof CHALLENGECATEGORIES)[number];
-export type ChallengeStatus = (typeof CHALLENGESTATUSES)[number];
+import { ChallengeCategory, ChallengeStatus } from '../../types/challengeTypes';
 
 export type ChallengesFilterSlice = {
   filterData: string | null;

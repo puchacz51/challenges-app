@@ -1,22 +1,10 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormChallenge } from './AddChellenge';
 import { ChallengeStep } from './ChallengeStep';
 import { ChangeStepOrder } from './ChangeStepOrder';
+import { FormChallenge } from '../../types/challengeFormTypes';
 
-export type ChallengeStepForm = {
-  title: string;
-  description?: string;
-  time: string;
-  challengeId?: number;
-  stepId?: number;
-  completed?: boolean;
-};
-export type ChallengeStepsForm = {
-  [key: UniqueIdentifier]: ChallengeStepForm;
-};
-export interface ChallengeSteps {}
 
 export const ChallengeStepForm = () => {
   const { getValues } = useFormContext<FormChallenge>();
