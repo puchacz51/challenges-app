@@ -53,12 +53,12 @@ export const SelectBoxForm = ({
   return (
     <div
       className={
-        `border-2 border-black uppercase flex items-center mb-[1.2em] flex-wrap relative ${
+        `border-2 border-black uppercase flex items-center mb-[1.2em] flex-wrap shrink relative ${
           displayError && 'text-red-600'
         }` + wrapperClass
       }>
       {displayError && (
-        <span className=' block w-full text-red-600 text-center absolute top-[110%]   '>
+        <span className='block w-full text-red-600 text-center absolute top-[110%] '>
           {errors.message}
         </span>
       )}
@@ -69,7 +69,7 @@ export const SelectBoxForm = ({
       <select
         name={name}
         {...register(name)}
-        className={'max-w-[20ch]' + className}
+        className={'' + className}
         {...props}>
         {values.map((value) => (
           <option key={value} value={value}>

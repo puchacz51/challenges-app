@@ -16,7 +16,6 @@ import { FormChallenge } from '../../types/challengeFormTypes';
 import { ChallengeStepForm } from './ChallengeSteps';
 import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 import { createChallengeFormData } from '../utilities/challengeFormData';
-import formidable from 'formidable';
 import axios from 'axios';
 
 const initialValues: FormChallenge = {
@@ -122,7 +121,11 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
               name='category'
               defaultValue='select category'
               errors={errors.category}
-              values={CHALLENGECATEGORIES.map((cat) => cat)}
+              values={CHALLENGECATEGORIES.map((cat) => {
+                const catName = cat;
+                catName.replace('-', ' ');
+                return catName;
+              })}
             />
             <CheckBox errors={null} name='isPublic' />
             <ImagesInput errors={errors.images} />

@@ -1,21 +1,17 @@
-import { nanoid } from '@reduxjs/toolkit';
-import axios from 'axios';
 import formidable from 'formidable';
 import next, { NextApiHandler, NextApiRequest } from 'next';
-import FormData, { from } from 'form-data';
 import {
   SupabaseClient,
   User,
   createServerSupabaseClient,
 } from '@supabase/auth-helpers-nextjs';
-import {
-  Challenge,
-  ChallengeCategory,
-  ChallengeInsert,
-} from '../../types/challengeTypes';
-import { ChallengeStepForm, ImageOrder } from '../../types/challengeFormTypes';
+import { ChallengeCategory, ChallengeInsert } from '../../types/challengeTypes';
+import { ImageOrder } from '../../types/challengeFormTypes';
 import { randomUUID } from 'crypto';
 import { Database } from '../../services/supabase/schema';
+import { UniqueIdentifier } from '@dnd-kit/core';
+import { ChallengeStepsForm } from '../../types/challengeFormTypes';
+import { ChallengeStepInsert } from '../../types/challengeTypes';
 export const config = {
   api: {
     bodyParser: false,
@@ -50,15 +46,18 @@ const handler: NextApiHandler = async (req, res) => {
           category: fields.category as ChallengeCategory,
           userId: fields.userId as string,
           isPublic: fields.isPublic === 'true',
-          imagesOrder: JSON.parse(fields.imageOrder as string) as ImageOrder,
           startTime: fields.startTime as string,
           endTime: fields.endTime as string,
-        };
-        const challengeSteps = fields.challengeSteps
-          ? JSON.parse(fields.challengeSteps as string)
-          : null;
+        } as ChallengeInsert;
+        const images = Array.isArray(files.images)
+          ? files.images
+          : [files.images];
+        let challengeSteps: ChallengeStepInsert[] | null = null;
+        if (fields.challengeSteps) {
+          challengeSteps = JSON.parse(fields.challengeSteps as string);
+        }
       } catch (err) {
-        res.end('sone error occurred');
+        res.end('some error occurred');
       }
 
       res.end('Dane odebrane!');
@@ -67,10 +66,16 @@ const handler: NextApiHandler = async (req, res) => {
 };
 export default handler;
 
-const addChallenge = (user: User, images: FileList) => {
+const addChallenge = async (
+  challengeData: ChallengeInsert,
+  challengeSteps: ChallengeStepInsert[] | null,
+  user: User,
+  images: File[]
+) => {
+  let uploadedImagesPaths: string[];
   try {
-    UploadImages(images, supabaseClient, user);
-  } catch (e) {}
+    const {} = UploadImages(images, user);
+  } catch (err) {}
 };
 
 const generateImagePath = (imagesArray: File[], userId: string) =>
@@ -81,46 +86,57 @@ const generateImagePath = (imagesArray: File[], userId: string) =>
     return { name: imageId, path: imagePath, image };
   });
 
-const UploadImages = async (
-  images: FileList,
-  supabaseClient: SupabaseClient<Database>,
-  user: User
-) => {
+const UploadImages = async (images: File[], user: User) => {
   try {
-    const imageArray = Array.from(images);
-    const imagesPaths = generateImagePath(imageArray, user.id);
+    const imagesPaths = generateImagePath(images, user.id);
     let imageUploadPromises: Promise<string>[] = [];
-    let successedPaths: string[];
+    // let successedPaths: string[];
 
     for (let { image, name, path } of imagesPaths) {
       imageUploadPromises.push(
-        uploadImage(supabaseClient, user.id, image, path).then((path) => {
-          successedPaths.push(path);
-          return path;
-        })
+        uploadImage(supabaseClient, user.id, image, path)
       );
     }
+    const imagesUploadData = await Promise.allSettled(imageUploadPromises);
+    if (
+      imagesUploadData.findIndex((imageRes) => imageRes.status === 'fulfilled')
+    ) {
+      const successedPaths = imagesUploadData
+        .filter((imageRes) => imageRes.status !== 'fulfilled')
 
-    Promise.all(imageUploadPromises).catch((_err) => {
-      removeImages(user.id, successedPaths);
-    }).then;
+      await removeImages(user.id);
+      return;
+    }
   } catch (err) {
     throw new Error('   ');
   }
 };
 
-const addChallengeToDB = async (
-  challengeData: ChallengeInsert,
-  challengeSteps?: ChallengeStepForm[]
-) => {
+const addChallengeToDB = async (challengeData: ChallengeInsert) => {
   try {
     await supabaseClient.from('challenges').insert(challengeData);
-    if (challengeSteps) {
-      supabaseClient.from('challenges').insert(challengeSteps);
-    }
   } catch (err) {
-    console.log(err, 'from add to db');
+    throw err;
   }
+};
+
+const addChallengeStepsToDB = async (
+  challengeStepsData: ChallengeStepsForm,
+  challengeId: string,
+  challengeStepsOrder: UniqueIdentifier[]
+) => {
+  const orderedSteps = challengeStepsOrder.map((challengeId, index) => {
+    const challengeStep = challengeStepsData[challengeId];
+    return {
+      stepId: index,
+      title: challengeStep.title,
+      description: challengeStep.description,
+      challengeId: challengeId,
+      time: challengeStep.time ? challengeStep.time : null,
+    } as ChallengeStepInsert;
+  });
+
+  supabaseClient.from('challengeSteps').insert(orderedSteps);
 };
 
 const uploadImage = (

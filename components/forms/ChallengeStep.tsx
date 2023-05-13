@@ -9,9 +9,7 @@ import { SimpleCheckBoxSwitch } from './inputs/CheckBox';
 import LongTextInput from './inputs/LongTextInput';
 import {FormTextInput} from './inputs/TextInput';
 import { TimeInput } from './inputs/TimeInput';
-import { FormChallenge } from './AddChellenge';
-import { ChallengeStepForm } from './ChallengeSteps';
-import { ChallengeStepForm } from '../../types/challengeFormTypes';
+import { ChallengeStepForm, FormChallenge } from '../../types/challengeFormTypes';
 
 interface ChallengeStepProps {
   index: number;

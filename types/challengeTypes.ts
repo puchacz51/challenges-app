@@ -7,6 +7,9 @@ export type ChallengeInsert =
 export type ChallengeStep =
   Database['public']['Tables']['challengeSteps']['Row'];
 
+export type ChallengeStepInsert =
+  Database['public']['Tables']['challengeSteps']['Insert'];
+
 export type ChallengeCategory =
   | 'SPORT'
   | 'CREATIVITY'
