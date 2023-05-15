@@ -24,26 +24,23 @@ export const createChallengeFormData = (challengeData: FormChallenge) => {
   challengeFormData.append('category', category);
   challengeFormData.append('userId', userId);
   challengeFormData.append('isPublic', isPublic + '');
-  // challengeFormData.append('imageOrder', JSON.stringify(imagesOrder));
   challengeFormData.append('startTime', endTime);
   challengeFormData.append('endTime', startTime);
-
   const imagesArray = Array.from(images);
-  imagesArray.forEach((image) => {
-    challengeFormData.append('images[]', image);
+  imagesArray.forEach((image, i) => {
+    challengeFormData.append(`images`, image);
   });
 
   if (challengeSteps && Object.keys(challengeSteps).length) {
     const orderedChallengeSteps = challengStepOrder.map((stepIndex, i) => {
       const { time, title, completed, description } = challengeSteps[stepIndex];
       return {
-        challengeId: null,
         completed,
         description,
         stepId: i,
         time,
         title,
-      } as ChallengeStepInsert;
+      } as Omit<ChallengeStepInsert, 'challengeId'>;
     });
 
     challengeFormData.append(

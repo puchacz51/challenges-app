@@ -13,12 +13,12 @@ interface TextInputProps {
   errors: FieldError;
 }
 const LongTextInput = ({ title, errors, name, ...att }: TextInputProps) => {
-  const { register, getFieldState,trigger } = useFormContext();
+  const { register, getFieldState, trigger } = useFormContext();
   const isTouched = getFieldState(name).isTouched;
-  const displayError = errors&&isTouched
+  const displayError = errors && isTouched;
 
   return (
-    <div className={`relative gap-1 pt-3 mt-5 `}>
+    <div className={`relative gap-1 pt-3 mt-[.5em]`}>
       <textarea
         name={name}
         {...register(name)}

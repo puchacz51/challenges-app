@@ -2,7 +2,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormTextInput } from './inputs/TextInput';
 import LongTextInput from './inputs/LongTextInput';
-import CheckBox from './inputs/CheckBox';
+import CheckBox, { SimpleCheckBoxSwitch } from './inputs/CheckBox';
 import ImagesInput from './inputs/ImagesInput';
 import { challengeSchema } from './validateChallenge';
 import { useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ import { ChallengeStepForm } from './ChallengeSteps';
 import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 import { createChallengeFormData } from '../utilities/challengeFormData';
 import axios from 'axios';
+import { TimeInput } from './inputs/TimeInput';
 
 const initialValues: FormChallenge = {
   title: '',
@@ -59,10 +60,16 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    getValues,
+    setValue,
   } = methods;
+  console.log(getValues());
+
+  const { endTime } = getValues();
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
   const { mutate, isSuccess } = addChallengeMutation(reset);
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
+  const [withEndTime, setWithEndTime] = useState(false);
   if (isSuccess) cancelForm();
   const onSubmitHandler = async (data: FormChallenge, userId) => {
     try {
@@ -73,9 +80,6 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
         },
         timeout: 2000,
       });
-
-      console.log();
-      // mutate({ ...data, userId });
     } catch (err) {
       console.log(err);
     }
@@ -108,27 +112,32 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
         </div>
         <div className={`${selectedForm !== 'INFO' && 'hidden'}`}>
           <div className='px-3'>
-            <FormTextInput
-              name='title'
-              errors={errors.title}
-              text={'title'}></FormTextInput>
-            <LongTextInput
-              name='description'
-              errors={errors.description}
-              title='description'></LongTextInput>
+            <FormTextInput name='title' errors={errors.title} text={'title'} />
             <SelectBoxForm
               title='category'
               name='category'
               defaultValue='select category'
               errors={errors.category}
-              values={CHALLENGECATEGORIES.map((cat) => {
-                const catName = cat;
-                catName.replace('-', ' ');
-                return catName;
-              })}
+              values={CHALLENGECATEGORIES.map((cat) => cat.replace('-', ' '))}
             />
-            <CheckBox errors={null} name='isPublic' />
+            <LongTextInput
+              name='description'
+              errors={errors.description}
+              title='description'></LongTextInput>
+
+            <TimeInput name='startTime' title='start' onChange={() => null} />
+            <SimpleCheckBoxSwitch
+              setValue={() =>
+                setValue('endTime', endTime ? null : new Date(0).toUTCString())
+              }
+              checked={!!endTime}
+              name='add end time'
+            />
+            {!!endTime && (
+              <TimeInput name='endTime' onChange={() => null} title='end' />
+            )}
             <ImagesInput errors={errors.images} />
+            <CheckBox errors={null} name='isPublic' />
           </div>
         </div>
         <div className={`${selectedForm !== 'STEPS' && 'hidden'}`}>

@@ -1,5 +1,5 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { ChallengeCategory } from './challengeTypes';
+import { ChallengeCategory, ChallengeStepInsert } from './challengeTypes';
 
 export type AddChallenge = {
   title: string;
@@ -29,8 +29,8 @@ export interface FormChallenge {
   title: string;
   description: string;
   isPublic: boolean;
-  startTime?: any;
-  endTime?: any;
+  startTime?: string | null;
+  endTime?: string | null;
   images: FileList | null;
   challengeSteps?: ChallengeStepsForm | null;
   challengStepOrder: UniqueIdentifier[];
@@ -38,3 +38,4 @@ export interface FormChallenge {
   imagesOrder: ImageOrder | null;
   category: ChallengeCategory | null;
 }
+export type ChallengeStepWithoutId = Omit<ChallengeStepInsert, 'challengeId'>;
