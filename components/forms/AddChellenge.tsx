@@ -18,6 +18,10 @@ import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 import { createChallengeFormData } from '../utilities/challengeFormData';
 import axios from 'axios';
 import { TimeInput } from './inputs/TimeInput';
+import {
+  useAddChallengeMutation,
+  usePostChallengeFormData,
+} from '../utilities/useChallengeMutation';
 
 const initialValues: FormChallenge = {
   title: '',
@@ -63,23 +67,19 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     getValues,
     setValue,
   } = methods;
-  console.log(getValues());
 
   const { endTime } = getValues();
   const user = useSelector<RootState>((state) => state.authInfo.user) as User;
-  const { mutate, isSuccess } = addChallengeMutation(reset);
+  // const { mutate, isSuccess } = addChallengeMutation(reset);
+  const { mutate, isLoading, uploadProgress } = useAddChallengeMutation();
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
   const [withEndTime, setWithEndTime] = useState(false);
-  if (isSuccess) cancelForm();
+  console.log(uploadProgress);
+  
   const onSubmitHandler = async (data: FormChallenge, userId) => {
     try {
       const test = createChallengeFormData(data);
-      axios.post('/api/challenge', test, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        timeout: 2000,
-      });
+      mutate(test);
     } catch (err) {
       console.log(err);
     }

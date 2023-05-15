@@ -57,7 +57,6 @@ const ImagesUplouder = ({ errors }) => {
   useEffect(() => {
     setValue('images', imageFiles);
   }, [setValue, imageFiles]);
-  console.log(imageFiles);
 
   return (
     <>
@@ -125,7 +124,6 @@ const ImageItemsList = ({
       const valueB = indexB === -1 ? 10 : indexB;
       return valueA - valueB;
     });
-    console.log(sortedNewLocalImages);
     
     setLocalImages(sortedNewLocalImages);
     setImagesOrder(sortedNewLocalImages);
