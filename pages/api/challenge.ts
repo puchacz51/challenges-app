@@ -11,9 +11,11 @@ import { Database } from '../../services/supabase/schema';
 import { ChallengeStepWithoutId } from '../../types/challengeFormTypes';
 import { ChallengeStepInsert } from '../../types/challengeTypes';
 import { incomingChallengeSchema } from '../../components/forms/validateIncomingChallenge';
+import { readFileSync } from 'fs';
 export const config = {
   api: {
     bodyParser: false,
+    responseLimit: 2000000,
   },
 };
 let supabaseClient: SupabaseClient<Database>;
@@ -27,6 +29,8 @@ const handler: NextApiHandler = async (req, res) => {
       res.statusCode = 500;
       res.end(err?.message || 'something goes wrong try again later');
     }
+    res.statusCode = 200;
+    res.end('ok');
   }
 };
 
@@ -45,21 +49,35 @@ const handlePostChallenge = async (
     res.end('Unauthorized request');
   }
   const user = session.user;
-  const { challengeData, challengeImages, challengeSteps } =
+  const { challengeFormData, challengeImages, challengeSteps } =
     await parseChallengeForm(req);
-  const { error: formError } = await validateChallengeSchema(challengeData);
-  if (formError) throw formError;
+
+  // const { error: formError } = await validateChallengeSchema(challengeFormData);
+  // if (formError) throw formError;
+
   const { data: imagesPaths, error: uploadImageError } = await UploadImages(
     challengeImages,
     user
   );
-  if (uploadImageError) throw uploadImageError;
+  if (uploadImageError) {
+    if (imagesPaths.length) {
+      removeImages(imagesPaths);
+    }
+    throw uploadImageError;
+  }
+  const challengeData = {
+    ...challengeFormData,
+    userId: user.id,
+    images: imagesPaths,
+  };
+
   const { error: addChallengeError, data: challengeId } =
     await addChallengeToDB(challengeData);
   if (addChallengeError) {
-    removeImages(user.id, imagesPaths);
+    removeImages(imagesPaths);
     throw addChallengeError;
   }
+
   if (!challengeSteps?.length) return;
   const { data, error: stepsError } = await addChallengeStepsToDB(
     challengeSteps,
@@ -70,29 +88,30 @@ const handlePostChallenge = async (
       .from('challengeSteps')
       .delete()
       .eq('challengeId', challengeId);
-    await removeImages(user.id, imagesPaths);
+    await removeImages(imagesPaths);
     throw stepsError;
   }
 };
 
 interface ParseChallengeForm {
-  challengeData: ChallengeInsert;
+  challengeFormData: ChallengeInsert;
   challengeImages: FormFile[] | null;
   challengeSteps: ChallengeStepInsert[] | null;
 }
 
 const parseChallengeForm = (req: NextApiRequest) => {
   return new Promise<ParseChallengeForm>((resolve, reject) => {
-    let challengeData: ChallengeInsert;
+    let challengeFormData: ChallengeInsert;
     let challengeSteps: ChallengeStepInsert[] | null;
     let challengeImages: FormFile[] | null;
-    const form = new formidable.IncomingForm({ multiples: true });
-
+    const form = new formidable.IncomingForm({
+      multiples: true,
+    });
     form.parse(req, (err, fields, files) => {
       if (err) {
         reject(err);
       } else {
-        challengeData = {
+        challengeFormData = {
           title: fields.title as string,
           description: fields.description as string,
           category: fields.category as ChallengeCategory,
@@ -101,15 +120,16 @@ const parseChallengeForm = (req: NextApiRequest) => {
           startTime: fields.startTime as string,
           endTime: fields.endTime as string,
         } as ChallengeInsert;
-
         if (fields.challengeSteps) {
           challengeSteps = JSON.parse(fields.challengeSteps as string);
         }
-        challengeImages = Array.isArray(files.images)
-          ? files.images
-          : [files.images];
+
+        const imagesFiles = files['images[]'];
+        challengeImages = Array.isArray(imagesFiles)
+          ? imagesFiles
+          : [imagesFiles];
         const result = {
-          challengeData,
+          challengeFormData,
           challengeImages,
           challengeSteps,
         };
@@ -150,7 +170,7 @@ const UploadImages = async (images: FormFile[], user: User) => {
         (imageRes) => imageRes.status === 'fulfilled'
       ) as PromiseFulfilledResult<string>[];
       successedPaths = fulfilledPromises.map((fulfilled) => fulfilled.value);
-      removeImages(user.id, successedPaths);
+      removeImages(successedPaths);
       throw new Error('image error');
     } else {
       successedPaths = (
@@ -159,7 +179,10 @@ const UploadImages = async (images: FormFile[], user: User) => {
       return { data: successedPaths, error: null };
     }
   } catch (err) {
-    removeImages(user.id, successedPaths);
+    if (successedPaths?.length) {
+      removeImages(successedPaths);
+    }
+
     return { data: successedPaths, error: err };
   }
 };
@@ -197,7 +220,10 @@ const uploadImage = (image: FormFile, imageName: string) => {
     try {
       const { data, error } = await supabaseClient.storage
         .from('challenges')
-        .upload(imageName, image as unknown as File);
+        .upload(imageName, readFileSync(image.filepath), {
+          contentType: image.mimetype,
+        });
+
       if (error) {
         throw error;
       }
@@ -208,19 +234,15 @@ const uploadImage = (image: FormFile, imageName: string) => {
   });
 };
 
-const removeImages = async (userId: string, imagesPaths: string[]) => {
+const removeImages = async (imagesPaths: string[]) => {
   for (let imagePath of imagesPaths) {
     try {
-      await removeImage(supabaseClient, userId, imagePath);
-    } catch (err) {
-      console.log(err);
-    }
+      await removeImage(imagePath);
+    } catch (err) {}
   }
 };
-const removeImage = async (
-  supabaseClient: SupabaseClient,
-  path: string,
-  imagePath: string
-) => {
-  await supabaseClient.storage.from(path).remove([imagePath]);
+const removeImage = async (imagePath: string) => {
+  const { data, error } = await supabaseClient.storage
+    .from('challenges')
+    .remove([imagePath]);
 };

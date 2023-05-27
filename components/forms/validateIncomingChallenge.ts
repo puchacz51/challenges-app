@@ -12,7 +12,10 @@ import {
 import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 
 const validateTime = date()
-  .min(new Date(), 'Date cannot be earlier than current time')
+  .min(
+    new Date(new Date().getFullYear(), 0, 0),
+    'start time must be in current year'
+  )
   .max(
     new Date(new Date().getFullYear() + 20, 11, 31),
     'Date must be within 20 years from now'
@@ -24,7 +27,7 @@ export const validateSize = (files: FileList) => {
   }
   let valided = true;
   Array.from(files).forEach((file) => {
-    if (file && file.size > 5000000) {
+    if (file && file.size > 2000000) {
       valided = false;
       return;
     }
@@ -77,7 +80,7 @@ export const challengeSchema = object({
       'you need to provide at least a one image',
       (files) => files.length > 0
     )
-    .test('fileSize', 'image must be smaller than 5MB', validateSize)
+    .test('fileSize', 'image must be smaller than 2MB', validateSize)
     .test('fileType', 'unsupported image type', validateType),
   challengeSteps: challengeStepsSchema,
 });
@@ -87,15 +90,6 @@ export const incomingChallengeSchema = object({
   category: string()
     .required()
     .oneOf(CHALLENGECATEGORIES as unknown as string[]),
-  images: mixed()
-    .required('you need to provide at least a one image')
-    .test(
-      'filesLength',
-      'you need to provide at least a one image',
-      (files) => files && files.length > 0
-    )
-    .test('fileSize', 'image must be smaller than 5MB', validateSize)
-    .test('fileType', 'unsupported image type', validateType),
   isPublic: boolean().required(),
   startTime: validateTime.required(),
   endTime: date()

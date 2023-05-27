@@ -1,17 +1,36 @@
+import { blob } from 'stream/consumers';
 import {
   ChallengeStepsForm,
   FormChallenge,
 } from '../../types/challengeFormTypes';
 import { ChallengeStepInsert } from '../../types/challengeTypes';
 
-export const createChallengeFormData = (challengeData: FormChallenge) => {
+export const readFileAsText = (file: File) => {
+  return new Promise<ArrayBuffer>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const content = event.target.result as ArrayBuffer;
+      resolve(content); // Przekazanie wczytanej zawartości jako wynik promisy
+    };
+
+    reader.onerror = (event) => {
+      reader.abort();
+      reject(new Error('Błąd wczytywania pliku.'));
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+export const createChallengeFormData = async (challengeData: FormChallenge) => {
   const challengeFormData = new FormData();
+
   const {
     category,
     description,
     challengStepOrder,
     images,
-    imagesOrder,
     isPublic,
     title,
     userId,
@@ -24,13 +43,19 @@ export const createChallengeFormData = (challengeData: FormChallenge) => {
   challengeFormData.append('category', category);
   challengeFormData.append('userId', userId);
   challengeFormData.append('isPublic', isPublic + '');
-  challengeFormData.append('startTime', endTime);
-  challengeFormData.append('endTime', startTime);
-  const imagesArray = Array.from(images);
-  imagesArray.forEach((image, i) => {
-    challengeFormData.append(`images`, image);
-  });
+  challengeFormData.append('endTime', endTime);
+  challengeFormData.append('startTime', startTime);
 
+  const imagesArray = Array.from(images);
+  let imageIdx = 0;
+
+  for (let img of imagesArray) {
+    try {
+      const imgText = await readFileAsText(img);
+      const imageFile = new Blob([imgText], { type: img.type });
+      challengeFormData.append('images[]', imageFile, 'image.jpg');
+    } catch (e) {}
+  }
   if (challengeSteps && Object.keys(challengeSteps).length) {
     const orderedChallengeSteps = challengStepOrder.map((stepIndex, i) => {
       const { time, title, completed, description } = challengeSteps[stepIndex];
@@ -43,10 +68,7 @@ export const createChallengeFormData = (challengeData: FormChallenge) => {
       } as Omit<ChallengeStepInsert, 'challengeId'>;
     });
 
-    challengeFormData.append(
-      'challengeSteps',
-      JSON.stringify(orderedChallengeSteps)
-    );
+    console.log(23213);
   }
   return challengeFormData;
 };

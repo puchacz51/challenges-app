@@ -13,7 +13,18 @@ export const usePostChallengeFormData = () => {
           const uploadPercentage = Math.round(
             (uploadedBytes / totalBytes) * 100
           );
-          setUploadProgress(uploadPercentage);
+          if (uploadPercentage === 100) {
+            setUploadProgress(null);
+          } else {
+            setUploadProgress(uploadPercentage);
+          }
+        },
+        transformRequest: (formData) => {
+          for (let to of formData) {
+            console.log(to);
+          }
+
+          return formData;
         },
       })
       .then((res) => {
@@ -21,7 +32,8 @@ export const usePostChallengeFormData = () => {
         return res;
       })
       .catch((err) => {
-        setUploadProgress;
+        console.log(err);
+        setUploadProgress(null);
       });
 
   return { postFn, uploadProgress };

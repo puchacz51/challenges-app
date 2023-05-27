@@ -7,7 +7,6 @@ import ImagesInput from './inputs/ImagesInput';
 import { challengeSchema } from './validateChallenge';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../services/Store/store';
-import { addChallengeMutation } from '../utilities/usePostQuery';
 import { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { MdCancel } from 'react-icons/md';
@@ -16,16 +15,11 @@ import { FormChallenge } from '../../types/challengeFormTypes';
 import { ChallengeStepForm } from './ChallengeSteps';
 import { CHALLENGECATEGORIES } from '../../types/challengeTypes';
 import { createChallengeFormData } from '../utilities/challengeFormData';
-import axios from 'axios';
 import { TimeInput } from './inputs/TimeInput';
-import {
-  useAddChallengeMutation,
-  usePostChallengeFormData,
-} from '../utilities/useChallengeMutation';
-
+import { useAddChallengeMutation } from '../utilities/useChallengeMutation';
 const initialValues: FormChallenge = {
-  title: '',
-  description: '',
+  title: 'title',
+  description: 'description',
   isPublic: false,
   startTime: new Date().toUTCString(),
   endTime: new Date().toUTCString(),
@@ -75,10 +69,10 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   const [selectedForm, setSelectedForm] = useState<'INFO' | 'STEPS'>('INFO');
   const [withEndTime, setWithEndTime] = useState(false);
   console.log(uploadProgress);
-  
+
   const onSubmitHandler = async (data: FormChallenge, userId) => {
     try {
-      const test = createChallengeFormData(data);
+      const test = await createChallengeFormData(data);
       mutate(test);
     } catch (err) {
       console.log(err);
@@ -86,8 +80,17 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
   };
   return (
     <FormProvider {...methods}>
+      <div
+        className={`border-2 border-black text-2xl flex justify-center items-center min-h-[200px] w-[95%] ${
+          !isLoading && 'hidden'
+        } `}>
+        {uploadProgress ? uploadProgress + '%' : 'verifing'}
+      </div>
+
       <form
-        className='flex flex-col relative uppercase mx-auto my-8 w-11/12 border-2 border-black pt-5 text-xl '
+        className={`flex flex-col relative uppercase mx-auto my-8 w-11/12 border-2 border-black pt-5 text-xl ${
+          isLoading && 'hidden'
+        }`}
         onSubmit={handleSubmit((data) => onSubmitHandler(data, user.id))}>
         <h2 className='absolute text-2xl left-1/2 bg-white font-bold border-4 border-black rounded-xl px-3 -translate-x-1/2 -translate-y-10 z-10 '>
           challenge
@@ -162,4 +165,5 @@ const ChallengeForm = ({ initialData, cancelForm }: ChallengeFormProps) => {
     </FormProvider>
   );
 };
+
 export default ChallengeForm;

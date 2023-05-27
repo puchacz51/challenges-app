@@ -42,6 +42,9 @@ const ImagesUplouder = ({ errors }) => {
       setInputErrors(['max amount of images is 5']);
       return;
     }
+    // console.log(imageInputRef.current.files);
+   
+
     setInputErrors([]);
     setImageFiles([...imageFiles, ...newInputValue]);
   };
@@ -124,7 +127,7 @@ const ImageItemsList = ({
       const valueB = indexB === -1 ? 10 : indexB;
       return valueA - valueB;
     });
-    
+
     setLocalImages(sortedNewLocalImages);
     setImagesOrder(sortedNewLocalImages);
   }, [imageFiles.length, imageFiles]);
