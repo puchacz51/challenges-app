@@ -32,6 +32,9 @@ const handler: NextApiHandler = async (req, res) => {
     res.statusCode = 200;
     res.end('ok');
   }
+  if (req.method === 'DELETE') {
+    console.log(req.body);
+  }
 };
 
 export default handler;
@@ -77,7 +80,6 @@ const handlePostChallenge = async (
     removeImages(imagesPaths);
     throw addChallengeError;
   }
-
   if (!challengeSteps?.length) return;
   const { data, error: stepsError } = await addChallengeStepsToDB(
     challengeSteps,
@@ -209,6 +211,9 @@ const addChallengeStepsToDB = async (
       challengeId: challengeId,
     } as ChallengeStepInsert;
   });
+
+  console.log(orderedSteps);
+
   const { data, error } = await supabaseClient
     .from('challengeSteps')
     .insert(orderedSteps);

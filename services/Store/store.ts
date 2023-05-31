@@ -6,7 +6,7 @@ import {
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import authSlice from './authSlice';
 import challengesSlice from './challengesSlice';
-import pageSlice from './userProfileSlice';
+import myChallengeSlice from './MyChallengeSlice';
 import challengesFilterSlice from './challengesFilterSlice';
 import userProfileSlice from './userProfileSlice';
 
@@ -15,6 +15,7 @@ const reducer = combineReducers({
   UserProfile: userProfileSlice,
   challenges: challengesSlice,
   challengesFilter: challengesFilterSlice,
+  myChallenge: myChallengeSlice,
 });
 const store = configureStore({
   reducer,

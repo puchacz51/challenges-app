@@ -67,8 +67,10 @@ export const createChallengeFormData = async (challengeData: FormChallenge) => {
         title,
       } as Omit<ChallengeStepInsert, 'challengeId'>;
     });
-
-    console.log(23213);
+    challengeFormData.append(
+      'challengeSteps',
+      JSON.stringify(orderedChallengeSteps)
+    );
   }
   return challengeFormData;
 };

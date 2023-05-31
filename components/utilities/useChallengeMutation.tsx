@@ -48,3 +48,10 @@ export const useAddChallengeMutation = () => {
   });
   return { ...mutateParam, uploadProgress };
 };
+
+const deleteChallenge = (challengeId: string) =>
+  axios.delete(`api/challenge/${challengeId}`);
+
+export const useDeleteChallengeMutation = () => {
+  return useMutation({ mutationFn: deleteChallenge });
+};

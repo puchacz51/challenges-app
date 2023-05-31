@@ -9,11 +9,12 @@ import {
   useChallengeQuery,
 } from '../../components/utilities/useChallengeQuery';
 import { AiFillEdit } from 'react-icons/ai';
-import { useState } from 'react';
+import { HTMLAttributes, useState } from 'react';
 import {
   useCompleteChallengeMutation,
   useCompleteStepMutation,
 } from '../../components/utilities/useCompleteMutation';
+import { MyChallengeEditOption } from '../../components/challenges/MyChallengeEditOptions';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const supabaseServerClient = createServerSupabaseClient(ctx);
 
@@ -53,6 +54,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 const CompleteChallegeView = ({ challengeData }: { challengeData }) => {
   return;
 };
+const btnStatusStyle = new Map<
+  String,
+  HTMLAttributes<HTMLButtonElement>['className']
+>([
+  ['COMPLETED', 'bg-green-600'],
+  ['PENDING', 'bg-blue-700'],
+]);
 
 const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
   const { user } = useAppSelector((state) => state.UserProfile);
@@ -68,7 +76,10 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
   const changeStepStatus = (stepId: number, status: boolean) => {
     mutate({ stepId, status });
   };
-
+  const allStepCompleted =
+    (challengeSteps &&
+      challengeSteps.findIndex((step) => step.completed !== true) === -1) ||
+    !challengeSteps;
   const { isLoading: challengeIsMutating, mutate: mutateChallenge } =
     useCompleteChallengeMutation(challengeId);
 
@@ -102,18 +113,19 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
           </div>
         ))}
         <button
+          disabled={!allStepCompleted && status !== 'COMPLETED'}
           onClick={() =>
             mutateChallenge(status !== 'COMPLETED' ? 'COMPLETED' : 'PENDING')
           }
-          className={`uppercase text-3xl font-bold border-4 border-black p-2 ${
-            status === 'COMPLETED' ? 'bg-green-600' : 'bg-red-600'
-          }`}>
+          className={`uppercase text-3xl font-bold border-4 border-black p-2 w-2/3 mx-auto ${btnStatusStyle.get(
+            status
+          )}
+          disabled:bg-gray-500
+          `}>
           {status === 'COMPLETED' ? 'cancel' : 'complete'}
         </button>
-
-        <button className='fixed bottom-5 right-5 bg-yellow-300 text-4xl p-4 rounded-xl shadow-lg shadow-black border-2 border-black'>
-          <AiFillEdit />
-        </button>
+<MyChallengeEditOption/>
+   
       </div>
     </main>
   );
