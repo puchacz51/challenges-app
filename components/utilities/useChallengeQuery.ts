@@ -7,8 +7,11 @@ import {
 import { supabase } from '../../services/supabase/supabase';
 import { store } from '../../services/Store/store';
 import { ChallengesFilterSlice } from '../../services/Store/challengesFilterSlice';
-import { Challenge, ChallengeReactionsData, ChallengeWithSteps } from '../../types/challengeTypes';
-  
+import {
+  Challenge,
+  ChallengeReactionsData,
+  ChallengeWithSteps,
+} from '../../types/challengeTypes';
 
 type FetchChallenge = (
   userId: string,
@@ -24,8 +27,6 @@ export const fetchChallenge = async (
       .from('challenges')
       .select('*,challengeSteps(*)')
       .eq('id', idChallenge);
-    
-
     return challenge[0] as ChallengeWithSteps;
   } catch (err) {
     throw err;

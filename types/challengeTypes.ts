@@ -40,3 +40,4 @@ export interface ChallengeReactionsData {
   oldUserReaction?: Reaction;
 }
 export type Reaction = Database['public']['Tables']['reactions']['Row'];
+

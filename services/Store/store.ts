@@ -6,7 +6,7 @@ import {
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import authSlice from './authSlice';
 import challengesSlice from './challengesSlice';
-import myChallengeSlice from './MyChallengeSlice';
+import myChallengeSlice from './myChallengeSlice';
 import challengesFilterSlice from './challengesFilterSlice';
 import userProfileSlice from './userProfileSlice';
 

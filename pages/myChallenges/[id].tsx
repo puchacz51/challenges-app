@@ -4,17 +4,17 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { QueryClient, dehydrate } from 'react-query';
 import { store, useAppSelector } from '../../services/Store/store';
 import { setCredentials } from '../../services/Store/authSlice';
-import {
-  fetchChallenge,
-  useChallengeQuery,
-} from '../../components/utilities/useChallengeQuery';
-import { AiFillEdit } from 'react-icons/ai';
-import { HTMLAttributes, useState } from 'react';
+import { useChallengeQuery } from '../../components/utilities/useChallengeQuery';
+import { HTMLAttributes, useEffect, useState } from 'react';
 import {
   useCompleteChallengeMutation,
   useCompleteStepMutation,
 } from '../../components/utilities/useCompleteMutation';
 import { MyChallengeEditOption } from '../../components/challenges/MyChallengeEditOptions';
+import { setCurrentChallenge } from '../../services/Store/myChallengeSlice';
+import { ChallengeWithSteps } from '../../types/challengeTypes';
+import { useDispatch } from 'react-redux';
+import { UpdateChallengeForm } from '../../components/forms/UpdateChallengeForm/UpdateChallengeForm';
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const supabaseServerClient = createServerSupabaseClient(ctx);
 
@@ -32,8 +32,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const challengeId = ctx.query.id as string;
   const queryClient = new QueryClient();
   try {
-    const challengedata = await fetchChallenge(challengeId);
-    await queryClient.setQueryData(['challenge', challengeId], challengedata);
+    const { data: challengedata, error: challengeError } =
+      await supabaseServerClient
+        .from('challenges')
+        .select('*,challengeSteps(*)')
+        .eq('id', challengeId);
+    queryClient.setQueryData(['challenge', challengeId], challengedata[0]);
+    store.dispatch(setCurrentChallenge(challengedata[0] as ChallengeWithSteps));
+    if (challengeError || challengedata.length != 1) throw new Error();
   } catch (err) {
     ctx.res.statusCode = 403;
     return {
@@ -41,7 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
   store.dispatch(setCredentials({ user, token }));
-
   return {
     props: {
       challengeId,
@@ -51,9 +56,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-const CompleteChallegeView = ({ challengeData }: { challengeData }) => {
-  return;
-};
 const btnStatusStyle = new Map<
   String,
   HTMLAttributes<HTMLButtonElement>['className']
@@ -62,8 +64,15 @@ const btnStatusStyle = new Map<
   ['PENDING', 'bg-blue-700'],
 ]);
 
-const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
+const MyChallengeView = ({
+  challengeId,
+  ...props
+}: {
+  challengeId: string;
+}) => {
   const { user } = useAppSelector((state) => state.UserProfile);
+  const { selectedView } = useAppSelector((state) => state.myChallenge);
+  const dispatch = useDispatch();
   const { data: challengeData } = useChallengeQuery(challengeId);
   const { title, images, challengeSteps, endTime, startTime, status } =
     challengeData;
@@ -72,7 +81,6 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
     mutate,
     variables: mutatingStep,
   } = useCompleteStepMutation(challengeId);
-  const [isEdited, setIsEdited] = useState();
   const changeStepStatus = (stepId: number, status: boolean) => {
     mutate({ stepId, status });
   };
@@ -82,6 +90,14 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
     !challengeSteps;
   const { isLoading: challengeIsMutating, mutate: mutateChallenge } =
     useCompleteChallengeMutation(challengeId);
+
+  useEffect(() => {
+    dispatch(setCurrentChallenge(challengeData));
+  }, []);
+
+  if (selectedView === 'INFO') {
+    return <UpdateChallengeForm />;
+  }
 
   return (
     <main className='flex flex-col bg-slate-200'>
@@ -124,8 +140,7 @@ const MyChallengeView = ({ challengeId }: { challengeId: string }) => {
           `}>
           {status === 'COMPLETED' ? 'cancel' : 'complete'}
         </button>
-<MyChallengeEditOption/>
-   
+        <MyChallengeEditOption />
       </div>
     </main>
   );

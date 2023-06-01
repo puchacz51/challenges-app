@@ -5,12 +5,12 @@ import {
   User,
   createServerSupabaseClient,
 } from '@supabase/auth-helpers-nextjs';
-import { ChallengeCategory, ChallengeInsert } from '../../types/challengeTypes';
+import { ChallengeCategory, ChallengeInsert } from '../../../types/challengeTypes';
 import { randomUUID } from 'crypto';
-import { Database } from '../../services/supabase/schema';
-import { ChallengeStepWithoutId } from '../../types/challengeFormTypes';
-import { ChallengeStepInsert } from '../../types/challengeTypes';
-import { incomingChallengeSchema } from '../../components/forms/validateIncomingChallenge';
+import { Database } from '../../../services/supabase/schema';
+import { ChallengeStepWithoutId } from '../../../types/challengeFormTypes';
+import { ChallengeStepInsert } from '../../../types/challengeTypes';
+import { incomingChallengeSchema } from '../../../components/forms/validateIncomingChallenge';
 import { readFileSync } from 'fs';
 export const config = {
   api: {
@@ -34,6 +34,7 @@ const handler: NextApiHandler = async (req, res) => {
   }
   if (req.method === 'DELETE') {
     console.log(req.body);
+    
   }
 };
 

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import moment from 'moment';
 import { ChallengeListFilter } from './ChallengeListFilter';
 import {
-  Challenge,
   useChallengesInifitinityQuery,
 } from '../utilities/useChallengeQuery';
 import { HTMLAttributes, useEffect } from 'react';
@@ -12,6 +11,7 @@ import { AiFillCloseCircle } from 'react-icons/ai';
 import { useDispatch } from 'react-redux';
 import { toggleFilterIsOpen } from '../../services/Store/challengesFilterSlice';
 import { MdFilterAlt } from 'react-icons/md';
+import { Challenge } from '../../types/challengeTypes';
 
 const ChallengesList = () => {
   const user = useAppSelector((state) => state.authInfo?.user);

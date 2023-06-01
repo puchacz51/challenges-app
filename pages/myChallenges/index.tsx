@@ -8,7 +8,6 @@ import { store } from '../../services/Store/store';
 import { supabase } from '../../services/supabase/supabase';
 import { RiAddFill } from 'react-icons/ri';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { useChallengesInifitinityQuery } from '../../components/utilities/useChallengeQuery';
 const ChallangeForm = dynamic(
   () => import('../../components/forms/AddChellenge')
 );

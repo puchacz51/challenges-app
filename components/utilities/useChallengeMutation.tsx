@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
+import { store } from '../../services/Store/store';
 
 export const usePostChallengeFormData = () => {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -50,8 +51,11 @@ export const useAddChallengeMutation = () => {
 };
 
 const deleteChallenge = (challengeId: string) =>
-  axios.delete(`api/challenge/${challengeId}`);
+  axios.delete(`http://localhost:3000/api/challenge/${challengeId}`);
 
 export const useDeleteChallengeMutation = () => {
-  return useMutation({ mutationFn: deleteChallenge });
+  const { id: challengeId } = store.getState().myChallenge.currrentChallenge;
+  console.log(challengeId, 'challengeId mutation');
+
+  return useMutation({ mutationFn: () => deleteChallenge(challengeId) });
 };
