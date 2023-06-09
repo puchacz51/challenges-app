@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { AiTwotoneLike, AiFillDislike } from 'react-icons/ai';
 import { DiCodeigniter } from 'react-icons/di';
 import { GiBrain } from 'react-icons/gi';
-import { Reaction, useChallengeReactionQuery } from '../utilities/useChallengeQuery';
+import {  useChallengeReactionQuery } from '../utilities/useChallengeQuery';
 import { useReactionMutation } from './useReactionMutate';
 import { Database } from '../../services/supabase/schema';
+import { Reaction } from '../../types/challengeTypes';
 const reactionsOptions = [
   { id: 0, name: 'like', Icon: AiTwotoneLike, color: '' },
   { id: 1, name: 'wow', Icon: DiCodeigniter },

@@ -14,9 +14,8 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { ValueOf } from 'next/dist/shared/lib/constants';
 import { useCallback, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormChallenge } from './AddChellenge';
-import { ChallengeStepsForm } from './ChallengeSteps';
 import { DraggableStep } from './DraggableStep';
+import { ChallengeStepsForm, FormChallenge } from '../../types/challengeFormTypes';
 
 export const ChangeStepOrder = ({ displayAddSteps }) => {
   const context = useFormContext<FormChallenge>();

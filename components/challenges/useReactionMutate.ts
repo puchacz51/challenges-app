@@ -1,8 +1,7 @@
 import { PostgrestResponse } from '@supabase/supabase-js';
 import { useMutation, useQueryClient } from 'react-query';
-import { ChallengeReactionsData } from '../utilities/useChallengeQuery';
 import { supabase } from '../../services/supabase/supabase';
-import { Reaction } from './ChallengeReactions';
+import { ChallengeReactionsData, Reaction } from '../../types/challengeTypes';
 
 interface MutateReactionProps {
   challegeId: number;
@@ -56,19 +55,19 @@ export const useReactionMutation = (challengeId: number, userId: string) => {
       let response: PostgrestResponse<Reaction>;
       if (!oldUserReaction?.userId) {
         response = await supabase
-          .from<Reaction>('reactions')
+          .from('reactions')
           .insert({ ...newReaction })
           .eq('challengeId', challengeId)
           .eq('userId', userId);
       } else if (reactionId == oldUserReaction.reactionId) {
         response = await supabase
-          .from<Reaction>('reactions')
+          .from('reactions')
           .delete()
           .eq('challengeId', challengeId)
           .eq('userId', userId);
       } else {
         response = await supabase
-          .from<Reaction>('reactions')
+          .from('reactions')
           .update({ reactionId })
           .eq('challengeId', challengeId)
           .eq('userId', userId);

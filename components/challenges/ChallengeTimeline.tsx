@@ -7,8 +7,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, useAppSelector } from '../../services/Store/store';
 import { HiOutlineArrowCircleUp } from 'react-icons/hi';
-import { ChallengeStep } from '../utilities/useChallengeQuery';
 import { maxNameLength } from '../utilities/maxNameLength';
+import { ChallengeStep } from '../../types/challengeTypes';
 interface ChallengeTimeLineProps {
   challengeSteps: ChallengeStep[];
   startTime: string;

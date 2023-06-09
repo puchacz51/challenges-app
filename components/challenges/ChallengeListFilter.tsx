@@ -70,7 +70,7 @@ const SelectStatus = () => {
           { value: 'COMPLITED', label: 'COMPLITED' },
           { value: 'ACTIVE', label: 'ACTIVE' },
           { value: 'PAUSED', label: 'PAUSED' },
-        ] as { value: ChallengeStatus; label: string }[]
+        ] as { value: ChallengeStatus; label: ChallengeStatus }[]
       }
       onChange={(val) => dispatch(setFiterStatus(val.value))}
     />

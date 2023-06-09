@@ -91,9 +91,7 @@ const MyChallengeView = ({
   const { isLoading: challengeIsMutating, mutate: mutateChallenge } =
     useCompleteChallengeMutation(challengeId);
 
-  useEffect(() => {
-    dispatch(setCurrentChallenge(challengeData));
-  }, []);
+
 
   if (selectedView === 'INFO') {
     return <UpdateChallengeForm />;

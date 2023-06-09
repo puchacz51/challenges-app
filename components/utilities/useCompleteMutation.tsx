@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { supabase } from '../../services/supabase/supabase';
-import { ChallengeWithSteps } from './useChallengeQuery';
+import { ChallengeWithSteps } from '../../types/challengeTypes';
 const completeChallengeStep = async (
   challengeId: string,
   stepId: number,
